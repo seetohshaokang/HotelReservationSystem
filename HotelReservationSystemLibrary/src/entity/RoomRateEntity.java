@@ -5,7 +5,8 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Date;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -14,6 +15,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import util.enumeration.RateType;
 
 /**
@@ -28,10 +31,20 @@ public class RoomRateEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 32, nullable = false)
     private String name;
     
     @Enumerated(EnumType.STRING)
     private RateType rateType;
+    
+    @Column(nullable = false)
+    private Double ratePerNight;
+    
+    @Temporal(TemporalType.DATE)
+    private Date startDate; // Only for peak and promotion rates
+    
+    @Temporal(TemporalType.DATE)
+    private Date endDate; // Only for peak and promotion rates
 
     // *...1 r/s with roomtype
     @ManyToOne
@@ -96,6 +109,62 @@ public class RoomRateEntity implements Serializable {
 
     public void setRateType(RateType rateType) {
         this.rateType = rateType;
+    }
+
+    /**
+     * @return the ratePerNight
+     */
+    public Double getRatePerNight() {
+        return ratePerNight;
+    }
+
+    /**
+     * @param ratePerNight the ratePerNight to set
+     */
+    public void setRatePerNight(Double ratePerNight) {
+        this.ratePerNight = ratePerNight;
+    }
+
+    /**
+     * @return the startDate
+     */
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    /**
+     * @param startDate the startDate to set
+     */
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    /**
+     * @return the endDate
+     */
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    /**
+     * @param endDate the endDate to set
+     */
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+
+    /**
+     * @return the roomType
+     */
+    public RoomTypeEntity getRoomType() {
+        return roomType;
+    }
+
+    /**
+     * @param roomType the roomType to set
+     */
+    public void setRoomType(RoomTypeEntity roomType) {
+        this.roomType = roomType;
     }
     
     
