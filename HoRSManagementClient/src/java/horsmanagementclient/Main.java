@@ -4,17 +4,22 @@
  */
 package horsmanagementclient;
 
+import javax.ejb.EJB;
+import ejb.session.EmployeeEntitySessionBeanRemote;
+
 /**
  *
  * @author shaokangseetoh
  */
 public class Main {
 
-    /**
-     * @param args the command line arguments
-     */
+    @EJB
+    private static EmployeeEntitySessionBeanRemote employeeSessionBean;
+    
+    
     public static void main(String[] args) {
-        // TODO code application logic here
+        MainApp mainApp= new MainApp(employeeSessionBean);
+        mainApp.runApp();
     }
     
 }

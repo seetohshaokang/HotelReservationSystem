@@ -8,22 +8,22 @@ package util.exception;
  *
  * @author shaokangseetoh
  */
-public class InvalidUsernameException extends Exception {
+public class InvalidLoginCredentialException extends Exception {
 
     /**
-     * Creates a new instance of <code>InvalidUsernameException</code> without
+     * Creates a new instance of <code>InvalidPasswordException</code> without
      * detail message.
      */
-    public InvalidUsernameException() {
+    public InvalidLoginCredentialException() {
     }
 
     /**
-     * Constructs an instance of <code>InvalidUsernameException</code> with the
+     * Constructs an instance of <code>InvalidPasswordException</code> with the
      * specified detail message.
      *
      * @param msg the detail message.
      */
-    public InvalidUsernameException(String msg) {
+    public InvalidLoginCredentialException(String msg) {
         super(msg);
     }
 }

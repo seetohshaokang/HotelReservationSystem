@@ -8,22 +8,22 @@ package util.exception;
  *
  * @author shaokangseetoh
  */
-public class InvalidPasswordException extends Exception {
+public class EmployeeNotFoundException extends Exception {
 
     /**
-     * Creates a new instance of <code>InvalidPasswordException</code> without
+     * Creates a new instance of <code>EmployeeNotFoundException</code> without
      * detail message.
      */
-    public InvalidPasswordException() {
+    public EmployeeNotFoundException() {
     }
 
     /**
-     * Constructs an instance of <code>InvalidPasswordException</code> with the
+     * Constructs an instance of <code>EmployeeNotFoundException</code> with the
      * specified detail message.
      *
      * @param msg the detail message.
      */
-    public InvalidPasswordException(String msg) {
+    public EmployeeNotFoundException(String msg) {
         super(msg);
     }
 }
