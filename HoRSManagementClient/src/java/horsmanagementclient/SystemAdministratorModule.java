@@ -53,6 +53,7 @@ public class SystemAdministratorModule {
             System.out.println("-------------------------");
             System.out.println("3: Create new partner");
             System.out.println("4: View all partners");
+            System.out.println("-------------------------");
             System.out.println("5: Back\n");
             response = 0;
 

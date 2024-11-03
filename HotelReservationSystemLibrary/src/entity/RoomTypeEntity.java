@@ -75,7 +75,7 @@ public class RoomTypeEntity implements Serializable {
         return "entity.RoomTypeEntity[ id=" + id + " ]";
     }
     
-    public Long getId() {
+    public Long getRoomTypeId() {
         return id;
     }
 

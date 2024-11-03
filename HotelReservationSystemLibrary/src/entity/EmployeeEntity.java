@@ -71,7 +71,7 @@ public class EmployeeEntity implements Serializable {
     }
     
     // Getters and Setters
-    public Long getId() {
+    public Long getEmployeeId() {
         return id;
     }
 

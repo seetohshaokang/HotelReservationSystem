@@ -25,7 +25,7 @@ public class PartnerEntitySessionBean implements PartnerEntitySessionBeanRemote,
     public Long createNewPartner(PartnerEntity newPartner) {
         em.persist(newPartner);
         em.flush();
-        return newPartner.getId();
+        return newPartner.getPartnerId();
     }
 
     @Override

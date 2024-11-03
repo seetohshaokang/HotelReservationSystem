@@ -74,7 +74,7 @@ public class RoomRateEntity implements Serializable {
     }
     
     // Getters and Setters
-    public Long getId() {
+    public Long getRoomRateId() {
         return id;
     }
 

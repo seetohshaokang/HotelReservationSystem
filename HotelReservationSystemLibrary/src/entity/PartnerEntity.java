@@ -78,7 +78,7 @@ public class PartnerEntity implements Serializable {
     }
     
     // Getters and Setters
-    public Long getId() {
+    public Long getPartnerId() {
         return id;
     }
 

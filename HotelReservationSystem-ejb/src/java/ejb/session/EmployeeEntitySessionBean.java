@@ -34,7 +34,7 @@ public class EmployeeEntitySessionBean implements EmployeeEntitySessionBeanRemot
             em.persist(newEmployee);
             em.flush();
             
-            return newEmployee.getId();
+            return newEmployee.getEmployeeId();
     }
 
     public EmployeeEntity employeeLogin(String username, String password) throws InvalidLoginCredentialException {

@@ -97,7 +97,7 @@ public class ReservationEntity implements Serializable {
     }
     
     // Getters and Setters
-    public Long getId() {
+    public Long getReservationId() {
         return id;
     }
 

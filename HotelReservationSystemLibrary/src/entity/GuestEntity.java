@@ -71,7 +71,7 @@ public class GuestEntity implements Serializable {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public Long getGuestId() {
         return id;
     }
 

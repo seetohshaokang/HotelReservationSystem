@@ -79,7 +79,7 @@ public class RoomEntity implements Serializable {
     }
     
     // Getters and Setters
-    public Long getId() {
+    public Long getRoomId() {
         return id;
     }
 
