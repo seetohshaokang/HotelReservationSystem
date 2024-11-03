@@ -17,7 +17,7 @@ import util.exception.InvalidAccessRightException;
  */
 public class SystemAdministratorModule {
     
-    private EmployeeEntitySessionBeanRemote employeeEntitySessionBean;
+    private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     
     // Insert PartnerEntitySessionBean Here
     
@@ -29,7 +29,7 @@ public class SystemAdministratorModule {
     
     // Constructor without partner operations
     public SystemAdministratorModule(EmployeeEntitySessionBeanRemote employeeEntitySessionBean, EmployeeEntity currentEmployee) {
-        this.employeeEntitySessionBean = employeeEntitySessionBean;
+        this.employeeEntitySessionBeanRemote = employeeEntitySessionBean;
         this.currentEmployee = currentEmployee;
     }
     
@@ -106,7 +106,7 @@ public class SystemAdministratorModule {
         // System.out.print("Enter password > ");
         // newEmployeeEntity.setPassword(scanner.nextLine().trim());
         
-        Long newEmployeeId = employeeEntitySessionBean.createNewEmployee(newEmployeeEntity);
+        Long newEmployeeId = employeeEntitySessionBeanRemote.createNewEmployee(newEmployeeEntity);
         System.out.println("New employee created successfully!: " + newEmployeeId + "\n");
     }
     
@@ -114,7 +114,7 @@ public class SystemAdministratorModule {
         
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** HORS System :: System Administratro :: View All Employees");
-        List<EmployeeEntity> employeeEntities = employeeEntitySessionBean.retrieveAllEmployees();
+        List<EmployeeEntity> employeeEntities = employeeEntitySessionBeanRemote.retrieveAllEmployees();
         
         System.out.printf("%10s%20s\n", "Username", "Role");
         

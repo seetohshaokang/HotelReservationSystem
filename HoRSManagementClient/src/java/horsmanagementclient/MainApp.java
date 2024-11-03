@@ -122,10 +122,13 @@ public class MainApp {
                     }
                 } else if (response == 2) {
                     // invoke module.method() in try catch
+                    System.out.println("Operation Manager Module is not implemented yet");
                 } else if (response == 3) {
                     // invoke module.method() in try catch
+                    System.out.println("Sales Manager Module is not implemented yet");
                 } else if (response == 4) {
                     // invoke module.method() in try catch
+                    System.out.println("Guest Relation Officer Module is not implemented yet");
                 } else if (response == 5) {
                     break; // Break inner while loop
                 } else {

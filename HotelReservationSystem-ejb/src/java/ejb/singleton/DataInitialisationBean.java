@@ -25,7 +25,7 @@ import util.exception.EmployeeNotFoundException;
 public class DataInitialisationBean {
 
     @EJB
-    private EmployeeEntitySessionBeanLocal employeeEntitySessionBean;
+    private EmployeeEntitySessionBeanLocal employeeEntitySessionBeanLocal;
 
     public DataInitialisationBean() {
     }
@@ -34,12 +34,12 @@ public class DataInitialisationBean {
     public void postContstruct() {
         
         // Initialise data if there are no employees.
-        if(employeeEntitySessionBean.retrieveAllEmployees().isEmpty()) {
+        if(employeeEntitySessionBeanLocal.retrieveAllEmployees().isEmpty()) {
             initialiseData();
         }
     }
     
     private void initialiseData() {
-        employeeEntitySessionBean.createNewEmployee(new EmployeeEntity("manager", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("manager", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
     }
 }
