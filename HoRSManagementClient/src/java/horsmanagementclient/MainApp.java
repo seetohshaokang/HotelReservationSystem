@@ -3,6 +3,7 @@ package horsmanagementclient;
 import entity.EmployeeEntity;
 import java.util.Scanner;
 import ejb.session.EmployeeEntitySessionBeanRemote;
+import ejb.session.PartnerEntitySessionBeanRemote;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 
@@ -18,6 +19,7 @@ public class MainApp {
 
     // Session Beans
     private EmployeeEntitySessionBeanRemote employeeEntitySessionBean;
+    private PartnerEntitySessionBeanRemote partnerEntitySessionBean;
 
     // Modules
     private SystemAdministratorModule systemAdminModule;
@@ -28,8 +30,9 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeEntitySessionBeanRemote employeeSessionBean) {
+    public MainApp(EmployeeEntitySessionBeanRemote employeeSessionBean,PartnerEntitySessionBeanRemote partnerEntitySessionBean) {
         this.employeeEntitySessionBean = employeeSessionBean;
+        this.partnerEntitySessionBean = partnerEntitySessionBean;
     }
 
     public void runApp() {
@@ -51,7 +54,7 @@ public class MainApp {
                     try {
                         doLogin();
                         System.out.println("Login Successful");
-                        systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBean, currentEmployee);
+                        systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBean, partnerEntitySessionBean, currentEmployee);
                         // Create operation manager module
                         // Create sales manager module
                         // Create guest relation officer module
@@ -122,17 +125,21 @@ public class MainApp {
                     }
                 } else if (response == 2) {
                     // invoke module.method() in try catch
-                    System.out.println("Operation Manager Module is not implemented yet");
+                    System.out.println("Operation Manager Module is not implemented yet!");
+                    System.out.println(" ");
                 } else if (response == 3) {
                     // invoke module.method() in try catch
-                    System.out.println("Sales Manager Module is not implemented yet");
+                    System.out.println("Sales Manager Module is not implemented yet!");
+                    System.out.println(" ");
                 } else if (response == 4) {
                     // invoke module.method() in try catch
-                    System.out.println("Guest Relation Officer Module is not implemented yet");
+                    System.out.println("Guest Relation Officer Module is not implemented yet!");
+                    System.out.println(" ");
                 } else if (response == 5) {
                     break; // Break inner while loop
                 } else {
                     System.out.println("Invalid option, please try again!\n");
+                    System.out.println(" ");
                 }
             }
 

@@ -4,9 +4,12 @@
  */
 package ejb.session;
 
+import entity.PartnerEntity;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -18,13 +21,17 @@ public class PartnerEntitySessionBean implements PartnerEntitySessionBeanRemote,
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
-    public void persist(Object object) {
-        em.persist(object);
+    @Override
+    public Long createNewPartner(PartnerEntity newPartner) {
+        em.persist(newPartner);
+        em.flush();
+        return newPartner.getId();
     }
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-    
-    
+    @Override
+    public List<PartnerEntity> viewAllPartners() {
+        Query query = em.createQuery("SELECT p FROM PartnerEntity p ");
+        return query.getResultList();
+    }    
     
 }

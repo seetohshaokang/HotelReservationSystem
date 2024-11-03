@@ -4,6 +4,8 @@
  */
 package ejb.session;
 
+import entity.PartnerEntity;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -12,5 +14,12 @@ import javax.ejb.Local;
  */
 @Local
 public interface PartnerEntitySessionBeanLocal {
+    
+    // System Administrator
+    public Long createNewPartner(PartnerEntity partnerEntity);
+    // System Administrator
+    public List<PartnerEntity> viewAllPartners();
+    
+    // Method to update partner reservations;
     
 }
