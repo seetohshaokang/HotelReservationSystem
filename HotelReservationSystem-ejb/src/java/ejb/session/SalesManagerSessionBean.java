@@ -29,7 +29,7 @@ public class SalesManagerSessionBean implements SalesManagerSessionBeanRemote, S
     public Long createNewRoomRate(RoomRateEntity roomRate) {
         em.persist(roomRate);
         em.flush();
-        return roomRate.getId();
+        return roomRate.getRoomRateId();
     }
 
     @Override
