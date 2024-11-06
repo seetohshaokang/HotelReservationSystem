@@ -5,6 +5,7 @@
 package entity;
 
 import java.io.Serializable;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -13,6 +14,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import util.enumeration.RoomStatus;
 
 /**
@@ -27,6 +30,7 @@ public class RoomEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    @Column(nullable = false)
     private String roomNumber;
     
     @Enumerated(EnumType.STRING)
@@ -41,6 +45,7 @@ public class RoomEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "reservation_id")
     private ReservationEntity reservation;
+    
 
     // JPA Constructor
     public RoomEntity() {
