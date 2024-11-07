@@ -42,6 +42,7 @@ public class PartnerEntity implements Serializable {
 
     // JPA Constructor
     public PartnerEntity() {
+        this.reservations = new ArrayList<>();
     }
 
     // Default Constructor
