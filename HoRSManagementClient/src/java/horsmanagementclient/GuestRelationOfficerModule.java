@@ -11,65 +11,59 @@ import util.exception.InvalidAccessRightException;
 
 /**
  *
- * @author bryan
+ * @author shaokangseetoh
  */
-public class SalesManagerModule {
+public class GuestRelationOfficerModule {
 
-    // Insert relevant sessionbeans
+    // Insert relevant sessionbeans;
     private EmployeeEntity currentEmployee;
     
-    public SalesManagerModule() {
+    public GuestRelationOfficerModule() {
     }
     
     // Insert constructor with appropriate sessionbean
     
-    public void menuSalesManager() throws InvalidAccessRightException {
+    public void menuGuestRelationOfficer() throws InvalidAccessRightException {
         
-        if(currentEmployee.getRole() != EmployeeRole.SALES_MANAGER) {
-            throw new InvalidAccessRightException("You don't have SALES MANAGER rights to access the sales manager module.");
+        if(currentEmployee.getRole() != EmployeeRole.GUEST_RELATION_OFFICER) {
+            throw new InvalidAccessRightException("You dont' have GUEST RELATION OFFICER rights to access the guest relation officer module.");
+           
         }
-        
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
         
         while(true) {
-            System.out.println("*** HORS System :: Sales Manager Module ***\n");
-            System.out.println("1: Create New Room Rate");
-            System.out.println("2: View Room Rate Details");
-            System.out.println("3: Update Room Rate");
-            System.out.println("4: Delete Room Rate");
-            System.out.println("5: View all Room Rates");
+            System.out.println("*** HORS System :: Guest Relation Officer Module ***\n");
+            System.out.println("1: Walk-in Search Room");
+            System.out.println("2: Walk-in Reserve Room");
+            System.out.println("3: Check-in Guest");
+            System.out.println("4: Check-out Guest");
             System.out.println("---------------------------");
-            System.out.println("6: Back\n");
+            System.out.println("5: Back\n");
             
-            while(response < 1 || response > 6) {
-            
+            while(response < 1 || response > 5) {
                 System.out.print("> ");
                 response = scanner.nextInt();
-                
                 if(response == 1){
                     System.out.println("Feature not implemented yet");
-                    // create new room rate
+                    // create new room type
                 } else if (response == 2){
                     System.out.println("Feature not implemented yet");
                 } else if (response == 3){
                     System.out.println("Feature not implemented yet");
                 } else if(response == 4){
                     System.out.println("Feature not implemented yet");
-                } else if(response == 5){
-                    System.out.println("Feature not implemented yet");
-                } else if (response == 6) {
+                } else if (response == 5) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
-            if (response == 6) {
+            if (response == 5) {
                 break;
             }
         }
+        
     }
-    
-    
     
 }
