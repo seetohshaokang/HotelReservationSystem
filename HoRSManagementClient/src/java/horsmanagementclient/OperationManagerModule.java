@@ -29,10 +29,10 @@ public class OperationManagerModule {
     public OperationManagerModule() {
     }
 
-    public OperationManagerModule(RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote) {
+    public OperationManagerModule(RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, EmployeeEntity currentEmployee) {
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
+        this.currentEmployee = currentEmployee;
     }
-   
 
     // insert constructor with the appropriate sessionbean
     public void menuOperationManager() throws InvalidAccessRightException {

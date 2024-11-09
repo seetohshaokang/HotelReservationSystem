@@ -6,14 +6,13 @@
             <name>HoRSReservationClient</name>
             <minimum-ant-version>1.6.5</minimum-ant-version>
             <source-roots>
-                <root id="src.dir" name="Source Packages"/>
+                <root id="src.dir"/>
             </source-roots>
             <test-roots>
-                <root id="test.src.dir" name="Test Packages"/>
+                <root id="test.src.dir"/>
             </test-roots>
-            <included-library dirs="200">reference.HotelReservationSystemLibrary.jar</included-library>
-            <included-library dirs="200">libs.jakartaee-api-8.0.classpath</included-library>
             <included-library dirs="200">file.reference.jakarta.jakartaee-api-8.0.0.jar</included-library>
+            <included-library dirs="200">reference.HotelReservationSystemLibrary.jar</included-library>
         </data>
         <libraries xmlns="http://www.netbeans.org/ns/ant-project-libraries/1">
             <definitions>./lib/nblibraries.properties</definitions>

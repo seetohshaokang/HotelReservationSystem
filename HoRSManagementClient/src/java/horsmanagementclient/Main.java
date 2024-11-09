@@ -16,15 +16,14 @@ import ejb.session.RoomTypeEntitySessionBeanRemote;
 public class Main {
 
     @EJB
-    private static RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
-
-    @EJB
     private static PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
 
     @EJB
     private static EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
 
-    
+    @EJB
+    private static RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
+
     public static void main(String[] args) {
         MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote);
         mainApp.runApp();
