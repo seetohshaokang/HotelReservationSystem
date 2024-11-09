@@ -4,6 +4,7 @@ import entity.EmployeeEntity;
 import java.util.Scanner;
 import ejb.session.EmployeeEntitySessionBeanRemote;
 import ejb.session.PartnerEntitySessionBeanRemote;
+import ejb.session.RoomTypeEntitySessionBeanRemote;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 
@@ -18,11 +19,13 @@ import util.exception.InvalidLoginCredentialException;
 public class MainApp {
 
     // Session Beans
-    private EmployeeEntitySessionBeanRemote employeeEntitySessionBean;
+    private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     private PartnerEntitySessionBeanRemote partnerEntitySessionBean;
+    private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
 
-    // Modules
+    // Modules for construction later
     private SystemAdministratorModule systemAdminModule;
+    private OperationManagerModule operationManagerModule;
 
     // Employee States
     private EmployeeEntity currentEmployee;
@@ -30,9 +33,10 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeEntitySessionBeanRemote employeeSessionBean,PartnerEntitySessionBeanRemote partnerEntitySessionBean) {
-        this.employeeEntitySessionBean = employeeSessionBean;
+    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, PartnerEntitySessionBeanRemote partnerEntitySessionBean, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote) {
+        this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.partnerEntitySessionBean = partnerEntitySessionBean;
+        this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
     }
 
     public void runApp() {
@@ -52,9 +56,12 @@ public class MainApp {
 
                 if (response == 1) {
                     try {
+                        if (this.employeeEntitySessionBeanRemote == null) {
+                            System.out.print("Bean in missing in RUN APP");
+                        }
                         doLogin();
                         System.out.println("Login Successful");
-                        systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBean, partnerEntitySessionBean, currentEmployee);
+                        systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBeanRemote, partnerEntitySessionBean, currentEmployee);
                         // Create operation manager module
                         // Create sales manager module
                         // Create guest relation officer module
@@ -86,9 +93,15 @@ public class MainApp {
         username = scanner.nextLine().trim();
         System.out.print("Enter password > ");
         password = scanner.nextLine().trim();
+        System.out.println("DEBUG");
+        if (this.employeeEntitySessionBeanRemote == null) {
+            System.out.print("Bean in missing in DO LOGIN");
+        }
 
         if (username.length() > 0 && password.length() > 0) {
-            currentEmployee = employeeEntitySessionBean.employeeLogin(username, password);
+            checkEmployeeSessionBeanInDoLogin(employeeEntitySessionBeanRemote);
+            currentEmployee = employeeEntitySessionBeanRemote.employeeLogin(username, password);
+            System.out.println("DEBUG");
         } else {
             throw new InvalidLoginCredentialException("Missing login credential!");
         }
@@ -117,9 +130,7 @@ public class MainApp {
                 if (response == 1) {
 
                     try {
-
                         systemAdminModule.menuSystemAdministrator();
-
                     } catch (InvalidAccessRightException ex) {
                         System.out.println("Invalid option, please try again!:" + ex.getMessage() + "\n");
                     }
@@ -147,6 +158,15 @@ public class MainApp {
                 break; // Break outer while loop
             }
         }
+    }
+
+    private void checkEmployeeSessionBeanInDoLogin(EmployeeEntitySessionBeanRemote test) {
+        if (test == null) {
+            System.out.println("Dependency injection failed for employeeEntitySessionBeanRemote INSIDE DO LOGIN.");
+        } else {
+            System.out.println("Dependency injection successful for employeeEntitySessionBeanRemote INSIDE DO LOGIN.");
+        }
+
     }
 
 }

@@ -4,9 +4,11 @@
  */
 package ejb.session;
 
+import entity.RoomTypeEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.enumeration.RoomTypeName;
 
 /**
  *
@@ -18,12 +20,19 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
-    public void persist(Object object) {
-        em.persist(object);
+    @Override
+    public String createNewRoomType(RoomTypeEntity newRoomType) {
+        em.persist(newRoomType);
+        em.flush();
+        return newRoomType.getName().toString();
     }
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    @Override
+    public RoomTypeEntity getRoomTypeByName(RoomTypeName name) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    
     
     
 }

@@ -4,7 +4,9 @@
  */
 package ejb.session;
 
+import entity.RoomTypeEntity;
 import javax.ejb.Remote;
+import util.enumeration.RoomTypeName;
 
 /**
  *
@@ -12,5 +14,9 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RoomTypeEntitySessionBeanRemote {
+    // Use case 7
+    public String createNewRoomType(RoomTypeEntity newRoomType);
     
+    // Use case 8
+    public RoomTypeEntity getRoomTypeByName(RoomTypeName name);
 }

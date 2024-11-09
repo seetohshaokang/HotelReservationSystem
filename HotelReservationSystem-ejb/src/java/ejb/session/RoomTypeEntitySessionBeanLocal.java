@@ -4,7 +4,9 @@
  */
 package ejb.session;
 
+import entity.RoomTypeEntity;
 import javax.ejb.Local;
+import util.enumeration.RoomTypeName;
 
 /**
  *
@@ -12,5 +14,12 @@ import javax.ejb.Local;
  */
 @Local
 public interface RoomTypeEntitySessionBeanLocal {
+    
+    // Use case 7
+    public String createNewRoomType(RoomTypeEntity newRoomType);
+    
+    // Use case 8
+    public RoomTypeEntity getRoomTypeByName(RoomTypeName name);
+            
     
 }
