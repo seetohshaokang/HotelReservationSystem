@@ -5,10 +5,12 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -25,7 +27,7 @@ public class RoomTypeEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long roomTypeId;
     
     @Enumerated(EnumType.STRING)
     private RoomTypeName name;
@@ -35,36 +37,51 @@ public class RoomTypeEntity implements Serializable {
     private String bed;
     private Integer capacity;
     private List<String> amenities;
+    private Boolean isDisabled; 
 
     // 1...* r/s with room
-    @OneToMany (mappedBy = "roomType")
+    @OneToMany (mappedBy = "roomType", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomEntity> rooms;
     
     // 1...* r/s with roomrate
-    @OneToMany (mappedBy = "roomType")
+    @OneToMany (mappedBy = "roomType", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomRateEntity> roomRates;
     
     
     // JPA Constructor
     public RoomTypeEntity() {
+        this.rooms = new ArrayList<>();
+        this.roomRates = new ArrayList<>();
     }
 
+    public RoomTypeEntity(RoomTypeName name, String description, Double size, String bed, Integer capacity, List<String> amenities, Boolean isDisabled) {
+        this.name = name;
+        this.description = description;
+        this.size = size;
+        this.bed = bed;
+        this.capacity = capacity;
+        this.amenities = amenities;
+        this.isDisabled = isDisabled;
+        // Relationship fields
+        this.rooms = new ArrayList<>();
+        this.roomRates = new ArrayList<>();
+    }
 
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (roomTypeId != null ? roomTypeId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the roomTypeId fields are not set
         if (!(object instanceof RoomTypeEntity)) {
             return false;
         }
         RoomTypeEntity other = (RoomTypeEntity) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.roomTypeId == null && other.roomTypeId != null) || (this.roomTypeId != null && !this.roomTypeId.equals(other.roomTypeId))) {
             return false;
         }
         return true;
@@ -72,16 +89,16 @@ public class RoomTypeEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.RoomTypeEntity[ id=" + id + " ]";
+        return "entity.RoomTypeEntity[ id=" + roomTypeId + " ]";
     }
     
     public Long getRoomTypeId() {
-        return id;
+        return roomTypeId;
     }
 
     // Getters and Setters
-    public void setId(Long id) {
-        this.id = id;
+    public void setRoomTypeId(Long roomTypeId) {
+        this.roomTypeId = roomTypeId;
     }
 
     public RoomTypeName getName() {

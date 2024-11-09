@@ -67,7 +67,7 @@ public class MainApp {
         }
     }
     
-    private void doLogin() {
+    private void doLogin() throws InvalidLoginCredentialException {
         
     }
     

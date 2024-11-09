@@ -11,6 +11,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,7 +30,7 @@ public class ReservationEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long reservationId;
 
     // *...1 r/s with Guest
     @ManyToOne
@@ -45,8 +46,8 @@ public class ReservationEntity implements Serializable {
     // Unable to put optional = false for both fields as its either or
     
     // 1...* r/s with room
-    @OneToMany(mappedBy = "reservation")
-    private List<RoomEntity> rooms;
+    @OneToMany(mappedBy = "reservation", cascade = {}, fetch = FetchType.LAZY)
+    private List<RoomReservationEntity> roomReservations;
    
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
@@ -57,6 +58,7 @@ public class ReservationEntity implements Serializable {
 
     // JPA Constructor
     public ReservationEntity() {
+        this.roomReservations = new ArrayList<>();
     }
 
     // Default Constructor
@@ -67,25 +69,25 @@ public class ReservationEntity implements Serializable {
         this.checkOutDate = checkOutDate;
         this.totalAmount = totalAmount;
         this.status = status;
-        this.rooms = new ArrayList<>();
+        this.roomReservations = new ArrayList<>();
     }
     
     
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (reservationId != null ? reservationId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the reservationId fields are not set
         if (!(object instanceof ReservationEntity)) {
             return false;
         }
         ReservationEntity other = (ReservationEntity) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.reservationId == null && other.reservationId != null) || (this.reservationId != null && !this.reservationId.equals(other.reservationId))) {
             return false;
         }
         return true;
@@ -93,16 +95,16 @@ public class ReservationEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.ReservationEntity[ id=" + id + " ]";
+        return "entity.ReservationEntity[ id=" + reservationId + " ]";
     }
     
     // Getters and Setters
     public Long getReservationId() {
-        return id;
+        return reservationId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setReservationId(Long reservationId) {
+        this.reservationId = reservationId;
     }
 
     public GuestEntity getGuest() {
@@ -143,6 +145,20 @@ public class ReservationEntity implements Serializable {
 
     public void setStatus(ReservationStatus status) {
         this.status = status;
+    }
+
+    /**
+     * @return the roomReservations
+     */
+    public List<RoomReservationEntity> getRoomReservations() {
+        return roomReservations;
+    }
+
+    /**
+     * @param roomReservations the roomReservations to set
+     */
+    public void setRoomReservations(List<RoomReservationEntity> roomReservations) {
+        this.roomReservations = roomReservations;
     }
     
     

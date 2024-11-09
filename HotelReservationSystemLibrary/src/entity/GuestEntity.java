@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -23,18 +24,19 @@ public class GuestEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long guestId;
 
     private String name;
     private String identifier;
     private String password;
 
     // 1...* r/s with reservation
-    @OneToMany(mappedBy = "guest")
+    @OneToMany(mappedBy = "guest", cascade = {}, fetch = FetchType.LAZY)
     private List<ReservationEntity> reservations;
 
     // JPA Constructor
     public GuestEntity() {
+        this.reservations = new ArrayList<>();
     }
 
     // Default Constructor
@@ -48,18 +50,18 @@ public class GuestEntity implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (guestId != null ? guestId.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
+        // TODO: Warning - this method won't work in the case the guestId fields are not set
         if (!(object instanceof GuestEntity)) {
             return false;
         }
         GuestEntity other = (GuestEntity) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.guestId == null && other.guestId != null) || (this.guestId != null && !this.guestId.equals(other.guestId))) {
             return false;
         }
         return true;
@@ -67,16 +69,16 @@ public class GuestEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "entity.GuestEntity[ id=" + id + " ]";
+        return "entity.GuestEntity[ id=" + guestId + " ]";
     }
 
     // Getters and Setters
     public Long getGuestId() {
-        return id;
+        return guestId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setGuestId(Long guestId) {
+        this.guestId = guestId;
     }
 
     public String getPassword() {
