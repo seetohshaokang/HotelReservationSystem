@@ -5,10 +5,15 @@
 package ejb.session;
 
 import entity.RoomTypeEntity;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import util.enumeration.RoomTypeName;
+import util.exception.RoomTypeNotFoundException;
 
 /**
  *
@@ -27,12 +32,24 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         return newRoomType.getName().toString();
     }
 
+    // JPQL Query
     @Override
-    public RoomTypeEntity getRoomTypeByName(RoomTypeName name) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public RoomTypeEntity getRoomTypeByName(RoomTypeName name) throws RoomTypeNotFoundException {
+        Query query = em.createQuery("SELECT rt FROM RoomTypeEntity rt WHERE rt.name = :rtName", RoomTypeEntity.class);
+        query.setParameter("rtName", name);
+        
+        try {
+            return (RoomTypeEntity) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new RoomTypeNotFoundException("Room Type: " + name.toString() + " does not exist");
+        }
+        
     }
 
-    
-    
-    
+    @Override
+    public List<RoomTypeEntity> viewAllRoomTypes() {
+        Query query = em.createQuery("SELECT rt FROM RoomTypeEntity rt");
+        return query.getResultList();
+    }
+
 }

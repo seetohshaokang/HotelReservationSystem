@@ -2,6 +2,7 @@ package horsmanagementclient;
 
 import ejb.session.RoomTypeEntitySessionBeanRemote;
 import entity.EmployeeEntity;
+import entity.PartnerEntity;
 import entity.RoomTypeEntity;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.Scanner;
 import util.enumeration.EmployeeRole;
 import util.enumeration.RoomTypeName;
 import util.exception.InvalidAccessRightException;
+import util.exception.RoomTypeNotFoundException;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -22,7 +24,7 @@ public class OperationManagerModule {
 
     // Insert relevant sessionbeans
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
-    
+
     // State for login
     private EmployeeEntity currentEmployee;
 
@@ -67,16 +69,15 @@ public class OperationManagerModule {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    System.out.println("Feature not implemented yet");
                     createNewRoomType();
                 } else if (response == 2) {
-                    System.out.println("Feature not implemented yet");
+                    viewRoomTypeDetails();
                 } else if (response == 3) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 4) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 5) {
-                    System.out.println("Feature not implemented yet");
+                    viewAllRoomTypes();
                 } else if (response == 6) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 7) {
@@ -124,6 +125,7 @@ public class OperationManagerModule {
                 break;
             }
         }
+        // Using enum values by indexing
         RoomTypeName selectedRoomType = RoomTypeName.values()[response - 1];
 
         String description = "";
@@ -169,24 +171,55 @@ public class OperationManagerModule {
             }
         }
         List<String> amenities = new ArrayList<>();
-        while(true) {
+        while (true) {
             System.out.print("Enter an amenity to add: ");
             String amenity = scanner.nextLine();
             amenities.add(amenity);
-            
+
             System.out.print("Do you want to add another amenity? (Y/N): ");
-            String reply = scanner.nextLine().trim();
-            
-            if(!reply.equalsIgnoreCase("y")) {
+            String reply = scanner.nextLine().trim().toLowerCase();
+
+            if (!reply.equalsIgnoreCase("y")) {
                 break;
-            } 
-            break;
+            }
         }
-        
+
         RoomTypeEntity newRoomType = new RoomTypeEntity(selectedRoomType, description, size, bed, capacity, amenities);
-        
+
         String newRoomTypeName = roomTypeEntitySessionBeanRemote.createNewRoomType(newRoomType);
         System.out.println("You have created a new room type: " + newRoomTypeName);
+    }
+
+    private void viewRoomTypeDetails() {
+        Scanner scanner = new Scanner(System.in);
+        viewAllRoomTypes(); // Show the list of roomtypes
+        Integer response = 0;
+        System.out.print("Enter number of room type to view more details > ");
+        response = scanner.nextInt();
+        scanner.nextLine();
+        RoomTypeName selectedRoomType = RoomTypeName.values()[response - 1];
+        try {
+            RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.getRoomTypeByName(selectedRoomType);
+            System.out.printf("%s || %s || %s || %s || %s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
+            System.out.printf("%s || %.2f || %s || %d || %s%n", roomType.getDescription(), roomType.getSize(), roomType.getBed(), roomType.getCapacity(), roomType.getAmenities().toString());
+        } catch (RoomTypeNotFoundException ex) {
+            System.out.println("Invalid room type: " + ex.getMessage());
+        }
+    }
+
+    private void viewAllRoomTypes() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** HORS System :: Operations Manager :: View all Room Types");
+        List<RoomTypeEntity> roomTypes = roomTypeEntitySessionBeanRemote.viewAllRoomTypes();
+        Integer roomTypeCount = 0;
+
+        System.out.printf("%s | %n", "Room Type Names");
+
+        for (RoomTypeEntity roomType : roomTypes) {
+            roomTypeCount++;
+            System.out.printf("%d %s%n", roomTypeCount, roomType.getName().toString());
+        }
+
     }
 
 }

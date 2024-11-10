@@ -5,8 +5,10 @@
 package ejb.session;
 
 import entity.RoomTypeEntity;
+import java.util.List;
 import javax.ejb.Remote;
 import util.enumeration.RoomTypeName;
+import util.exception.RoomTypeNotFoundException;
 
 /**
  *
@@ -18,5 +20,8 @@ public interface RoomTypeEntitySessionBeanRemote {
     public String createNewRoomType(RoomTypeEntity newRoomType);
     
     // Use case 8
-    public RoomTypeEntity getRoomTypeByName(RoomTypeName name);
+    public RoomTypeEntity getRoomTypeByName(RoomTypeName name) throws RoomTypeNotFoundException;
+    
+    // Use case 11
+    public List<RoomTypeEntity> viewAllRoomTypes();
 }

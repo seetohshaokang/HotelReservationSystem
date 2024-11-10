@@ -159,7 +159,7 @@ public class SystemAdministratorModule {
     private void doViewAllPartners() {
         
         Scanner scanner = new Scanner(System.in);
-        System.out.println("*** HORS System :: System Administrato :: View all Partners");
+        System.out.println("*** HORS System :: System Administrator :: View all Partners");
         List<PartnerEntity> partnerEntities = partnerEntitySessionBeanRemote.viewAllPartners();
         
         System.out.printf("%10s\n", "Username");
