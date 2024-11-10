@@ -5,6 +5,7 @@ import java.util.Scanner;
 import ejb.session.EmployeeEntitySessionBeanRemote;
 import ejb.session.PartnerEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
+import ejb.session.RoomRateEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
@@ -24,10 +25,12 @@ public class MainApp {
     private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
+    private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
 
     // Modules for construction later
     private SystemAdministratorModule systemAdminModule;
     private OperationManagerModule operationManagerModule;
+    private SalesManagerModule salesManagerModule;
 
     // Employee States
     private EmployeeEntity currentEmployee;
@@ -38,11 +41,12 @@ public class MainApp {
     public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, 
             PartnerEntitySessionBeanRemote partnerEntitySessionBean, 
             RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote) {
+            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote) {
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBean;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
+        this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
     }
 
     public void runApp() {
@@ -66,7 +70,7 @@ public class MainApp {
                         System.out.println("Login Successful");
                         systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployee);
                         operationManagerModule = new OperationManagerModule(roomTypeEntitySessionBeanRemote, roomEntitySessionBeanRemote, currentEmployee);
-                        // Create sales manager module
+                        salesManagerModule = new SalesManagerModule(roomRateEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployee);
                         // Create guest relation officer module
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
@@ -145,9 +149,11 @@ public class MainApp {
                     
                     System.out.println(" ");
                 } else if (response == 3) {
-                    // invoke module.method() in try catch
-                    System.out.println("Sales Manager Module is not implemented yet!");
-                    System.out.println(" ");
+                    try {
+                        salesManagerModule.menuSalesManager();
+                    } catch(InvalidAccessRightException ex) {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
                 } else if (response == 4) {
                     // invoke module.method() in try catch
                     System.out.println("Guest Relation Officer Module is not implemented yet!");

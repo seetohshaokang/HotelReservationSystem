@@ -8,6 +8,7 @@ import javax.ejb.EJB;
 import ejb.session.EmployeeEntitySessionBeanRemote;
 import ejb.session.PartnerEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
+import ejb.session.RoomRateEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
 
 /**
@@ -17,6 +18,9 @@ import ejb.session.RoomTypeEntitySessionBeanRemote;
 public class Main {
 
     @EJB
+    private static RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
+
+    @EJB
     private static PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
 
     @EJB
@@ -24,15 +28,15 @@ public class Main {
 
     @EJB
     private static RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
-    
+
     @EJB
     private static RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
 
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, 
-                partnerEntitySessionBeanRemote, 
+        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote,
+                partnerEntitySessionBeanRemote,
                 roomTypeEntitySessionBeanRemote,
-                roomEntitySessionBeanRemote);
+                roomEntitySessionBeanRemote, roomRateEntitySessionBeanRemote);
         mainApp.runApp();
     }
 
