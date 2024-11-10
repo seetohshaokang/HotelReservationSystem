@@ -6,6 +6,7 @@ package ejb.session;
 
 import entity.RoomEntity;
 import entity.RoomTypeEntity;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -42,6 +43,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
             if(existingRoom != null) {
                 throw new ExistingRoomException("There is an existing room with room number: " + roomNumber);
             }
+            return null; // This is to remove compilation warning, but actually not needed.
         } catch (NoExistingRoomException ex) {
             // No existing room
             // Find roomType
@@ -68,5 +70,12 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new NoExistingRoomException ("Room with room number " + roomNumber + " does not exist!");
         }
+    }
+
+    @Override
+    public List<RoomEntity> viewAllRooms() {
+        Query query = em.createQuery("SELECT r FROM RoomEntity r");
+        
+        return query.getResultList();
     }
 }

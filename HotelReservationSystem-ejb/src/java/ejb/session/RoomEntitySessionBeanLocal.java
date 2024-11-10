@@ -5,6 +5,7 @@
 package ejb.session;
 
 import entity.RoomEntity;
+import java.util.List;
 import javax.ejb.Local;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
@@ -22,5 +23,7 @@ public interface RoomEntitySessionBeanLocal {
     public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus)throws RoomTypeNotFoundException, ExistingRoomException;
     
     public RoomEntity searchRoomByRoomNumber(String roomNumber) throws NoExistingRoomException;
+    
+    public List<RoomEntity> viewAllRooms();
     
 }

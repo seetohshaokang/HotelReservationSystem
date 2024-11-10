@@ -93,7 +93,7 @@ public class OperationManagerModule {
                 } else if (response == 8) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 9) {
-                    System.out.println("Feature not implemented yet");
+                    viewAllRooms();
                 } else if (response == 10) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 11) {
@@ -378,4 +378,20 @@ public class OperationManagerModule {
             System.out.println("Invalid creation of new room: " + ex.getMessage());
         }
     }
+    
+    // Use case 15
+    private void viewAllRooms() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** HORS System :: Operations Manager :: View all Room ");
+        List<RoomEntity> rooms = roomEntitySessionBeanRemote.viewAllRooms();
+        Integer roomTypeCount = 0;
+
+        System.out.printf("%s || %s|| %s || %s%n", "S/N", "Room Id", "Room Type", "Room Number");
+
+        for (RoomEntity room : rooms) {
+            roomTypeCount++;
+            System.out.printf("%d || %d || %s || %s%n", roomTypeCount, room.getRoomId(), room.getRoomType().toString(), room.getRoomNumber());
+        }
+    }
+    
 }
