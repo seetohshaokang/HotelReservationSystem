@@ -32,6 +32,7 @@ public class PartnerEntity implements Serializable {
     
     @Column(unique = true)
     private String username;
+    @Column
     private String password;
     
     @Enumerated(EnumType.STRING)

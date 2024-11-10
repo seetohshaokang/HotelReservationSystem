@@ -7,6 +7,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -26,8 +27,11 @@ public class GuestEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long guestId;
 
+    @Column
     private String name;
+    @Column
     private String identifier;
+    @Column
     private String password;
 
     // 1...* r/s with reservation

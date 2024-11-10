@@ -7,6 +7,7 @@ package entity;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -28,26 +29,31 @@ public class RoomTypeEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomTypeId;
-    
+
     @Enumerated(EnumType.STRING)
     private RoomTypeName name;
-    
+
+    @Column
     private String description;
+    @Column
     private Double size;
+    @Column
     private String bed;
+    @Column
     private Integer capacity;
+    @Column
     private List<String> amenities;
-    private Boolean isDisabled; 
+    @Column
+    private Boolean isDisabled;
 
     // 1...* r/s with room
-    @OneToMany (mappedBy = "roomType", cascade = {}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "roomType", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomEntity> rooms;
-    
+
     // 1...* r/s with roomrate
-    @OneToMany (mappedBy = "roomType", cascade = {}, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "roomType", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomRateEntity> roomRates;
-    
-    
+
     // JPA Constructor
     public RoomTypeEntity() {
         this.rooms = new ArrayList<>();
@@ -91,7 +97,7 @@ public class RoomTypeEntity implements Serializable {
     public String toString() {
         return "entity.RoomTypeEntity[ id=" + roomTypeId + " ]";
     }
-    
+
     public Long getRoomTypeId() {
         return roomTypeId;
     }
@@ -148,7 +154,5 @@ public class RoomTypeEntity implements Serializable {
     public void setAmenities(List<String> amenities) {
         this.amenities = amenities;
     }
-    
-    
-    
+
 }

@@ -8,6 +8,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -49,8 +50,11 @@ public class ReservationEntity implements Serializable {
     @OneToMany(mappedBy = "reservation", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomReservationEntity> roomReservations;
    
+    @Column
     private LocalDate checkInDate;
+    @Column
     private LocalDate checkOutDate;
+    @Column
     private Double totalAmount;
 
     @Enumerated(EnumType.STRING)

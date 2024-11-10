@@ -59,6 +59,7 @@ public class OperationManagerModule {
             System.out.println("10: View Room Allocation Report");
             System.out.println("---------------------------");
             System.out.println("11: Back\n");
+            response = 0;
 
             while (response < 1 || response > 11) {
 
@@ -174,11 +175,12 @@ public class OperationManagerModule {
             amenities.add(amenity);
             
             System.out.print("Do you want to add another amenity? (Y/N): ");
-            String reply = scanner.nextLine().trim().toLowerCase();
+            String reply = scanner.nextLine().trim();
             
-            if(!response.equals("y")) {
+            if(!reply.equalsIgnoreCase("y")) {
                 break;
             } 
+            break;
         }
         
         RoomTypeEntity newRoomType = new RoomTypeEntity(selectedRoomType, description, size, bed, capacity, amenities);
