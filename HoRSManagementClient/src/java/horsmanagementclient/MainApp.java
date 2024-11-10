@@ -4,6 +4,7 @@ import entity.EmployeeEntity;
 import java.util.Scanner;
 import ejb.session.EmployeeEntitySessionBeanRemote;
 import ejb.session.PartnerEntitySessionBeanRemote;
+import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
@@ -22,6 +23,7 @@ public class MainApp {
     private EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote;
     private PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote;
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
+    private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
 
     // Modules for construction later
     private SystemAdministratorModule systemAdminModule;
@@ -33,9 +35,13 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, PartnerEntitySessionBeanRemote partnerEntitySessionBean, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote) {
+    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, 
+            PartnerEntitySessionBeanRemote partnerEntitySessionBean, 
+            RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
+            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote) {
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBean;
+        this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
     }
 
@@ -59,7 +65,7 @@ public class MainApp {
                         doLogin();
                         System.out.println("Login Successful");
                         systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployee);
-                        operationManagerModule = new OperationManagerModule(roomTypeEntitySessionBeanRemote, currentEmployee);
+                        operationManagerModule = new OperationManagerModule(roomTypeEntitySessionBeanRemote, roomEntitySessionBeanRemote, currentEmployee);
                         // Create sales manager module
                         // Create guest relation officer module
                         menuMain();

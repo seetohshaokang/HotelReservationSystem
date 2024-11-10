@@ -1,14 +1,18 @@
 package horsmanagementclient;
 
+import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
 import entity.EmployeeEntity;
 import entity.PartnerEntity;
+import entity.RoomEntity;
 import entity.RoomTypeEntity;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeRole;
+import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
+import util.exception.ExistingRoomException;
 import util.exception.InvalidAccessRightException;
 import util.exception.RoomTypeNotFoundException;
 
@@ -24,6 +28,7 @@ public class OperationManagerModule {
 
     // Insert relevant sessionbeans
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
+    private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
 
     // State for login
     private EmployeeEntity currentEmployee;
@@ -31,8 +36,11 @@ public class OperationManagerModule {
     public OperationManagerModule() {
     }
 
-    public OperationManagerModule(RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, EmployeeEntity currentEmployee) {
+    public OperationManagerModule(RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, 
+            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote,
+            EmployeeEntity currentEmployee) {
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
+        this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.currentEmployee = currentEmployee;
     }
 
@@ -79,7 +87,7 @@ public class OperationManagerModule {
                 } else if (response == 5) {
                     viewAllRoomTypes();
                 } else if (response == 6) {
-                    System.out.println("Feature not implemented yet");
+                    createNewRoom();
                 } else if (response == 7) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 8) {
@@ -99,7 +107,7 @@ public class OperationManagerModule {
             }
         }
     }
-        
+
     // Use case 7
     private void createNewRoomType() {
         Scanner scanner = new Scanner(System.in);
@@ -184,9 +192,9 @@ public class OperationManagerModule {
                 break;
             }
         }
-
+        // Instantiate Entity
         RoomTypeEntity newRoomType = new RoomTypeEntity(selectedRoomType, description, size, bed, capacity, amenities);
-
+        // Call Session Bean
         String newRoomTypeName = roomTypeEntitySessionBeanRemote.createNewRoomType(newRoomType);
         System.out.println("You have created a new room type: " + newRoomTypeName);
     }
@@ -209,7 +217,7 @@ public class OperationManagerModule {
             System.out.println("Invalid room type: " + ex.getMessage());
         }
     }
-    
+
     // Use case 9
     private void updateRoomTypeDetails() {
         Scanner scanner = new Scanner(System.in);
@@ -218,7 +226,7 @@ public class OperationManagerModule {
         System.out.print("Enter number of the room type you wish to update > ");
         response = scanner.nextInt();
         scanner.nextLine();
-        
+
         String newDescription = "";
         while (true) {
             System.out.print("Enter description > ");
@@ -279,17 +287,17 @@ public class OperationManagerModule {
             RoomTypeEntity roomTypeUpdated = roomTypeEntitySessionBeanRemote.updateRoomType(Long.valueOf(response), newDescription, newSize, newBed, newCapacity, newAmenities);
             System.out.println("*** Updated details of room type: ***\n");
             System.out.printf("%s || %s || %s || %s || %s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
-            System.out.printf("%s || %.2f || %s || %d || %s%n", 
-                    roomTypeUpdated.getDescription(), 
-                    roomTypeUpdated.getSize(), 
-                    roomTypeUpdated.getBed(), 
-                    roomTypeUpdated.getCapacity(), 
+            System.out.printf("%s || %.2f || %s || %d || %s%n",
+                    roomTypeUpdated.getDescription(),
+                    roomTypeUpdated.getSize(),
+                    roomTypeUpdated.getBed(),
+                    roomTypeUpdated.getCapacity(),
                     roomTypeUpdated.getAmenities().toString());
         } catch (RoomTypeNotFoundException ex) {
             System.out.println("Invalid Room Type Selected: " + ex.getMessage());
         }
     }
-    
+
     // Use case 11
     private void viewAllRoomTypes() {
         Scanner scanner = new Scanner(System.in);
@@ -305,4 +313,69 @@ public class OperationManagerModule {
         }
     }
 
+    // Use case 12
+    private void createNewRoom() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** HORS System :: Operation Manager :: Create New Room ***\n");
+        System.out.println("-------------------------------------------------------------------");
+        // Input Room Type
+        viewAllRoomTypes();
+        Integer response = 0;
+        System.out.println("Enter the S/N of room type you which to create a new room type for> ");
+        response = scanner.nextInt();
+        scanner.nextLine();
+        RoomTypeName selectedRoomType = RoomTypeName.values()[response - 1];
+        // Input floor
+        Integer floor = 0;
+        while (true) {
+            System.out.print("Enter Floor Number > ");
+            if (scanner.hasNextInt()) {
+                floor = scanner.nextInt();
+                scanner.nextLine();
+                break;
+            } else {
+                System.out.println("Please input a valid Floor Number");
+            }
+        }
+        // Input sequence
+        Integer sequence = 0;
+        while (true) {
+            System.out.print("Enter Room Sequence Number > ");
+            if (scanner.hasNextInt()) {
+                sequence = scanner.nextInt();
+                scanner.nextLine();
+                break;
+            } else {
+                System.out.println("Please input a valid Room Sequence Number");
+            }
+        }
+        // Input Room Status
+        while (true) {
+            response = 0;
+            System.out.println("Please Select Room Status");
+            System.out.println("1: AVAILABLE");
+            System.out.println("2: NOT_AVAILABLE");
+            System.out.print("Enter room status number> ");
+            response = scanner.nextInt();
+            scanner.nextLine();
+
+            if (response < 1 || response > 2) {
+                System.out.println("Invalid option. Please select a number between 1 and 5.");
+            } else {
+                System.out.println("You have selected option " + response);
+                break;
+            }
+        }
+        RoomStatus selectedRoomStatus = RoomStatus.values()[response - 1];
+        try {
+            RoomEntity newRoom = roomEntitySessionBeanRemote.createNewRoom(selectedRoomType, floor, sequence, selectedRoomStatus);
+            System.out.println("New room has been created with room type " 
+                    + newRoom.getRoomType().getName().toString() 
+                    + " and room number: " + newRoom.getRoomNumber());
+        } catch (RoomTypeNotFoundException ex) {
+            System.out.println("Invalid creation of new room: " + ex.getMessage());
+        } catch (ExistingRoomException ex) {
+            System.out.println("Invalid creation of new room: " + ex.getMessage());
+        }
+    }
 }

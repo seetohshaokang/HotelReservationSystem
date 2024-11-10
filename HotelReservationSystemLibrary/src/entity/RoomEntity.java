@@ -32,7 +32,7 @@ public class RoomEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomId;
     
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 4)
     private String roomNumber;
     
     @Enumerated(EnumType.STRING)
@@ -53,12 +53,11 @@ public class RoomEntity implements Serializable {
     }
 
     // Default Constructor
-    public RoomEntity(RoomTypeEntity roomType, String roomNumber, RoomStatus status) {
+    public RoomEntity(RoomTypeEntity roomType, int floor, int sequence, RoomStatus status) {
         this.roomType = roomType;
-        this.roomNumber = roomNumber;
+        this.roomNumber = String.format("%02d%02d", floor, sequence);
         this.status = status;
         this.roomReservations = new ArrayList<>();
-        
     }
 
     @Override

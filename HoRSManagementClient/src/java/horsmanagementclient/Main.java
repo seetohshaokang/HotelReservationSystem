@@ -7,6 +7,7 @@ package horsmanagementclient;
 import javax.ejb.EJB;
 import ejb.session.EmployeeEntitySessionBeanRemote;
 import ejb.session.PartnerEntitySessionBeanRemote;
+import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
 
 /**
@@ -23,9 +24,15 @@ public class Main {
 
     @EJB
     private static RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
+    
+    @EJB
+    private static RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
 
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote);
+        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote, 
+                partnerEntitySessionBeanRemote, 
+                roomTypeEntitySessionBeanRemote,
+                roomEntitySessionBeanRemote);
         mainApp.runApp();
     }
 

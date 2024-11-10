@@ -155,4 +155,32 @@ public class RoomTypeEntity implements Serializable {
         this.amenities = amenities;
     }
 
+    /**
+     * @return the rooms
+     */
+    public List<RoomEntity> getRooms() {
+        return rooms;
+    }
+
+    /**
+     * @param rooms the rooms to set
+     */
+    public void setRooms(List<RoomEntity> rooms) {
+        this.rooms = rooms;
+    }
+
+    /**
+     * @return the roomRates
+     */
+    public List<RoomRateEntity> getRoomRates() {
+        return roomRates;
+    }
+
+    /**
+     * @param roomRates the roomRates to set
+     */
+    public void setRoomRates(List<RoomRateEntity> roomRates) {
+        this.roomRates = roomRates;
+    }
+
 }
