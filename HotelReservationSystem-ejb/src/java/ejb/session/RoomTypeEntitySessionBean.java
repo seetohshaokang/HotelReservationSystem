@@ -37,13 +37,28 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     public RoomTypeEntity getRoomTypeByName(RoomTypeName name) throws RoomTypeNotFoundException {
         Query query = em.createQuery("SELECT rt FROM RoomTypeEntity rt WHERE rt.name = :rtName", RoomTypeEntity.class);
         query.setParameter("rtName", name);
-        
+
         try {
             return (RoomTypeEntity) query.getSingleResult();
         } catch (NoResultException | NonUniqueResultException ex) {
             throw new RoomTypeNotFoundException("Room Type: " + name.toString() + " does not exist");
         }
-        
+    }
+
+    @Override
+    public RoomTypeEntity updateRoomType(Long roomTypeId, String newDescription, Double newSize, String newBed, Integer newCapacity, List<String> newAmenities) throws RoomTypeNotFoundException {
+       RoomTypeEntity retrievedRoomType = em.find(RoomTypeEntity.class, roomTypeId); // returns null if not found
+        if(retrievedRoomType == null) {
+            throw new RoomTypeNotFoundException("Room Type is not found");
+        } else {
+            retrievedRoomType.setDescription(newDescription);
+            retrievedRoomType.setSize(newSize);
+            retrievedRoomType.setBed(newBed);
+            retrievedRoomType.setCapacity(newCapacity);
+            retrievedRoomType.setAmenities(newAmenities);
+            em.flush();
+            return retrievedRoomType;
+        }
     }
 
     @Override

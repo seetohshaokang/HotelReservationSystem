@@ -73,7 +73,7 @@ public class OperationManagerModule {
                 } else if (response == 2) {
                     viewRoomTypeDetails();
                 } else if (response == 3) {
-                    System.out.println("Feature not implemented yet");
+                    updateRoomTypeDetails();
                 } else if (response == 4) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 5) {
@@ -99,7 +99,8 @@ public class OperationManagerModule {
             }
         }
     }
-
+        
+    // Use case 7
     private void createNewRoomType() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
@@ -190,14 +191,16 @@ public class OperationManagerModule {
         System.out.println("You have created a new room type: " + newRoomTypeName);
     }
 
+    // Use case 8
     private void viewRoomTypeDetails() {
         Scanner scanner = new Scanner(System.in);
         viewAllRoomTypes(); // Show the list of roomtypes
         Integer response = 0;
-        System.out.print("Enter number of room type to view more details > ");
+        System.out.print("Enter S/N of a displayed room type to view more details > ");
         response = scanner.nextInt();
         scanner.nextLine();
         RoomTypeName selectedRoomType = RoomTypeName.values()[response - 1];
+        // Call session bean
         try {
             RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.getRoomTypeByName(selectedRoomType);
             System.out.printf("%s || %s || %s || %s || %s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
@@ -206,20 +209,100 @@ public class OperationManagerModule {
             System.out.println("Invalid room type: " + ex.getMessage());
         }
     }
+    
+    // Use case 9
+    private void updateRoomTypeDetails() {
+        Scanner scanner = new Scanner(System.in);
+        viewAllRoomTypes();
+        Integer response = 0;
+        System.out.print("Enter number of the room type you wish to update > ");
+        response = scanner.nextInt();
+        scanner.nextLine();
+        
+        String newDescription = "";
+        while (true) {
+            System.out.print("Enter description > ");
+            if (scanner.hasNextLine()) {
+                newDescription = scanner.nextLine();
+                break;
+            } else {
+                System.out.println("Please input a valid description!");
+            }
+        }
+        Double newSize = 0.0;
+        while (true) {
+            System.out.print("Enter size > ");
+            if (scanner.hasNextDouble()) {
+                newSize = scanner.nextDouble();
+                scanner.nextLine();
+                break;
+            } else {
+                System.out.println("Please input a valid size!");
+            }
+        }
+        String newBed = "";
+        while (true) {
+            System.out.print("Enter bed > ");
+            if (scanner.hasNextLine()) {
+                newBed = scanner.nextLine();
+                break;
+            } else {
+                System.out.println("Please input a valid bed!");
+            }
+        }
+        Integer newCapacity = 0;
+        while (true) {
+            System.out.print("Enter capacity > ");
+            if (scanner.hasNextInt()) {
+                newCapacity = scanner.nextInt();
+                scanner.nextLine();
+                break;
+            } else {
+                System.out.println("Please input a valid capacity!");
+            }
+        }
+        List<String> newAmenities = new ArrayList<>();
+        while (true) {
+            System.out.print("Enter an amenity to add: ");
+            String amenity = scanner.nextLine();
+            newAmenities.add(amenity);
 
+            System.out.print("Do you want to add another amenity? (Y/N): ");
+            String reply = scanner.nextLine().trim().toLowerCase();
+
+            if (!reply.equalsIgnoreCase("y")) {
+                break;
+            }
+        }
+        // Call session bean
+        try {
+            RoomTypeEntity roomTypeUpdated = roomTypeEntitySessionBeanRemote.updateRoomType(Long.valueOf(response), newDescription, newSize, newBed, newCapacity, newAmenities);
+            System.out.println("*** Updated details of room type: ***\n");
+            System.out.printf("%s || %s || %s || %s || %s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
+            System.out.printf("%s || %.2f || %s || %d || %s%n", 
+                    roomTypeUpdated.getDescription(), 
+                    roomTypeUpdated.getSize(), 
+                    roomTypeUpdated.getBed(), 
+                    roomTypeUpdated.getCapacity(), 
+                    roomTypeUpdated.getAmenities().toString());
+        } catch (RoomTypeNotFoundException ex) {
+            System.out.println("Invalid Room Type Selected: " + ex.getMessage());
+        }
+    }
+    
+    // Use case 11
     private void viewAllRoomTypes() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** HORS System :: Operations Manager :: View all Room Types");
         List<RoomTypeEntity> roomTypes = roomTypeEntitySessionBeanRemote.viewAllRoomTypes();
         Integer roomTypeCount = 0;
 
-        System.out.printf("%s | %n", "Room Type Names");
+        System.out.printf("%s || %s|| %s%n", "S/N", "Room Type Id", "Room Type Names");
 
         for (RoomTypeEntity roomType : roomTypes) {
             roomTypeCount++;
-            System.out.printf("%d %s%n", roomTypeCount, roomType.getName().toString());
+            System.out.printf("%d || %d || %s%n", roomTypeCount, roomType.getRoomTypeId(), roomType.getName().toString());
         }
-
     }
 
 }
