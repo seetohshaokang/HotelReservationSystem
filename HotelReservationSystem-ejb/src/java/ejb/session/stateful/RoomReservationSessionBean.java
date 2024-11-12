@@ -4,8 +4,8 @@
  */
 package ejb.session.stateful;
 
-import ejb.session.RoomEntitySessionBeanLocal;
-import ejb.session.RoomTypeEntitySessionBeanLocal;
+import ejb.session.stateless.RoomEntitySessionBeanLocal;
+import ejb.session.stateless.RoomTypeEntitySessionBeanLocal;
 import entity.RoomEntity;
 import entity.RoomTypeEntity;
 import java.time.LocalDate;

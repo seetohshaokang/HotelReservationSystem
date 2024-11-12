@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/J2EE/EJB30/SessionLocal.java to edit this template
  */
-package ejb.session;
+package ejb.session.stateless;
 
 import entity.RoomRateEntity;
 import java.util.Date;
@@ -20,10 +20,12 @@ import util.exception.RoomTypeNotFoundException;
 @Local
 public interface RoomRateEntitySessionBeanLocal {
 
-    public String createNewRoomRate(String name, RoomTypeName selectedRoomType, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException;
-
     public RoomRateEntity getRoomRateById(Long id) throws RoomRateNotFoundException;
 
     public List<RoomRateEntity> viewAllRoomRates();
+
+    public String createNewRoomRate(String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException;
+
+    public RoomRateEntity updateRoomRate(Long id, String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException, RoomRateNotFoundException;
     
 }

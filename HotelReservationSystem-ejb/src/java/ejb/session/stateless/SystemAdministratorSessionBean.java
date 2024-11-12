@@ -2,8 +2,9 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/J2EE/EJB30/StatefulEjbClass.java to edit this template
  */
-package ejb.session;
+package ejb.session.stateless;
 
+import ejb.session.SystemAdministratorSessionBeanRemote;
 import javax.ejb.Stateful;
 
 /**
