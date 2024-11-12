@@ -116,14 +116,19 @@ public class GuestRelationOfficerModule {
                 System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
             }
         }
-        System.out.printf("%-20s || %-20s%n", "Room Type", "Number of Available Rooms");
+        // Header for the output table
+        System.out.printf("%-20s || %-20s || %-20s%n", "Room Type", "Available Rooms", "Total Rate Per Room For Given Duration");
 
-        // Loop through each RoomTypeName and fetch available rooms
+        // Loop through each RoomTypeName and fetch available rooms and rates
         for (RoomTypeName roomTypeName : RoomTypeName.values()) {
+            // Fetch available rooms for the specified check-in and check-out dates
             List<RoomEntity> availableRooms = roomReservationSessionBeanRemote.searchAvailableRooms(checkInDate, checkOutDate, roomTypeName);
 
-            // Print the room type name and the number of available rooms
-            System.out.printf("%-20s || %-20d%n", roomTypeName, availableRooms.size());
+            // Fetch the total rate for the duration of stay for the room type
+            Double totalRate = roomReservationSessionBeanRemote.getWalkInRate(checkInDate, checkOutDate, roomTypeName);
+
+            // Print the room type, available room count, and the total rate
+            System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
         }
     }
 

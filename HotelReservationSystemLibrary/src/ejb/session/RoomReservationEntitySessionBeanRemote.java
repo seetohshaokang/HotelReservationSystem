@@ -7,7 +7,9 @@ package ejb.session;
 import entity.ReservationEntity;
 import entity.RoomEntity;
 import entity.RoomReservationEntity;
+import java.time.LocalDate;
 import javax.ejb.Remote;
+import util.enumeration.RoomTypeName;
 
 /**
  *
@@ -17,5 +19,6 @@ import javax.ejb.Remote;
 public interface RoomReservationEntitySessionBeanRemote {
 
     public RoomReservationEntity createNewRoomReservation(RoomEntity room, ReservationEntity reservation);
+    
 
 }

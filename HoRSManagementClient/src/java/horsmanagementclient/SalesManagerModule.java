@@ -202,8 +202,10 @@ public class SalesManagerModule {
                 start = "NA";
                 end = "NA";
             }
-            System.out.printf("%s || %s || %s || %s || %s || %s || %s%n", "Room Rate Id", "Room Rate Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
-            System.out.printf("%d || %s || %s || %s || %f || %s || %s%n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName().toString(), roomRate.getRateType().toString(), roomRate.getRatePerNight(), start, end);
+            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s || %-20s || %-20s%n", 
+                    "Room Rate Id", "Room Rate Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
+            System.out.printf("%-20d || %-20s || %-20s || %-20s || %-20f || %-20s || %-20s%n", 
+                    roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName().toString(), roomRate.getRateType().toString(), roomRate.getRatePerNight(), start, end);
         } catch (RoomRateNotFoundException ex) {
             System.out.println("Invalid room type: " + ex.getMessage());
         }
@@ -303,8 +305,8 @@ public class SalesManagerModule {
                 end = "NA";
             }
             System.out.println("*** Updated details of rate type: ***\n");
-            System.out.printf("%s || %s || %s || %s || %s || %s%n", "Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
-            System.out.printf("%s || %s || %s || %.2f || %s || %s%n",
+            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s || %-20s%n", "Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
+            System.out.printf("%-20s || %-20s || %-20s || %-20.2f || %-20s || %s%n",
                     updated.getName(),
                     updated.getRoomType().getName().toString(),
                     updated.getRateType().toString(),
@@ -328,11 +330,11 @@ public class SalesManagerModule {
         List<RoomRateEntity> roomRates = roomRateEntitySessionBeanRemote.viewAllRoomRates();
         Integer roomRateCount = 0;
 
-        System.out.printf("%s || %s || %s%n", "S/N", "Room Rate Id", "Room Rate Name");
+        System.out.printf("%-20s || %-20s || %-20s || %-20s%n", "S/N", "Room Rate Id", "Room Rate Name", "Room Type Name");
 
         for (RoomRateEntity roomRate : roomRates) {
             roomRateCount++;
-            System.out.printf("%d || %d || %s%n", roomRateCount, roomRate.getRoomRateId(), roomRate.getName());
+            System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomRateCount, roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName().toString());
         }
     }
 
@@ -343,11 +345,11 @@ public class SalesManagerModule {
         List<RoomTypeEntity> roomTypes = roomTypeEntitySessionBeanRemote.viewAllRoomTypes();
         Integer roomTypeCount = 0;
 
-        System.out.printf("%s || %s|| %s%n", "S/N", "Room Type Id", "Room Type Names");
+        System.out.printf("%-20s || %-20s|| %-20s%n", "S/N", "Room Type Id", "Room Type Names");
 
         for (RoomTypeEntity roomType : roomTypes) {
             roomTypeCount++;
-            System.out.printf("%d || %d || %s%n", roomTypeCount, roomType.getRoomTypeId(), roomType.getName().toString());
+            System.out.printf("%-20d || %-20d || %-20s%n", roomTypeCount, roomType.getRoomTypeId(), roomType.getName().toString());
         }
     }
 

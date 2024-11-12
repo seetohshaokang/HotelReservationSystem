@@ -216,8 +216,8 @@ public class OperationManagerModule {
         // Call session bean
         try {
             RoomTypeEntity roomType = roomTypeEntitySessionBeanRemote.getRoomTypeByName(selectedRoomType);
-            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
-            System.out.printf("%-20s || %-20.2f || %-20s || %-20d || %-20s%n", roomType.getDescription(), roomType.getSize(), roomType.getBed(), roomType.getCapacity(), roomType.getAmenities().toString());
+            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-40s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
+            System.out.printf("%-20s || %-20.2f || %-20s || %-20d || %-40s%n", roomType.getDescription(), roomType.getSize(), roomType.getBed(), roomType.getCapacity(), roomType.getAmenities().toString());
         } catch (RoomTypeNotFoundException ex) {
             System.out.println("Invalid room type: " + ex.getMessage());
         }
