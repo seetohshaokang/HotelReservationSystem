@@ -68,7 +68,6 @@ public class MainApp {
                     }
                 } else if (response == 2) {
                     registerAsGuest();
-
                 } else if (response == 3) {
                     searchHotelRoom();
                 } else if (response == 4) {
@@ -171,6 +170,7 @@ public class MainApp {
     }
 
     private void reserveHotelRoom() {
+        
     }
 
     private void viewMyReservationDetails() {
