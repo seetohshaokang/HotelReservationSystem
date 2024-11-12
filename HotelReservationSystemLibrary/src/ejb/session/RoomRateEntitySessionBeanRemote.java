@@ -20,9 +20,12 @@ import util.exception.RoomTypeNotFoundException;
 @Remote
 public interface RoomRateEntitySessionBeanRemote {
 
-    public String createNewRoomRate(String name, RoomTypeName selectedRoomType, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException;
-
     public RoomRateEntity getRoomRateById(Long id) throws RoomRateNotFoundException;
 
     public List<RoomRateEntity> viewAllRoomRates();
+
+    public String createNewRoomRate(String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException;
+
+    public RoomRateEntity updateRoomRate(Long id, String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException, RoomRateNotFoundException;
+    
 }

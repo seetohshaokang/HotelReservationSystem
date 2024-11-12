@@ -32,14 +32,17 @@ public class DataInitialisationBean {
 
     @PostConstruct
     public void postContstruct() {
-        
+
         // Initialise data if there are no employees.
-        if(employeeEntitySessionBeanLocal.retrieveAllEmployees().isEmpty()) {
+        if (employeeEntitySessionBeanLocal.retrieveAllEmployees().isEmpty()) {
             initialiseData();
         }
     }
-    
+
     private void initialiseData() {
         employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("manager", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("operationmanager", "password", EmployeeRole.OPERATION_MANAGER));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("salesmanager", "password", EmployeeRole.SALES_MANAGER));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("guestrelationofficer", "password", EmployeeRole.GUEST_RELATION_OFFICER));
     }
 }

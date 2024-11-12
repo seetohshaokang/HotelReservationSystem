@@ -38,13 +38,11 @@ public class SalesManagerModule {
     }
 
     // Insert constructor with appropriate sessionbean
-
     public SalesManagerModule(RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, EmployeeEntity currentEmployee) {
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.currentEmployee = currentEmployee;
     }
-
 
     public void menuSalesManager() throws InvalidAccessRightException {
         if (currentEmployee.getRole() != EmployeeRole.SALES_MANAGER) {
@@ -52,7 +50,6 @@ public class SalesManagerModule {
         }
 
         Scanner scanner = new Scanner(System.in);
-        Integer response = 0;
 
         while (true) {
             System.out.println("*** HORS System :: Sales Manager Module ***\n");
@@ -63,6 +60,7 @@ public class SalesManagerModule {
             System.out.println("5: View all Room Rates");
             System.out.println("---------------------------");
             System.out.println("6: Back\n");
+            Integer response = 0;
 
             while (response < 1 || response > 6) {
 
@@ -74,7 +72,7 @@ public class SalesManagerModule {
                 } else if (response == 2) {
                     viewRoomRateDetails();
                 } else if (response == 3) {
-                    //updateRoomRateDetails();
+                    updateRoomRateDetails();
                 } else if (response == 4) {
                     //deleteRoomRate();
                 } else if (response == 5) {
@@ -94,13 +92,135 @@ public class SalesManagerModule {
     // Use case 17
     private void createNewRoomRate() {
         Scanner scanner = new Scanner(System.in);
-        Integer response = 0;
         System.out.println("*** HORS System :: Sales Manager :: Create New Room Rate ***\n");
         System.out.println("-------------------------------------------------------------------");
         // Input name
+        System.out.print("Enter name > ");
+        String name = scanner.nextLine();
+
+        // Input Room Type
+        viewAllRoomTypes();
+        Integer roomTypeId = null;
+        while (roomTypeId == null) {
+            System.out.print("Enter the Room Type Id you wish to create a new room rate for> ");
+            if (scanner.hasNextInt()) {
+                roomTypeId = scanner.nextInt();
+                scanner.nextLine();  // Clear buffer
+            } else {
+                System.out.println("Please enter a valid Room Type Id!");
+                scanner.nextLine();  // Clear invalid input
+            }
+        }
+
+        // Select Rate Type
+        Integer response = 0;
+        RateType selectedRateType = null;
+        while (selectedRateType == null) {
+            System.out.println("Please Select Rate Type");
+            System.out.println("1: PUBLISHED");
+            System.out.println("2: NORMAL");
+            System.out.println("3: PEAK");
+            System.out.println("4: PROMOTION");
+            System.out.print("Enter rate type number> ");
+
+            if (scanner.hasNextInt()) {
+                response = scanner.nextInt();
+                scanner.nextLine();  // Clear buffer
+
+                if (response >= 1 && response <= 4) {
+                    selectedRateType = RateType.values()[response - 1];
+                } else {
+                    System.out.println("Invalid option. Please select a number between 1 and 4.");
+                }
+            } else {
+                System.out.println("Please enter a valid number!");
+                scanner.nextLine();  // Clear invalid input
+            }
+        }
+
+        // Input rate per night
+        Double ratePerNight = null;
+        while (ratePerNight == null) {
+            System.out.print("Enter rate per night > ");
+            if (scanner.hasNextDouble()) {
+                ratePerNight = scanner.nextDouble();
+                scanner.nextLine();  // Clear buffer
+                System.out.println("Entered Rate per Night: " + ratePerNight);  // Debug statement
+            } else {
+                System.out.println("Please input a valid Rate per night!");
+                scanner.nextLine();  // Clear invalid input
+            }
+        }
+
+        Date startDate = null, endDate = null;
+        if (response == 3 || response == 4) {
+            while (true) {
+                System.out.print("Enter start date (YYYY-MM-DD) > ");
+                String input = scanner.nextLine();
+                try {
+                    startDate = parseDate(input);
+                    break;
+                } catch (ParseException e) {
+                    System.out.println("Please input a valid start date in the format YYYY-MM-DD!");
+                }
+            }
+            while (true) {
+                System.out.print("Enter end date (YYYY-MM-DD) > ");
+                String input2 = scanner.nextLine();
+                try {
+                    endDate = parseDate(input2);
+                    break;
+                } catch (ParseException e) {
+                    System.out.println("Please input a valid end date in the format YYYY-MM-DD!");
+                }
+            }
+        }
+
+        try {
+            String newRateName = roomRateEntitySessionBeanRemote.createNewRoomRate(name, Long.valueOf(roomTypeId), selectedRateType, ratePerNight, startDate, endDate);
+            System.out.println("New room rate has been created: " + newRateName);
+        } catch (RoomTypeNotFoundException e) {
+            System.out.println("Invalid creation of new room rate: " + e.getMessage());
+        }
+    }
+
+    // Use case 18
+    private void viewRoomRateDetails() {
+        Scanner scanner = new Scanner(System.in);
+        viewAllRoomRates(); // Show the list of roomrates
+        Integer roomRateId = 0;
+        System.out.print("Enter ID of a displayed room rate to view more details > ");
+        roomRateId = scanner.nextInt();
+        scanner.nextLine();
+        try {
+            RoomRateEntity roomRate = roomRateEntitySessionBeanRemote.getRoomRateById(Long.valueOf(roomRateId));
+            String start, end;
+            if (roomRate.getRateType() == RateType.PEAK || roomRate.getRateType() == RateType.PROMOTION) {
+                start = roomRate.getStartDate().toString();
+                end = roomRate.getEndDate().toString();
+            } else {
+                start = "NA";
+                end = "NA";
+            }
+            System.out.printf("%s || %s || %s || %s || %s || %s || %s%n", "Room Rate Id", "Room Rate Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
+            System.out.printf("%d || %s || %s || %s || %f || %s || %s%n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName().toString(), roomRate.getRateType().toString(), roomRate.getRatePerNight(), start, end);
+        } catch (RoomRateNotFoundException ex) {
+            System.out.println("Invalid room type: " + ex.getMessage());
+        }
+    }
+
+    private void updateRoomRateDetails() {
+        Scanner scanner = new Scanner(System.in);
+        viewAllRoomRates();
+        Integer id = 0;
+        System.out.print("Enter Room Rate Id of the room rate you wish to update > ");
+        id = scanner.nextInt();
+        scanner.nextLine();
+
+        // Input name
         String name = "";
         while (true) {
-            System.out.print("Enter name > ");
+            System.out.print("Enter new name > ");
             if (scanner.hasNextLine()) {
                 name = scanner.nextLine();
                 break;
@@ -110,12 +230,12 @@ public class SalesManagerModule {
         }
         // Input Room Type
         viewAllRoomTypes();
-        Integer roomType = 0;
-        System.out.println("Enter the S/N of room type you wish to create a new room rate for> ");
-        roomType = scanner.nextInt();
+        Integer roomTypeId = 0;
+        System.out.println("Enter the Room Type Id of the room type you wish to update the room rate > ");
+        roomTypeId = scanner.nextInt();
         scanner.nextLine();
-        RoomTypeName selectedRoomType = RoomTypeName.values()[response - 1];
 
+        Integer response;
         while (true) {
             response = 0;
             System.out.println("Please Select Rate Type");
@@ -139,8 +259,8 @@ public class SalesManagerModule {
         double ratePerNight = 0;
         while (true) {
             System.out.print("Enter rate per night > ");
-            if (scanner.hasNextInt()) {
-                ratePerNight = scanner.nextInt();
+            if (scanner.hasNextDouble()) {
+                ratePerNight = scanner.nextDouble();
                 scanner.nextLine();
                 break;
             } else {
@@ -171,36 +291,30 @@ public class SalesManagerModule {
                     System.out.println("Please input a valid end date in the format YYYY-MM-DD!");
                 }
             }
-
-            try {
-                String newRateName = roomRateEntitySessionBeanRemote.createNewRoomRate(name, selectedRoomType, selectedRateType, ratePerNight, startDate, endDate);
-                System.out.println("New room rate has been created: " + newRateName);
-            } catch (RoomTypeNotFoundException ex) {
-                System.out.println("Invalid creation of new room rate: "+ ex.getMessage());
-            }
         }
-    }
-
-    // Use case 18
-    private void viewRoomRateDetails() {
-        Scanner scanner = new Scanner(System.in);
-        viewAllRoomRates(); // Show the list of roomrates
-        Integer response = 0;
-        System.out.print("Enter ID of a displayed room rate to view more details > ");
-        Long roomRateId = scanner.nextLong();
-        scanner.nextLine();
-        // Call session bean
         try {
-            RoomRateEntity roomRate = roomRateEntitySessionBeanRemote.getRoomRateById(roomRateId);
-            System.out.printf("%s || %s || %s || %s || %s || %s || %s%n", "Room Rate Id", "Room Rate Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
-            System.out.printf("%d || %s || %s || %s || %f || %s || %s%n", roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().toString(), roomRate.getRateType().toString(), roomRate.getRatePerNight(), roomRate.getStartDate().toString(), roomRate.getEndDate().toString());
-        } catch (RoomRateNotFoundException ex) {
-            System.out.println("Invalid room type: " + ex.getMessage());
+            RoomRateEntity updated = roomRateEntitySessionBeanRemote.updateRoomRate(Long.valueOf(id), name, Long.valueOf(roomTypeId), selectedRateType, ratePerNight, startDate, endDate);
+            String start, end;
+            if (updated.getRateType() == RateType.PEAK || updated.getRateType() == RateType.PROMOTION) {
+                start = updated.getStartDate().toString();
+                end = updated.getEndDate().toString();
+            } else {
+                start = "NA";
+                end = "NA";
+            }
+            System.out.println("*** Updated details of rate type: ***\n");
+            System.out.printf("%s || %s || %s || %s || %s || %s%n", "Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
+            System.out.printf("%s || %s || %s || %.2f || %s || %s%n",
+                    updated.getName(),
+                    updated.getRoomType().getName().toString(),
+                    updated.getRateType().toString(),
+                    updated.getRatePerNight(),
+                    start,
+                    end
+            );
+        } catch (RoomTypeNotFoundException | RoomRateNotFoundException ex) {
+            System.out.println("Invalid creation of new room rate: " + ex.getMessage());
         }
-    }
-
-    private void updateRoomRateDetails() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void deleteRoomRate() {
@@ -214,11 +328,11 @@ public class SalesManagerModule {
         List<RoomRateEntity> roomRates = roomRateEntitySessionBeanRemote.viewAllRoomRates();
         Integer roomRateCount = 0;
 
-        System.out.printf("%s || %s || %s || %s || %s || %s || %s || %s%n", "S/N", "Room Rate Id", "Room Rate Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
+        System.out.printf("%s || %s || %s%n", "S/N", "Room Rate Id", "Room Rate Name");
 
         for (RoomRateEntity roomRate : roomRates) {
             roomRateCount++;
-            System.out.printf("%d || %d || %s || %s || %s || %f || %s || %s%n", roomRateCount, roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().toString(), roomRate.getRateType().toString(), roomRate.getRatePerNight(), roomRate.getStartDate().toString(), roomRate.getEndDate().toString());
+            System.out.printf("%d || %d || %s%n", roomRateCount, roomRate.getRoomRateId(), roomRate.getName());
         }
     }
 

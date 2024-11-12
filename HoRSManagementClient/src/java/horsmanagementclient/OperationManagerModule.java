@@ -46,7 +46,7 @@ public class OperationManagerModule {
 
     // insert constructor with the appropriate sessionbean
     public void menuOperationManager() throws InvalidAccessRightException {
-        if (currentEmployee.getRole() != EmployeeRole.OPERATIONS_MANAGER) {
+        if (currentEmployee.getRole() != EmployeeRole.OPERATION_MANAGER) {
             throw new InvalidAccessRightException("You don't have OPERATIONS MANAGER rights to access the system administator module.");
         }
 
