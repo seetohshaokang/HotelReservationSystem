@@ -65,9 +65,18 @@ public class ReservationEntity implements Serializable {
         this.roomReservations = new ArrayList<>();
     }
 
-    // Default Constructor
-    public ReservationEntity(GuestEntity guest, PartnerEntity partner, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
+    // Constructor for guests
+    public ReservationEntity(GuestEntity guest, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
         this.guest = guest;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+        this.totalAmount = totalAmount;
+        this.status = status;
+        this.roomReservations = new ArrayList<>();
+    }
+
+    // Constructor for partners
+    public ReservationEntity(PartnerEntity partner, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
         this.partner = partner;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;

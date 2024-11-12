@@ -5,12 +5,16 @@
 package ejb.session;
 
 import entity.RoomEntity;
+import entity.RoomTypeEntity;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Remote;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
+import util.exception.DisabledException;
 import util.exception.ExistingRoomException;
 import util.exception.NoExistingRoomException;
+import util.exception.RoomNotFoundException;
 import util.exception.RoomTypeNotFoundException;
 
 /**
@@ -20,10 +24,14 @@ import util.exception.RoomTypeNotFoundException;
 @Remote
 public interface RoomEntitySessionBeanRemote {
 
-    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus)throws RoomTypeNotFoundException, ExistingRoomException;
-    
+    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException;
+
     public RoomEntity searchRoomByRoomNumber(String roomNumber) throws NoExistingRoomException;
-    
+
+    public RoomEntity updateRoom(Long roomId, Long roomTypeId, String newRoomNumber, RoomStatus newStatus) throws RoomNotFoundException, RoomTypeNotFoundException;
+
     public List<RoomEntity> viewAllRooms();
+    
+     public List<RoomEntity> retrieveAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName);
 
 }

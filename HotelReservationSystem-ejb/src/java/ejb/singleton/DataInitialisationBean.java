@@ -4,15 +4,26 @@
  */
 package ejb.singleton;
 
-import ejb.session.EmployeeEntitySessionBeanLocal;
+import ejb.session.stateless.EmployeeEntitySessionBeanLocal;
+import ejb.session.stateless.RoomEntitySessionBeanLocal;
 import entity.EmployeeEntity;
+import entity.GuestEntity;
+import entity.ReservationEntity;
+import entity.RoomEntity;
+import entity.RoomReservationEntity;
+import java.time.LocalDate;
+import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
 import javax.ejb.Startup;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import util.enumeration.EmployeeRole;
+import util.enumeration.ReservationStatus;
 import util.exception.EmployeeNotFoundException;
+import ejb.session.stateless.RoomReservationEntitySessionBeanLocal;
 
 /**
  *
@@ -25,8 +36,20 @@ import util.exception.EmployeeNotFoundException;
 public class DataInitialisationBean {
 
     @EJB
-    private EmployeeEntitySessionBeanLocal employeeEntitySessionBeanLocal;
+    private RoomReservationEntitySessionBeanLocal roomReservationSessionBean;
 
+    
+    
+    @EJB
+    private RoomEntitySessionBeanLocal roomEntitySessionBean;
+
+    @EJB
+    private EmployeeEntitySessionBeanLocal employeeEntitySessionBeanLocal;
+    @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
+    private EntityManager em;
+
+    
+    
     public DataInitialisationBean() {
     }
 
@@ -40,9 +63,10 @@ public class DataInitialisationBean {
     }
 
     private void initialiseData() {
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("manager", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("operationmanager", "password", EmployeeRole.OPERATION_MANAGER));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("salesmanager", "password", EmployeeRole.SALES_MANAGER));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("guestrelationofficer", "password", EmployeeRole.GUEST_RELATION_OFFICER));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("sa", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("om", "password", EmployeeRole.OPERATION_MANAGER));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("sm", "password", EmployeeRole.SALES_MANAGER));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("gro", "password", EmployeeRole.GUEST_RELATION_OFFICER));
+
     }
 }

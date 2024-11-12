@@ -10,12 +10,16 @@ import ejb.session.PartnerEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomRateEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
+import ejb.session.stateful.RoomReservationSessionBeanRemote;
 
 /**
  *
  * @author shaokangseetoh
  */
 public class Main {
+
+    @EJB
+    private static RoomReservationSessionBeanRemote roomReservationSessionBean;
 
     @EJB
     private static RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
@@ -33,10 +37,14 @@ public class Main {
     private static RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
 
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(employeeEntitySessionBeanRemote,
+        MainApp mainApp = new MainApp(
+                employeeEntitySessionBeanRemote,
                 partnerEntitySessionBeanRemote,
                 roomTypeEntitySessionBeanRemote,
-                roomEntitySessionBeanRemote, roomRateEntitySessionBeanRemote);
+                roomEntitySessionBeanRemote,
+                roomRateEntitySessionBeanRemote,
+                roomReservationSessionBean
+        );
         mainApp.runApp();
     }
 

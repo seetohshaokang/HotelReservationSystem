@@ -32,6 +32,9 @@ public class RoomTypeEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private RoomTypeName name;
+    
+    //@Enumerated(EnumType.STRING)
+    //private RoomTypeName nextHighestRT;
 
     @Column
     private String description;
@@ -62,6 +65,7 @@ public class RoomTypeEntity implements Serializable {
 
     public RoomTypeEntity(RoomTypeName name, String description, Double size, String bed, Integer capacity, List<String> amenities) {
         this.name = name;
+        // this.nextHighestRT = nextHighest;
         this.description = description;
         this.size = size;
         this.bed = bed;
@@ -181,6 +185,20 @@ public class RoomTypeEntity implements Serializable {
      */
     public void setRoomRates(List<RoomRateEntity> roomRates) {
         this.roomRates = roomRates;
+    }
+
+    /**
+     * @return the isDisabled
+     */
+    public Boolean getIsDisabled() {
+        return isDisabled;
+    }
+
+    /**
+     * @param isDisabled the isDisabled to set
+     */
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
 
 }

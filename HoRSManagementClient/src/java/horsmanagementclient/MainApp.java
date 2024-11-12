@@ -7,6 +7,7 @@ import ejb.session.PartnerEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomRateEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
+import ejb.session.stateful.RoomReservationSessionBeanRemote;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 
@@ -26,11 +27,13 @@ public class MainApp {
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
+    private RoomReservationSessionBeanRemote roomReservationSessionBeanRemote;
 
     // Modules for construction later
     private SystemAdministratorModule systemAdminModule;
     private OperationManagerModule operationManagerModule;
     private SalesManagerModule salesManagerModule;
+    private GuestRelationOfficerModule guestRelationOfficerModule;
 
     // Employee States
     private EmployeeEntity currentEmployee;
@@ -38,15 +41,19 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, 
-            PartnerEntitySessionBeanRemote partnerEntitySessionBean, 
+    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote,
+            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote,
             RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote) {
+            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote,
+            RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote,
+            RoomReservationSessionBeanRemote roomReservationSessionBean) {
+
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
-        this.partnerEntitySessionBeanRemote = partnerEntitySessionBean;
-        this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
+        this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
+        this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
+        this.roomReservationSessionBeanRemote = roomReservationSessionBean;
     }
 
     public void runApp() {
@@ -71,6 +78,7 @@ public class MainApp {
                         systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployee);
                         operationManagerModule = new OperationManagerModule(roomTypeEntitySessionBeanRemote, roomEntitySessionBeanRemote, currentEmployee);
                         salesManagerModule = new SalesManagerModule(roomRateEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployee);
+                        guestRelationOfficerModule = new GuestRelationOfficerModule(roomReservationSessionBeanRemote, currentEmployee);
                         // Create guest relation officer module
                         menuMain();
                     } catch (InvalidLoginCredentialException ex) {
@@ -101,9 +109,6 @@ public class MainApp {
         System.out.print("Enter password > ");
         password = scanner.nextLine().trim();
 
-        if (this.employeeEntitySessionBeanRemote == null) {
-            System.out.print("Bean in missing in DO LOGIN");
-        }
         if (username.length() > 0 && password.length() > 0) {
             currentEmployee = employeeEntitySessionBeanRemote.employeeLogin(username, password);
         } else {
@@ -111,6 +116,7 @@ public class MainApp {
         }
     }
 
+    // COMPLETED
     private void menuMain() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
@@ -138,26 +144,32 @@ public class MainApp {
                     } catch (InvalidAccessRightException ex) {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
                     }
+
                 } else if (response == 2) {
-                    // invoke module.method() in try catch
-                    // System.out.println("Operation Manager Module is not implemented yet!");
+
                     try {
                         operationManagerModule.menuOperationManager();
-                    } catch(InvalidAccessRightException ex) {
+                    } catch (InvalidAccessRightException ex) {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
                     }
-                    
+
                     System.out.println(" ");
                 } else if (response == 3) {
+
                     try {
                         salesManagerModule.menuSalesManager();
-                    } catch(InvalidAccessRightException ex) {
+                    } catch (InvalidAccessRightException ex) {
                         System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
                     }
+
                 } else if (response == 4) {
-                    // invoke module.method() in try catch
-                    System.out.println("Guest Relation Officer Module is not implemented yet!");
-                    System.out.println(" ");
+
+                    try {
+                        guestRelationOfficerModule.menuGuestRelationOfficer();
+                    } catch (InvalidAccessRightException ex) {
+                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                    }
+
                 } else if (response == 5) {
                     break; // Break inner while loop
                 } else {
@@ -165,7 +177,6 @@ public class MainApp {
                     System.out.println(" ");
                 }
             }
-
             if (response == 5) {
                 break; // Break outer while loop
             }
