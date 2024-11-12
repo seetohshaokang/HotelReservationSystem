@@ -79,10 +79,15 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
             roomRate.setEndDate(end);
             if (roomTypeId != roomRate.getRoomType().getRoomTypeId()) {     // if room type has changed, reassign
                 try {
+                    // Find New room Type
                     RoomTypeEntity newRoomType = em.find(RoomTypeEntity.class, roomTypeId);
+                    // Find old room type
                     RoomTypeEntity oldRoomType = em.find(RoomTypeEntity.class, oldRoomTypeId);
+                    // Remove roomrate from old room type
                     oldRoomType.getRoomRates().remove(roomRate);
+                    // Add roomrate to new room type
                     newRoomType.getRoomRates().add(roomRate);
+                    // Update room type of roomrate.
                     roomRate.setRoomType(newRoomType);
                 } catch (NoResultException | NonUniqueResultException ex) {
                     throw new RoomTypeNotFoundException("Room Type does not exist!");

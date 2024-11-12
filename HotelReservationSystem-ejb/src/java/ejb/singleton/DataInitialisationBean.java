@@ -63,10 +63,9 @@ public class DataInitialisationBean {
     }
 
     private void initialiseData() {
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("sa", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("om", "password", EmployeeRole.OPERATION_MANAGER));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("sm", "password", EmployeeRole.SALES_MANAGER));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("gro", "password", EmployeeRole.GUEST_RELATION_OFFICER));
-
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("sysadmin", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("opmanager", "password", EmployeeRole.OPERATION_MANAGER));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("salesmanager", "password", EmployeeRole.SALES_MANAGER));
+        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("guestrelo", "password", EmployeeRole.GUEST_RELATION_OFFICER));
     }
 }
