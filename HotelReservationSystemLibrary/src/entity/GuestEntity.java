@@ -30,7 +30,7 @@ public class GuestEntity implements Serializable {
     @Column
     private String name;
     @Column
-    private String identifier;
+    private String email;
     @Column
     private String password;
 
@@ -46,7 +46,7 @@ public class GuestEntity implements Serializable {
     // Default Constructor
     public GuestEntity(String name, String identifier, String password) {
         this.name = name;
-        this.identifier = identifier;
+        this.email = identifier;
         this.password = password;
         this.reservations = new ArrayList<>();
     }
@@ -109,12 +109,12 @@ public class GuestEntity implements Serializable {
         this.name = name;
     }
 
-    public String getIdentifier() {
-        return identifier;
+    public String getEmail() {
+        return email;
     }
 
-    public void setIdentifier(String identifier) {
-        this.identifier = identifier;
+    public void setEmail(String email) {
+        this.email = email;
     }
     
     

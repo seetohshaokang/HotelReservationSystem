@@ -4,8 +4,11 @@
  */
 package ejb.session;
 
+import entity.GuestEntity;
 import javax.ejb.Remote;
+import util.exception.GuestNotFoundException;
 import util.exception.InvalidInputException;
+import util.exception.InvalidLoginCredentialException;
 
 /**
  *
@@ -14,6 +17,10 @@ import util.exception.InvalidInputException;
 @Remote
 public interface GuestEntitySessionBeanRemote {
 
-    public Long createNewGuest(String name, String email, String password) throws InvalidInputException;
+    public Long createNewGuest(String name, String email, String password)throws InvalidInputException;
+    
+    public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException;
+
+    public GuestEntity retrieveGuestByEmail(String email) throws GuestNotFoundException;
 
 }

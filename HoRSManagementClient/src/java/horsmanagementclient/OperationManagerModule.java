@@ -14,6 +14,7 @@ import java.util.Scanner;
 import util.enumeration.EmployeeRole;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
+import util.exception.DisabledException;
 import util.exception.ExistingRoomException;
 import util.exception.InvalidAccessRightException;
 import util.exception.RoomNotFoundException;
@@ -290,8 +291,8 @@ public class OperationManagerModule {
         try {
             RoomTypeEntity roomTypeUpdated = roomTypeEntitySessionBeanRemote.updateRoomType(Long.valueOf(response), newDescription, newSize, newBed, newCapacity, newAmenities);
             System.out.println("*** Updated details of room type: ***\n");
-            System.out.printf("%s || %s || %s || %s || %s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
-            System.out.printf("%s || %.2f || %s || %d || %s%n",
+            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
+            System.out.printf("%-20s || %-20.2f || %-20s || %-20d || %-20s%n",
                     roomTypeUpdated.getDescription(),
                     roomTypeUpdated.getSize(),
                     roomTypeUpdated.getBed(),
@@ -378,6 +379,8 @@ public class OperationManagerModule {
         } catch (RoomTypeNotFoundException ex) {
             System.out.println("Invalid creation of new room: " + ex.getMessage());
         } catch (ExistingRoomException ex) {
+            System.out.println("Invalid creation of new room: " + ex.getMessage());
+        } catch (DisabledException ex) {
             System.out.println("Invalid creation of new room: " + ex.getMessage());
         }
     }

@@ -17,6 +17,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
+import util.exception.DisabledException;
 import util.exception.ExistingRoomException;
 import util.exception.NoExistingRoomException;
 import util.exception.RoomNotFoundException;
@@ -37,8 +38,9 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
 
     // Might need to include validation checks to see if room already exists
     @Override
-    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException {
+    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException {
         try {
+
             // There is existing room
             String roomNumber = String.format("%02d%02d", floor, sequence);
             RoomEntity existingRoom = searchRoomByRoomNumber(roomNumber);
@@ -50,16 +52,22 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
             // No existing room
             // Find roomType
             RoomTypeEntity rt = roomTypeEntitySessionBean.getRoomTypeByName(rtName);
-            // Instantiate room entity
-            RoomEntity newRoom = new RoomEntity(rt, floor, sequence, roomStatus);
-            // Add room to room type
-            rt.getRooms().add(newRoom);
-            // persist room
-            em.persist(newRoom);
-            em.flush();
-            // Lazy fetching of roomtype
-            newRoom.getRoomType();
-            return newRoom;
+            
+            // Check if room type is disabled
+            if (rt.getIsDisabled() == true) {
+                throw new DisabledException("Room Type is current disabled!");
+            } else {
+                // Instantiate room entity
+                RoomEntity newRoom = new RoomEntity(rt, floor, sequence, roomStatus);
+                // Add room to room type
+                rt.getRooms().add(newRoom);
+                // persist room
+                em.persist(newRoom);
+                em.flush();
+                // Lazy fetching of roomtype
+                newRoom.getRoomType();
+                return newRoom;
+            }
         }
     }
 
@@ -106,13 +114,13 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         Query query = em.createQuery("SELECT r FROM RoomEntity r");
         return query.getResultList();
     }
-    
+
     @Override
-     public List<RoomEntity> retrieveAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName) {  
-        
+    public List<RoomEntity> retrieveAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName) {
+
         System.out.println("Check-In Date: " + checkInDate);
         System.out.println("Check-Out Date: " + checkOutDate);
-        
+
         Query query = em.createQuery("SELECT r FROM RoomEntity r "
                 + "WHERE r.status = util.enumeration.RoomStatus.AVAILABLE "
                 + "AND r.roomType.name = :roomTypeName "
@@ -125,7 +133,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         query.setParameter("checkInDate", checkInDate);
         query.setParameter("checkOutDate", checkOutDate);
         query.setParameter("roomTypeName", roomTypeName);
-        
+
         List<RoomEntity> availableRooms = query.getResultList();
         return availableRooms;
     }

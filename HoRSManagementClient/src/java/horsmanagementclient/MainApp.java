@@ -109,9 +109,6 @@ public class MainApp {
         System.out.print("Enter password > ");
         password = scanner.nextLine().trim();
 
-        if (this.employeeEntitySessionBeanRemote == null) {
-            System.out.print("Bean in missing in DO LOGIN");
-        }
         if (username.length() > 0 && password.length() > 0) {
             currentEmployee = employeeEntitySessionBeanRemote.employeeLogin(username, password);
         } else {

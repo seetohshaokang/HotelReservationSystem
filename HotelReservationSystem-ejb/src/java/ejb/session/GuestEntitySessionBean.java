@@ -7,8 +7,13 @@ package ejb.session;
 import entity.GuestEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import util.exception.GuestNotFoundException;
 import util.exception.InvalidInputException;
+import util.exception.InvalidLoginCredentialException;
 
 /**
  *
@@ -34,6 +39,34 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
             em.flush();
             return newGuest.getGuestId();
         }
+    }
+
+    @Override
+    public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException {
+        try {
+            GuestEntity guestEntity = retrieveGuestByEmail(email);
+            if (guestEntity.getPassword().equals(password)) {
+                return guestEntity;
+            } else {
+                throw new InvalidLoginCredentialException("Password is invalid!");
+            }
+        } catch (GuestNotFoundException ex) {
+            throw new InvalidLoginCredentialException("" + ex.getMessage());
+        }
+    }
+
+    @Override
+    public GuestEntity retrieveGuestByEmail(String email) throws GuestNotFoundException {
+
+        Query query = em.createQuery("SELECT g FROM GuestEntity g WHERE g.email = :inEmail", GuestEntity.class);
+        query.setParameter("inEmail", email);
+
+        try {
+            return (GuestEntity) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new GuestNotFoundException("Guest with email " + email + "does not exist!");
+        }
+
     }
 
 }

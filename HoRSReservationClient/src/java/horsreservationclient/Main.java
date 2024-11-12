@@ -6,6 +6,7 @@ package horsreservationclient;
 
 import ejb.session.GuestEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
+import ejb.session.stateful.RoomReservationSessionBeanRemote;
 import javax.ejb.EJB;
 
 /**
@@ -15,13 +16,18 @@ import javax.ejb.EJB;
 public class Main {
 
     @EJB
+    private static RoomReservationSessionBeanRemote roomReservationSessionBean;
+
+    @EJB
     private static RoomEntitySessionBeanRemote roomEntitySessionBean;
 
     @EJB
     private static GuestEntitySessionBeanRemote guestEntitySessionBean;
     
+    
+    
     public static void main(String[] args) {
-        MainApp mainApp = new MainApp(guestEntitySessionBean, roomEntitySessionBean);
+        MainApp mainApp = new MainApp(guestEntitySessionBean, roomEntitySessionBean, roomReservationSessionBean);
         mainApp.runApp();
     }
     

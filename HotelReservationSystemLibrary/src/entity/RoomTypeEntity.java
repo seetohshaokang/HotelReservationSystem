@@ -187,4 +187,18 @@ public class RoomTypeEntity implements Serializable {
         this.roomRates = roomRates;
     }
 
+    /**
+     * @return the isDisabled
+     */
+    public Boolean getIsDisabled() {
+        return isDisabled;
+    }
+
+    /**
+     * @param isDisabled the isDisabled to set
+     */
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
+    }
+
 }

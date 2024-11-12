@@ -11,6 +11,7 @@ import java.util.List;
 import javax.ejb.Remote;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
+import util.exception.DisabledException;
 import util.exception.ExistingRoomException;
 import util.exception.NoExistingRoomException;
 import util.exception.RoomNotFoundException;
@@ -23,7 +24,7 @@ import util.exception.RoomTypeNotFoundException;
 @Remote
 public interface RoomEntitySessionBeanRemote {
 
-    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException;
+    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException;
 
     public RoomEntity searchRoomByRoomNumber(String roomNumber) throws NoExistingRoomException;
 
