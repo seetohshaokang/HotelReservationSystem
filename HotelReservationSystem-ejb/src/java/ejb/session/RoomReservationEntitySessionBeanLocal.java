@@ -4,6 +4,9 @@
  */
 package ejb.session;
 
+import entity.ReservationEntity;
+import entity.RoomEntity;
+import entity.RoomReservationEntity;
 import javax.ejb.Local;
 
 /**
@@ -11,6 +14,8 @@ import javax.ejb.Local;
  * @author shaokangseetoh
  */
 @Local
-public interface RoomReservationSessionBeanLocal {
+public interface RoomReservationEntitySessionBeanLocal {
+    
+    public RoomReservationEntity createNewRoomReservation(RoomEntity room, ReservationEntity reservation);
     
 }

@@ -5,6 +5,7 @@
 package ejb.session;
 
 import javax.ejb.Remote;
+import util.exception.InvalidInputException;
 
 /**
  *
@@ -12,5 +13,7 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface GuestEntitySessionBeanRemote {
-    
+
+    public Long createNewGuest(String name, String email, String password) throws InvalidInputException;
+
 }

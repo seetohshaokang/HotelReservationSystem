@@ -5,6 +5,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,6 +32,10 @@ public class RoomReservationEntity implements Serializable {
     @ManyToOne
     @JoinColumn(name = "reservation_id", nullable = false)
     private ReservationEntity reservation;
+    
+    // Date attributes
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
 
     public RoomReservationEntity() {
     }

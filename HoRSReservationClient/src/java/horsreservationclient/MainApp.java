@@ -4,8 +4,16 @@
  */
 package horsreservationclient;
 
+import ejb.session.GuestEntitySessionBeanRemote;
+import ejb.session.RoomEntitySessionBeanRemote;
 import entity.GuestEntity;
+import entity.RoomEntity;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
 import java.util.Scanner;
+import util.exception.InvalidInputException;
 import util.exception.InvalidLoginCredentialException;
 
 /**
@@ -13,22 +21,26 @@ import util.exception.InvalidLoginCredentialException;
  * @author shaokangseetoh
  */
 public class MainApp {
-    
+
     // Session Beans
-    
+    private GuestEntitySessionBeanRemote guestEntitySessionBeanRemote;
+    private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
+
     // Module -> No seperation of modules but have 2 "menus"
-    
     private GuestEntity loggedInGuest;
 
     public MainApp() {
     }
-    
-    // Insert constructor with the session beans
-    
+
+    public MainApp(GuestEntitySessionBeanRemote guestEntitySessionBeanRemote, RoomEntitySessionBeanRemote roomEntitySessionBeanRemote) {
+        this.guestEntitySessionBeanRemote = guestEntitySessionBeanRemote;
+        this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
+    }
+
     public void runApp() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
-        
+
         while (true) {
             System.out.println("*** Welcome to HORS - Reservation System ***");
             System.out.println("1: Guest Login");
@@ -51,43 +63,99 @@ public class MainApp {
                         System.out.println("Invalid Login Credentials: " + ex.getMessage() + "\n");
                     }
                 } else if (response == 2) {
-                    //
+
                 } else if (response == 3) {
-                    //
+                    // searchHotelRoom();
                 } else if (response == 4) {
-                    break; 
+                    break;
                 } else {
                     System.out.println("Invalid Option, please try again!\n");
                 }
-
             }
             if (response == 4) {
                 break;
             }
         }
     }
-    
+
     private void doLogin() throws InvalidLoginCredentialException {
-        
+
     }
-    
-    private void registerVisitor() {
+
+    private void registerAsGuest() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** HORS System :: System Administrator :: Create New Employee");
+        System.out.println("Enter Guest Name: ");
+        String name = scanner.nextLine().trim();
+
+        System.out.println("Enter Guest Email: ");
+        String email = scanner.nextLine().trim();
+
+        System.out.println("Enter Guest Password: ");
+        String password = scanner.nextLine().trim();
+        try {
+            Long guestId = guestEntitySessionBeanRemote.createNewGuest(name, email, password);
+        } catch (InvalidInputException ex) {
+            System.out.println("Invalid Input: " + ex.getMessage());
+        }
     }
-    
+
+    /*
     private void searchHotelRoom() {
+        Scanner scanner = new Scanner(System.in);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        LocalDate checkInDate = null;
+        LocalDate checkOutDate = null;
+
+        // Read and parse checkInDate
+        while (checkInDate == null) {
+            System.out.print("Enter check-in date (yyyy-MM-dd): ");
+            String checkInInput = scanner.nextLine();
+            try {
+                checkInDate = LocalDate.parse(checkInInput, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+            }
+        }
+        // Read and parse checkOutDate
+        while (checkOutDate == null) {
+            System.out.print("Enter check-out date (yyyy-MM-dd): ");
+            String checkOutInput = scanner.nextLine();
+            try {
+                checkOutDate = LocalDate.parse(checkOutInput, formatter);
+
+                // Ensure checkOutDate is after checkInDate
+                if (checkOutDate.isBefore(checkInDate)) {
+                    System.out.println("Check-out date must be after check-in date. Please enter again.");
+                    checkOutDate = null; // Reset checkOutDate to re-prompt user
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+            }
+        }
+
+        List<RoomEntity> availableRooms = roomEntitySessionBeanRemote.retrieveAvailableRooms(checkInDate, checkOutDate);
+        // Print rooms
+        Integer roomTypeCount = 0;
+        System.out.printf("%-20s || %-20s || %-20s || %-20s%n", "S/N", "Room Id", "Room Type", "Room Number");
+        for (RoomEntity room : availableRooms) {
+            roomTypeCount++;
+            System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomTypeCount, room.getRoomId(), room.getRoomType().getName().toString(), room.getRoomNumber());
+        }
     }
-    
-    private void menuGuest(){
-        
+     */
+    private void menuGuest() {
+
     }
-    
+
     private void reserveHotelRoom() {
     }
-    
+
     private void viewMyReservationDetails() {
     }
-    
+
     private void viewAllMyReservations() {
     }
-    
+
 }

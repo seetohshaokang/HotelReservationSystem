@@ -4,6 +4,9 @@
  */
 package ejb.session;
 
+import entity.ReservationEntity;
+import entity.RoomEntity;
+import entity.RoomReservationEntity;
 import javax.ejb.Remote;
 
 /**
@@ -11,6 +14,8 @@ import javax.ejb.Remote;
  * @author shaokangseetoh
  */
 @Remote
-public interface RoomReservationSessionBeanRemote {
-    
+public interface RoomReservationEntitySessionBeanRemote {
+
+    public RoomReservationEntity createNewRoomReservation(RoomEntity room, ReservationEntity reservation);
+
 }

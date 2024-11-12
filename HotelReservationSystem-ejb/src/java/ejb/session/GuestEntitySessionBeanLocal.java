@@ -5,6 +5,7 @@
 package ejb.session;
 
 import javax.ejb.Local;
+import util.exception.InvalidInputException;
 
 /**
  *
@@ -12,5 +13,8 @@ import javax.ejb.Local;
  */
 @Local
 public interface GuestEntitySessionBeanLocal {
+    
+    public Long createNewGuest(String name, String email, String password)throws InvalidInputException;
+    
     
 }

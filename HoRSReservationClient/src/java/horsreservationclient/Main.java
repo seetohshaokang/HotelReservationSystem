@@ -4,14 +4,25 @@
  */
 package horsreservationclient;
 
+import ejb.session.GuestEntitySessionBeanRemote;
+import ejb.session.RoomEntitySessionBeanRemote;
+import javax.ejb.EJB;
+
 /**
  *
  * @author shaokangseetoh
  */
 public class Main {
 
+    @EJB
+    private static RoomEntitySessionBeanRemote roomEntitySessionBean;
+
+    @EJB
+    private static GuestEntitySessionBeanRemote guestEntitySessionBean;
+    
     public static void main(String[] args) {
-        // TODO code application logic here
+        MainApp mainApp = new MainApp(guestEntitySessionBean, roomEntitySessionBean);
+        mainApp.runApp();
     }
     
 }

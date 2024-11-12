@@ -5,12 +5,15 @@
 package ejb.session;
 
 import entity.RoomEntity;
+import entity.RoomTypeEntity;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
 import util.exception.ExistingRoomException;
 import util.exception.NoExistingRoomException;
+import util.exception.RoomNotFoundException;
 import util.exception.RoomTypeNotFoundException;
 
 /**
@@ -24,6 +27,9 @@ public interface RoomEntitySessionBeanLocal {
     
     public RoomEntity searchRoomByRoomNumber(String roomNumber) throws NoExistingRoomException;
     
+    public RoomEntity updateRoom(Long roomId, Long roomTypeId , String newRoomNumber, RoomStatus newStatus)throws RoomNotFoundException, RoomTypeNotFoundException;
+    
     public List<RoomEntity> viewAllRooms();
     
+    public List<RoomEntity> retrieveAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName);
 }

@@ -4,9 +4,11 @@
  */
 package ejb.session;
 
+import entity.GuestEntity;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.exception.InvalidInputException;
 
 /**
  *
@@ -18,10 +20,20 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
-    public void persist(Object object) {
-        em.persist(object);
+    @Override
+    public Long createNewGuest(String name, String email, String password) throws InvalidInputException {
+        if (name.isEmpty()) {
+            throw new InvalidInputException("Name cannot be empty!");
+        } else if (email.isEmpty()) {
+            throw new InvalidInputException("Email cannot be empty!");
+        } else if (password.isEmpty()) {
+            throw new InvalidInputException("Password cannot be empty");
+        } else {
+            GuestEntity newGuest = new GuestEntity(name, email, password);
+            em.persist(newGuest);
+            em.flush();
+            return newGuest.getGuestId();
+        }
     }
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
 }
