@@ -20,5 +20,9 @@ import util.enumeration.RoomTypeName;
 @Local
 public interface RoomReservationSessionBeanLocal {
 
-    public List<RoomEntity> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName rtName);    
+    public List<RoomEntity> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName rtName);
+
+    public Double getWalkInRate(LocalDate checkInDate, LocalDate checkoutDate, RoomTypeName rtName);
+
+    
 }

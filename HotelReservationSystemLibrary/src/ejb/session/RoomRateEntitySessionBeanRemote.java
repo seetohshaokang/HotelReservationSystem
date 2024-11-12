@@ -28,4 +28,5 @@ public interface RoomRateEntitySessionBeanRemote {
 
     public RoomRateEntity updateRoomRate(Long id, String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException, RoomRateNotFoundException;
     
+    public RoomRateEntity getRoomRateByRateAndRoomType(RoomTypeName roomTypeName, RateType rateType) throws RoomRateNotFoundException;
 }

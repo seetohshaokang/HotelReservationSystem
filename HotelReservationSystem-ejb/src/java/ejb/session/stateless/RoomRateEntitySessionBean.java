@@ -87,7 +87,7 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
                     oldRoomType.getRoomRates().remove(roomRate);
                     // Add roomrate to new room type
                     newRoomType.getRoomRates().add(roomRate);
-                    // Update room type of roomrate.
+                    // Update room type of roomrate
                     roomRate.setRoomType(newRoomType);
                 } catch (NoResultException | NonUniqueResultException ex) {
                     throw new RoomTypeNotFoundException("Room Type does not exist!");
@@ -112,5 +112,21 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     public List<RoomRateEntity> viewAllRoomRates() {
         Query query = em.createQuery("SELECT r FROM RoomRateEntity r");
         return query.getResultList();
+    }
+
+    @Override
+    public RoomRateEntity getRoomRateByRateAndRoomType(RoomTypeName roomTypeName, RateType rateType) throws RoomRateNotFoundException {
+        try {
+            // Construct the JPQL query to find the RoomRateEntity by RoomTypeName and RateType
+            Query query = em.createQuery("SELECT rr FROM RoomRateEntity rr WHERE rr.rateType = :rateType AND rr.roomType.name = :roomTypeName");
+            query.setParameter("rateType", rateType);
+            query.setParameter("roomTypeName", roomTypeName);
+
+            // Execute the query and return the result
+            return (RoomRateEntity) query.getSingleResult();
+
+        } catch (NoResultException ex) {
+            throw new RoomRateNotFoundException("Room Rate with room type name: " + roomTypeName.toString() + " and rate type " + rateType.toString() + " does not exist!");
+        } 
     }
 }
