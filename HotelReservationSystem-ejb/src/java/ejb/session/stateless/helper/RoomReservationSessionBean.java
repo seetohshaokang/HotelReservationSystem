@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/J2EE/EJB30/StatefulEjbClass.java to edit this template
  */
-package ejb.session.stateful;
+package ejb.session.stateless.helper;
 
 import ejb.session.stateless.RoomEntitySessionBeanLocal;
 import ejb.session.stateless.RoomRateEntitySessionBeanLocal;
@@ -11,6 +11,7 @@ import entity.RoomEntity;
 import entity.RoomRateEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
 import dataaccessobject.RoomsPerRoomType;
+import ejb.session.stateful.RoomReservationSessionBeanRemote;
 import ejb.session.stateless.ReservationEntitySessionBeanLocal;
 import ejb.session.stateless.RoomReservationEntitySessionBeanLocal;
 import entity.GuestEntity;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
+import javax.ejb.Stateless;
 import javax.persistence.Query;
 import util.enumeration.RateType;
 import util.enumeration.RoomTypeName;
@@ -36,7 +38,7 @@ import util.exception.RoomTypeNotFoundException;
  *
  * @author shaokangseetoh
  */
-@Stateful
+@Stateless
 public class RoomReservationSessionBean implements RoomReservationSessionBeanRemote, RoomReservationSessionBeanLocal {
 
     @EJB
