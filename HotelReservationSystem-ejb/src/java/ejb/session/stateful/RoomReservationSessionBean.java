@@ -17,6 +17,7 @@ import entity.GuestEntity;
 import entity.ReservationEntity;
 import entity.RoomReservationEntity;
 import entity.RoomTypeEntity;
+import entity.VisitorEntity;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -129,6 +130,59 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         reservationEntitySessionBean.confirmReservation(reservation);
 
         System.out.println("Reservation created with ID: " + reservationId);
+        return reservationId;
+    }
+
+    public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve) {
+        Double totalAmount = 0.0;
+        ReservationEntity reservation = null;
+
+        // Create a reservation for the visitor without room reservations initially
+        Long reservationId = reservationEntitySessionBean.createReservationForVisitor(visitor, checkInDate, checkOutDate, totalAmount);
+
+        if (reservationId == null) {
+            System.out.println("Reservation could not be created for visitor.");
+            return null;
+        }
+
+        // Fetch the created reservation entity
+        reservation = reservationEntitySessionBean.findReservationById(reservationId);
+
+        // Iterate over each RoomsPerRoomType DTO in the list
+        for (RoomsPerRoomType rooms : roomsToReserve) {
+            RoomTypeName roomTypeName = rooms.getRoomTypeName();
+            int numberOfRooms = rooms.getNumRooms();
+
+            // Retrieve the latest availability for the required room type
+            List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(checkInDate, checkOutDate, roomTypeName);
+
+            if (availableRooms.size() < numberOfRooms) {
+                System.out.println("Not enough rooms available for room type: " + roomTypeName + ". Requested: " + numberOfRooms + ", Available: " + availableRooms.size());
+                return null;
+            }
+
+            // Calculate the rate for the requested number of rooms for this room type
+            Double roomRate = getWalkInRate(checkInDate, checkOutDate, roomTypeName);
+            if (roomRate == null) {
+                System.out.println("Rate not available for room type: " + roomTypeName);
+                return null;
+            }
+            totalAmount += roomRate * numberOfRooms;
+
+            // Reserve the specific rooms by creating RoomReservationEntity records
+            for (int i = 0; i < numberOfRooms; i++) {
+                RoomEntity roomToReserve = availableRooms.get(i);
+
+                // Create a RoomReservationEntity for each room
+                RoomReservationEntity roomReservation = roomReservationEntitySessionBean.createNewRoomReservation(roomToReserve, reservation);
+            }
+        }
+
+        // Update the reservation's total amount
+        reservation.setTotalAmount(totalAmount);
+        reservationEntitySessionBean.confirmReservation(reservation);
+
+        System.out.println("Reservation created for visitor with ID: " + reservationId);
         return reservationId;
     }
 

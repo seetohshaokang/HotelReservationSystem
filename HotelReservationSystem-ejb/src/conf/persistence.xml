@@ -10,6 +10,7 @@
     <class>entity.RoomRateEntity</class>
     <class>entity.RoomTypeEntity</class>
     <class>entity.RoomReservationEntity</class>
+    <class>entity.VisitorEntity</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>
