@@ -35,6 +35,7 @@ public interface RoomReservationSessionBeanLocal {
     
     public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
     
+    // public void allocateRoomsForThatDay(LocalDate checkInDate);
 
 
 }

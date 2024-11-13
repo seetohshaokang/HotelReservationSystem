@@ -8,6 +8,7 @@ import entity.ReservationEntity;
 import entity.RoomEntity;
 import entity.RoomReservationEntity;
 import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.Remote;
 import util.enumeration.RoomTypeName;
 
@@ -19,6 +20,7 @@ import util.enumeration.RoomTypeName;
 public interface RoomReservationEntitySessionBeanRemote {
 
     public RoomReservationEntity createNewRoomReservation(RoomEntity room, ReservationEntity reservation);
+    public List<RoomReservationEntity> findRoomReservationsByDate(LocalDate date);
     
 
 }

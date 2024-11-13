@@ -33,6 +33,7 @@ public interface RoomReservationSessionBeanRemote {
     public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
     
     public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
-
+    
+    // public void allocateRoomsForThatDay(LocalDate checkInDate);
 
 }

@@ -36,6 +36,7 @@ public class RoomReservationEntity implements Serializable {
     // Date attributes
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
+    private boolean isAssigned;
 
     public RoomReservationEntity() {
     }
@@ -45,6 +46,7 @@ public class RoomReservationEntity implements Serializable {
         this.reservation = reservation;
         this.checkInDate = reservation.getCheckInDate();
         this.checkOutDate = reservation.getCheckOutDate();
+        this.isAssigned = false;
     }
     public Long getRoomReservationid() {
         return roomReservationid;
@@ -105,6 +107,20 @@ public class RoomReservationEntity implements Serializable {
      */
     public void setReservation(ReservationEntity reservation) {
         this.reservation = reservation;
+    }
+
+    /**
+     * @return the isAssigned
+     */
+    public boolean isIsAssigned() {
+        return isAssigned;
+    }
+
+    /**
+     * @param isAssigned the isAssigned to set
+     */
+    public void setIsAssigned(boolean isAssigned) {
+        this.isAssigned = isAssigned;
     }
     
 }

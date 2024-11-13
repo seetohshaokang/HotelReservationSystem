@@ -69,11 +69,12 @@ public class GuestRelationOfficerModule {
                 if (response == 1) {
                     walkInSearchRoom();
                 } else if (response == 2) {
-                   walkInReserveRoom();
+                    walkInReserveRoom();
                 } else if (response == 3) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 4) {
-                    System.out.println("Feature not implemented yet");
+                    // System.out.println("Feature not implemented yet");
+                    // allocateRoomsForSpecificDate(); for testing
                 } else if (response == 5) {
                     break;
                 } else {
@@ -222,4 +223,27 @@ public class GuestRelationOfficerModule {
         }
     }
 
+    /*
+    public void allocateRoomsForSpecificDate() {
+        Scanner scanner = new Scanner(System.in);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        LocalDate allocationDate = null;
+
+        // Prompt user for a valid date
+        while (allocationDate == null) {
+            System.out.print("Enter the date for room allocation (yyyy-MM-dd): ");
+            String dateInput = scanner.nextLine();
+            try {
+                allocationDate = LocalDate.parse(dateInput, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+            }
+        }
+
+        // Call the room allocation method for the specified date
+        roomReservationSessionBeanRemote.allocateRoomsForThatDay(allocationDate);
+        System.out.println("Room allocation for date " + allocationDate + " has been processed.");
+    }
+     */
 }

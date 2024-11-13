@@ -7,6 +7,8 @@ package ejb.session.stateless;
 import entity.ReservationEntity;
 import entity.RoomEntity;
 import entity.RoomReservationEntity;
+import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -17,5 +19,6 @@ import javax.ejb.Local;
 public interface RoomReservationEntitySessionBeanLocal {
 
     public RoomReservationEntity createNewRoomReservation(RoomEntity room, ReservationEntity reservation);
+    public List<RoomReservationEntity> findRoomReservationsByDate(LocalDate date);
     
 }

@@ -8,9 +8,12 @@ import ejb.session.RoomReservationEntitySessionBeanRemote;
 import entity.ReservationEntity;
 import entity.RoomEntity;
 import entity.RoomReservationEntity;
+import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -21,8 +24,7 @@ public class RoomReservationEntitySessionBean implements RoomReservationEntitySe
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
-    
-    
+
     @Override
     public RoomReservationEntity createNewRoomReservation(RoomEntity room, ReservationEntity reservation) {
         // Get primary key of existing room
@@ -30,7 +32,7 @@ public class RoomReservationEntitySessionBean implements RoomReservationEntitySe
         // Persist unmanaged reservation
         em.persist(reservation);
         // Retriev extising room from database
-        RoomEntity retrievedRoom = em.find(RoomEntity.class, roomId);        
+        RoomEntity retrievedRoom = em.find(RoomEntity.class, roomId);
         // Initalise new RR record
         RoomReservationEntity newRR = new RoomReservationEntity(retrievedRoom, reservation);
         // Add RR to Room Record
@@ -41,5 +43,13 @@ public class RoomReservationEntitySessionBean implements RoomReservationEntitySe
         em.flush();
         return newRR;
     }
-    
+
+    public List<RoomReservationEntity> findRoomReservationsByDate(LocalDate date) {
+        Query query = em.createQuery(
+                "SELECT rr FROM RoomReservationEntity rr "
+                + "WHERE rr.checkInDate = :date");
+        query.setParameter("date", date);
+        return query.getResultList();
+    }
+
 }
