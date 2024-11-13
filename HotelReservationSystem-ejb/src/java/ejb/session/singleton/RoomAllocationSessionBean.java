@@ -4,7 +4,7 @@
  */
 package ejb.session.singleton;
 
-import ejb.session.stateful.RoomReservationSessionBean;
+import ejb.session.stateless.helper.RoomReservationSessionBean;
 import ejb.session.stateless.RoomEntitySessionBean;
 import entity.ReservationEntity;
 import entity.RoomEntity;
@@ -77,5 +77,5 @@ public class RoomAllocationSessionBean {
             }
         }
     }
-*/
+     */
 }
