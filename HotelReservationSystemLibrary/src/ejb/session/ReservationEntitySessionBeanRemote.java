@@ -4,6 +4,8 @@
  */
 package ejb.session;
 
+import entity.GuestEntity;
+import java.time.LocalDate;
 import javax.ejb.Remote;
 
 /**
@@ -12,5 +14,7 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface ReservationEntitySessionBeanRemote {
-    
+
+    public Long createReservationForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount);
+
 }

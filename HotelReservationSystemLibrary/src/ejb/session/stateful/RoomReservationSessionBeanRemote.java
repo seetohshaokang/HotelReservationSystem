@@ -5,6 +5,8 @@
 package ejb.session.stateful;
 
 import entity.RoomEntity;
+import dataaccessobject.AvailableRoomsPerRoomType;
+import dataaccessobject.RoomsPerRoomType;
 import entity.RoomTypeEntity;
 import java.time.LocalDate;
 import java.util.List;
@@ -19,7 +21,9 @@ import util.enumeration.RoomTypeName;
 @Remote
 public interface RoomReservationSessionBeanRemote {
 
-    public List<RoomEntity> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName rtName);
+    public List<AvailableRoomsPerRoomType> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate);
     
+    public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
+
     public Double getWalkInRate(LocalDate checkInDate, LocalDate checkoutDate, RoomTypeName rtName);
 }

@@ -43,9 +43,6 @@ public class ReservationEntity implements Serializable {
     @JoinColumn
     private PartnerEntity partner;
     
-    // A reservation must be tied to either a guest or partner, how to resolve?
-    // Unable to put optional = false for both fields as its either or
-    
     // 1...* r/s with room
     @OneToMany(mappedBy = "reservation", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomReservationEntity> roomReservations;

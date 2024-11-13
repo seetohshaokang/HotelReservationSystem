@@ -4,6 +4,8 @@
  */
 package ejb.session.stateless;
 
+import entity.GuestEntity;
+import java.time.LocalDate;
 import javax.ejb.Local;
 
 /**
@@ -12,5 +14,6 @@ import javax.ejb.Local;
  */
 @Local
 public interface ReservationEntitySessionBeanLocal {
-    
+
+    public Long createReservationForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount);
 }

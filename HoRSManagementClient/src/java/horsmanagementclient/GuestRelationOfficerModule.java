@@ -8,6 +8,7 @@ import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.stateful.RoomReservationSessionBeanRemote;
 import entity.EmployeeEntity;
 import entity.RoomEntity;
+import dataaccessobject.AvailableRoomsPerRoomType;
 import entity.RoomTypeEntity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -90,7 +91,7 @@ public class GuestRelationOfficerModule {
         LocalDate checkInDate = null;
         LocalDate checkOutDate = null;
 
-        // Read and parse checkInDate
+        // Prompt for check-in and check-out dates
         while (checkInDate == null) {
             System.out.print("Enter check-in date (yyyy-MM-dd): ");
             String checkInInput = scanner.nextLine();
@@ -100,34 +101,32 @@ public class GuestRelationOfficerModule {
                 System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
             }
         }
-        // Read and parse checkOutDate
         while (checkOutDate == null) {
             System.out.print("Enter check-out date (yyyy-MM-dd): ");
             String checkOutInput = scanner.nextLine();
             try {
                 checkOutDate = LocalDate.parse(checkOutInput, formatter);
-
-                // Ensure checkOutDate is after checkInDate
                 if (checkOutDate.isBefore(checkInDate)) {
                     System.out.println("Check-out date must be after check-in date. Please enter again.");
-                    checkOutDate = null; // Reset checkOutDate to re-prompt user
+                    checkOutDate = null;
                 }
             } catch (DateTimeParseException e) {
                 System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
             }
         }
+
+        // Call searchAvailableRooms to get a list of AvailableRoomsPerRoomType objects
+        List<AvailableRoomsPerRoomType> roomTypeAvailabilityList = roomReservationSessionBeanRemote.searchAvailableRooms(checkInDate, checkOutDate);
+
         // Header for the output table
         System.out.printf("%-20s || %-20s || %-20s%n", "Room Type", "Available Rooms", "Total Rate Per Room For Given Duration");
 
-        // Loop through each RoomTypeName and fetch available rooms and rates
-        for (RoomTypeName roomTypeName : RoomTypeName.values()) {
-            // Fetch available rooms for the specified check-in and check-out dates
-            List<RoomEntity> availableRooms = roomReservationSessionBeanRemote.searchAvailableRooms(checkInDate, checkOutDate, roomTypeName);
-
-            // Fetch the total rate for the duration of stay for the room type
+        // Print each AvailableRoomsPerRoomType object with details
+        for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
+            RoomTypeName roomTypeName = roomTypeAvailability.getRoomTypeName();
+            List<RoomEntity> availableRooms = roomTypeAvailability.getAvailableRooms();
             Double totalRate = roomReservationSessionBeanRemote.getWalkInRate(checkInDate, checkOutDate, roomTypeName);
 
-            // Print the room type, available room count, and the total rate
             System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
         }
     }

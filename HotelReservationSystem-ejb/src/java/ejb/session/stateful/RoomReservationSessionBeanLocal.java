@@ -6,6 +6,7 @@ package ejb.session.stateful;
 
 import entity.ReservationEntity;
 import entity.RoomEntity;
+import dataaccessobject.AvailableRoomsPerRoomType;
 import entity.RoomTypeEntity;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +21,7 @@ import util.enumeration.RoomTypeName;
 @Local
 public interface RoomReservationSessionBeanLocal {
 
-    public List<RoomEntity> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName rtName);
+    public List<AvailableRoomsPerRoomType> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate);
 
     public Double getWalkInRate(LocalDate checkInDate, LocalDate checkoutDate, RoomTypeName rtName);
 

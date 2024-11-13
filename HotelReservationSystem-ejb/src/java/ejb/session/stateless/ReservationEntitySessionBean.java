@@ -5,9 +5,14 @@
 package ejb.session.stateless;
 
 import ejb.session.ReservationEntitySessionBeanRemote;
+import entity.GuestEntity;
+import entity.ReservationEntity;
+import java.time.LocalDate;
+import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import util.enumeration.ReservationStatus;
 
 /**
  *
@@ -16,16 +21,28 @@ import javax.persistence.PersistenceContext;
 @Stateless
 public class ReservationEntitySessionBean implements ReservationEntitySessionBeanRemote, ReservationEntitySessionBeanLocal {
 
+    @EJB
+    private GuestEntitySessionBeanLocal guestEntitySessionBean;
+
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
-
-    public void persist(Object object) {
-        em.persist(object);
+    
+  
+    // Method to create a new newReservation for a guest, verifying the guest exists
+    public Long createReservationForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount) {
+        // Retrieve guest from database
+        GuestEntity guest = em.find(GuestEntity.class, guestId);
+        if (guest == null) {
+            System.out.println("Guest with ID " + guestId + " does not exist.");
+            return null;
+        }
+        // Create new newReservation entity
+        ReservationEntity newReservation = new ReservationEntity(guest, checkInDate, checkOutDate, totalAmount, ReservationStatus.PENDING);
+        // Add reservation entity to guest
+        guest.getReservations().add(newReservation);
+        em.persist(newReservation);
+        em.flush();
+        return newReservation.getReservationId();
     }
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-    
-    
-    
 }
