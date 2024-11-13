@@ -2,13 +2,14 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/J2EE/EJB30/SessionLocal.java to edit this template
  */
-package ejb.session.stateful;
+package ejb.session.stateless.helper;
 
 import entity.ReservationEntity;
 import entity.RoomEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
 import dataaccessobject.RoomsPerRoomType;
 import entity.RoomTypeEntity;
+import entity.VisitorEntity;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -32,4 +33,8 @@ public interface RoomReservationSessionBeanLocal {
 
     public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
     
+    public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
+    
+
+
 }

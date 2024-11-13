@@ -53,7 +53,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
             // No existing room
             // Find roomType
             RoomTypeEntity rt = roomTypeEntitySessionBean.getRoomTypeByName(rtName);
-            
+
             // Check if room type is disabled
             if (rt.getIsDisabled() == true) {
                 throw new DisabledException("Room Type is current disabled!");
@@ -128,7 +128,8 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
                 + "AND NOT EXISTS ("
                 + "SELECT rr FROM RoomReservationEntity rr "
                 + "WHERE rr.reservedRoom = r "
-                + "AND (rr.checkOutDate >= :checkInDate OR rr.checkInDate <= :checkOutDate))");
+                + "AND rr.checkInDate < :checkOutDate "
+                + "AND rr.checkOutDate > :checkInDate)");
         // NOT EXIST clause will be true even if there are no room reservations associated with room.
 
         query.setParameter("checkInDate", checkInDate);

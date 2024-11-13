@@ -118,7 +118,7 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     public RoomRateEntity getRoomRateByRateAndRoomType(RoomTypeName roomTypeName, RateType rateType) throws RoomRateNotFoundException {
         try {
             // Construct the JPQL query to find the RoomRateEntity by RoomTypeName and RateType
-            Query query = em.createQuery("SELECT rr FROM RoomRateEntity rr WHERE rr.rateType = :rateType AND rr.roomType.name = :roomTypeName");
+            Query query = em.createQuery("SELECT rr FROM RoomRateEntity rr WHERE rr.rateType = :rateType AND rr.roomType.roomTypeName = :roomTypeName");
             query.setParameter("rateType", rateType);
             query.setParameter("roomTypeName", roomTypeName);
 

@@ -9,10 +9,13 @@ import ejb.session.stateful.RoomReservationSessionBeanRemote;
 import entity.EmployeeEntity;
 import entity.RoomEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
+import dataaccessobject.RoomsPerRoomType;
 import entity.RoomTypeEntity;
+import entity.VisitorEntity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -64,10 +67,9 @@ public class GuestRelationOfficerModule {
                 System.out.print("> ");
                 response = scanner.nextInt();
                 if (response == 1) {
-                    System.out.println("Feature not implemented yet");
                     walkInSearchRoom();
                 } else if (response == 2) {
-                    System.out.println("Feature not implemented yet");
+                   walkInReserveRoom();
                 } else if (response == 3) {
                     System.out.println("Feature not implemented yet");
                 } else if (response == 4) {
@@ -132,7 +134,92 @@ public class GuestRelationOfficerModule {
     }
 
     private void walkInReserveRoom() {
+        Scanner scanner = new Scanner(System.in);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+        // Gather visitor details
+        System.out.print("Enter Visitor Name: ");
+        String visitorName = scanner.nextLine().trim();
+
+        System.out.print("Enter Visitor Email: ");
+        String visitorEmail = scanner.nextLine().trim();
+
+        // Create a new VisitorEntity for the walk-in visitor
+        VisitorEntity visitor = new VisitorEntity(visitorName, visitorEmail);
+
+        // Prompt for check-in and check-out dates
+        LocalDate checkInDate = null;
+        LocalDate checkOutDate = null;
+        while (checkInDate == null) {
+            System.out.print("Enter check-in date (yyyy-MM-dd): ");
+            String checkInInput = scanner.nextLine();
+            try {
+                checkInDate = LocalDate.parse(checkInInput, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+            }
+        }
+        while (checkOutDate == null) {
+            System.out.print("Enter check-out date (yyyy-MM-dd): ");
+            String checkOutInput = scanner.nextLine();
+            try {
+                checkOutDate = LocalDate.parse(checkOutInput, formatter);
+                if (checkOutDate.isBefore(checkInDate)) {
+                    System.out.println("Check-out date must be after check-in date. Please enter again.");
+                    checkOutDate = null;
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+            }
+        }
+
+        // Show available room types for the selected dates
+        List<AvailableRoomsPerRoomType> roomTypeAvailabilityList = roomReservationSessionBeanRemote.searchAvailableRooms(checkInDate, checkOutDate);
+        System.out.println("\nAvailable Room Types:");
+        System.out.printf("%-20s || %-20s%n", "Room Type", "Available Rooms");
+        for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
+            System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRooms().size());
+        }
+
+        // Gather room reservation details from the visitor
+        List<RoomsPerRoomType> roomsToReserve = new ArrayList<>();
+        while (true) {
+            System.out.print("Enter room type name to reserve (or type 'done' to finish): ");
+            String roomTypeNameInput = scanner.nextLine().trim();
+            if (roomTypeNameInput.equalsIgnoreCase("done")) {
+                break;
+            }
+
+            RoomTypeName roomTypeName;
+            try {
+                roomTypeName = RoomTypeName.valueOf(roomTypeNameInput.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Invalid room type. Please try again.");
+                continue;
+            }
+
+            System.out.print("Enter the number of rooms to reserve for " + roomTypeName + ": ");
+            int numberOfRooms;
+            try {
+                numberOfRooms = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid number of rooms. Please enter a valid integer.");
+                continue;
+            }
+
+            RoomsPerRoomType rooms = new RoomsPerRoomType();
+            rooms.setRoomTypeName(roomTypeName);
+            rooms.setNumRooms(numberOfRooms);
+            roomsToReserve.add(rooms);
+        }
+
+        // Make the reservation for the visitor
+        Long reservationId = roomReservationSessionBeanRemote.reserveRoomForVisitor(visitor, checkInDate, checkOutDate, roomsToReserve);
+        if (reservationId != null) {
+            System.out.println("Reservation successful. The reservation ID is: " + reservationId);
+        } else {
+            System.out.println("Reservation failed. Please ensure your requested rooms are available.");
+        }
     }
 
 }

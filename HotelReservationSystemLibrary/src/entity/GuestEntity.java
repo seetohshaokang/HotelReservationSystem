@@ -20,103 +20,76 @@ import javax.persistence.OneToMany;
  * @author shaokangseetoh
  */
 @Entity
-public class GuestEntity implements Serializable {
+public class GuestEntity extends VisitorEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long guestId;
 
-    @Column
-    private String name;
-    @Column
-    private String email;
-    @Column
+    @Column(nullable = false)
     private String password;
 
-    // 1...* r/s with reservation
-    @OneToMany(mappedBy = "guest", cascade = {}, fetch = FetchType.LAZY)
-    private List<ReservationEntity> reservations;
-
-    // JPA Constructor
     public GuestEntity() {
-        this.reservations = new ArrayList<>();
+        super();
     }
 
     // Default Constructor
-    public GuestEntity(String name, String identifier, String password) {
-        this.name = name;
-        this.email = identifier;
+    public GuestEntity(String name, String email, String password) {
+        super(name, email);
         this.password = password;
-        this.reservations = new ArrayList<>();
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 0;
-        hash += (guestId != null ? guestId.hashCode() : 0);
-        return hash;
-    }
-
-    @Override
-    public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the guestId fields are not set
-        if (!(object instanceof GuestEntity)) {
-            return false;
-        }
-        GuestEntity other = (GuestEntity) object;
-        if ((this.guestId == null && other.guestId != null) || (this.guestId != null && !this.guestId.equals(other.guestId))) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "entity.GuestEntity[ id=" + guestId + " ]";
-    }
-
-    // Getters and Setters
+    // Alias for visitorId as guestId
     public Long getGuestId() {
-        return guestId;
+        return getVisitorId();
     }
 
     public void setGuestId(Long guestId) {
-        this.guestId = guestId;
+        setVisitorId(guestId);
     }
 
+    // Alias for name
+    public String getGuestName() {
+        return getName();
+    }
+
+    public void setGuestName(String name) {
+        setName(name);
+    }
+
+    // Alias for email
+    public String getGuestEmail() {
+        return getEmail();
+    }
+
+    public void setGuestEmail(String email) {
+        setEmail(email);
+    }
+
+    // Alias for reservations
+    public List<ReservationEntity> getGuestReservations() {
+        return getReservations();
+    }
+
+    public void setGuestReservations(List<ReservationEntity> reservations) {
+        setReservations(reservations);
+    }
+
+    /**
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * @param password the password to set
+     */
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public List<ReservationEntity> getReservations() {
-        return reservations;
+    @Override
+    public String toString() {
+        return "GuestEntity[ id=" + getGuestId() + ", name=" + getGuestName() + ", email=" + getGuestEmail() + " ]";
     }
-
-    public void setReservations(List<ReservationEntity> reservations) {
-        this.reservations = reservations;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    
 
 }

@@ -36,19 +36,18 @@ public class ReservationEntity implements Serializable {
     // *...1 r/s with Guest
     @ManyToOne
     @JoinColumn
-    private GuestEntity guest;
-    
+    private VisitorEntity visitor;
+
     // *...1 r/s with partner
     /*
     @ManyToOne
     @JoinColumn
     private PartnerEntity partner;
-    */
-    
+     */
     // 1...* r/s with room
     @OneToMany(mappedBy = "reservation", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomReservationEntity> roomReservations;
-   
+
     @Column
     private LocalDate checkInDate;
     @Column
@@ -57,7 +56,6 @@ public class ReservationEntity implements Serializable {
     private Double totalAmount;
     @Column
     private LocalDate reservationDate;
-
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
@@ -68,8 +66,8 @@ public class ReservationEntity implements Serializable {
     }
 
     // Constructor for guests
-    public ReservationEntity(GuestEntity guest, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
-        this.guest = guest;
+    public ReservationEntity(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
+        this.visitor = visitor;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.totalAmount = totalAmount;
@@ -88,8 +86,7 @@ public class ReservationEntity implements Serializable {
         this.status = status;
         this.roomReservations = new ArrayList<>();
     }
-    */
-    
+     */
     @Override
     public int hashCode() {
         int hash = 0;
@@ -114,7 +111,7 @@ public class ReservationEntity implements Serializable {
     public String toString() {
         return "entity.ReservationEntity[ id=" + reservationId + " ]";
     }
-    
+
     // Getters and Setters
     public Long getReservationId() {
         return reservationId;
@@ -124,14 +121,20 @@ public class ReservationEntity implements Serializable {
         this.reservationId = reservationId;
     }
 
-    public GuestEntity getGuest() {
-        return guest;
+    /**
+     * @return the visitor
+     */
+    public VisitorEntity getVisitor() {
+        return visitor;
     }
 
-    public void setGuest(GuestEntity guest) {
-        this.guest = guest;
+    /**
+     * @param visitor the visitor to set
+     */
+    public void setVisitor(VisitorEntity visitor) {
+        this.visitor = visitor;
     }
-    
+
     public LocalDate getCheckInDate() {
         return checkInDate;
     }
@@ -191,7 +194,14 @@ public class ReservationEntity implements Serializable {
     public void setReservationDate(LocalDate reservationDate) {
         this.reservationDate = reservationDate;
     }
-    
-    
-    
+
+    // Alias getter and setter methods for GuestEntity compatibility
+    public GuestEntity getGuest() {
+        return (this.visitor instanceof GuestEntity) ? (GuestEntity) this.visitor : null;
+    }
+
+    public void setGuest(GuestEntity guest) {
+        this.visitor = guest;
+    }
+
 }

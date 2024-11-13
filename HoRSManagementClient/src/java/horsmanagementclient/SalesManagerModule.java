@@ -331,11 +331,11 @@ public class SalesManagerModule {
         List<RoomRateEntity> roomRates = roomRateEntitySessionBeanRemote.viewAllRoomRates();
         Integer roomRateCount = 0;
 
-        System.out.printf("%-20s || %-20s || %-20s || %-20s%n", "S/N", "Room Rate Id", "Room Rate Name", "Room Type Name");
+        System.out.printf("%-20s || %-20s || %-30s || %-30s%n", "S/N", "Room Rate Id", "Room Rate Name", "Room Type Name");
 
         for (RoomRateEntity roomRate : roomRates) {
             roomRateCount++;
-            System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomRateCount, roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getRoomTypeName().toString());
+            System.out.printf("%-20d || %-20d || %-30s || %-30s%n", roomRateCount, roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getRoomTypeName().toString());
         }
     }
 
