@@ -19,6 +19,8 @@ import util.enumeration.EmployeeRole;
 import ejb.session.stateless.RoomReservationEntitySessionBeanLocal;
 import ejb.session.stateless.RoomTypeEntitySessionBeanLocal;
 import entity.RoomTypeEntity;
+import java.util.ArrayList;
+import java.util.List;
 import util.enumeration.RateType;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
@@ -64,7 +66,7 @@ public class DataInitialisationBean {
             initialiseEmployeeData();
         }
         if (roomTypeEntitySessionBeanLocal.viewAllRoomTypes().isEmpty()) {
-            //initialiseRoomTypeData();
+            initialiseRoomTypeData();
         }
         if (roomRateEntitySessionBeanLocal.viewAllRoomRates().isEmpty()) {
             initialiseRoomRateData();
@@ -83,13 +85,99 @@ public class DataInitialisationBean {
     }
 
     private void initialiseRoomTypeData() {
-        /*Name, NextHigherRoomType
-        
-        Deluxe Room, Premier Room
-        Premier Room, Family Room
-        Family Room, Junior Suite
-        Junior Suite, Grand Suite
-        Grand Suite, None (i.e., Grand Suite is the current highest room type)*/
+        try {
+            // Deluxe Room, Premier Room
+            List<String> deluxeAmenities = new ArrayList<>();
+            deluxeAmenities.add("TV");
+            deluxeAmenities.add("Mini Fridge");
+            deluxeAmenities.add("Air Conditioning");
+            RoomTypeEntity deluxeRoom = new RoomTypeEntity(
+                    RoomTypeName.DELUXE,
+                    RoomTypeName.PREMIER,
+                    "Deluxe Room with essential amenities, suitable for budget travelers.",
+                    30.0,
+                    "Queen Bed",
+                    2,
+                    deluxeAmenities
+            );
+            roomTypeEntitySessionBeanLocal.createNewRoomType(deluxeRoom);
+
+            // Premier Room, Family Room
+            List<String> premierAmenities = new ArrayList<>();
+            premierAmenities.add("TV");
+            premierAmenities.add("Mini Fridge");
+            premierAmenities.add("Air Conditioning");
+            premierAmenities.add("Work Desk");
+            RoomTypeEntity premierRoom = new RoomTypeEntity(
+                    RoomTypeName.PREMIER,
+                    RoomTypeName.FAMILY,
+                    "Premier Room with enhanced amenities and larger space.",
+                    40.0,
+                    "King Bed",
+                    2,
+                    premierAmenities
+            );
+            roomTypeEntitySessionBeanLocal.createNewRoomType(premierRoom);
+
+            // Family Room, Junior Suite
+            List<String> familyAmenities = new ArrayList<>();
+            familyAmenities.add("TV");
+            familyAmenities.add("Mini Fridge");
+            familyAmenities.add("Air Conditioning");
+            familyAmenities.add("Living Area");
+            RoomTypeEntity familyRoom = new RoomTypeEntity(
+                    RoomTypeName.FAMILY,
+                    RoomTypeName.JUNIOR,
+                    "Family Room with spacious area, ideal for small families.",
+                    50.0,
+                    "Two Queen Beds",
+                    4,
+                    familyAmenities
+            );
+            roomTypeEntitySessionBeanLocal.createNewRoomType(familyRoom);
+
+            // Junior Suite, Grand Suite
+            List<String> juniorSuiteAmenities = new ArrayList<>();
+            juniorSuiteAmenities.add("TV");
+            juniorSuiteAmenities.add("Mini Fridge");
+            juniorSuiteAmenities.add("Air Conditioning");
+            juniorSuiteAmenities.add("Living Room");
+            juniorSuiteAmenities.add("Coffee Maker");
+            RoomTypeEntity juniorSuite = new RoomTypeEntity(
+                    RoomTypeName.JUNIOR,
+                    RoomTypeName.GRAND,
+                    "Junior Suite with a luxurious setting and additional services.",
+                    60.0,
+                    "King Bed and Sofa Bed",
+                    4,
+                    juniorSuiteAmenities
+            );
+            roomTypeEntitySessionBeanLocal.createNewRoomType(juniorSuite);
+
+            // Grand Suite, None (highest level)
+            List<String> grandSuiteAmenities = new ArrayList<>();
+            grandSuiteAmenities.add("TV");
+            grandSuiteAmenities.add("Mini Fridge");
+            grandSuiteAmenities.add("Air Conditioning");
+            grandSuiteAmenities.add("Living Room");
+            grandSuiteAmenities.add("Coffee Maker");
+            grandSuiteAmenities.add("Private Balcony");
+            RoomTypeEntity grandSuite = new RoomTypeEntity(
+                    RoomTypeName.GRAND,
+                    null,
+                    "Grand Suite, our highest level suite offering top-tier luxury and space.",
+                    80.0,
+                    "King Bed and Sofa Bed",
+                    4,
+                    grandSuiteAmenities
+            );
+            roomTypeEntitySessionBeanLocal.createNewRoomType(grandSuite);
+
+            System.out.println("Room type data initialized successfully.");
+
+        } catch (Exception ex) {
+            System.out.println("Failed to initialize room type data: " + ex.getMessage());
+        }
     }
 
     private void initialiseRoomRateData() {

@@ -119,71 +119,90 @@ public class OperationManagerModule {
         System.out.println("*** HORS System :: Operation Manager :: Create New Room Type ***\n");
         System.out.println("-------------------------------------------------------------------");
 
+        // Select the room type name
+        RoomTypeName selectedRoomType = null;
         while (true) {
             response = 0;
             System.out.println("Please Select Room Type");
             int count = 0;
-            // Print out roomtype name enum
             for (RoomTypeName roomTypeName : RoomTypeName.values()) {
                 count++;
-                System.out.println(count + " " + roomTypeName);
+                System.out.println(count + ". " + roomTypeName);
             }
             System.out.print("Enter room type number> ");
             response = scanner.nextInt();
             scanner.nextLine();
 
-            if (response < 1 || response > 5) {
-                System.out.println("Invalid option. Please select a number between 1 and 5.");
+            if (response < 1 || response > RoomTypeName.values().length) {
+                System.out.println("Invalid option. Please select a valid room type number.");
             } else {
-                System.out.println("You have selected option " + response);
+                selectedRoomType = RoomTypeName.values()[response - 1];
+                System.out.println("You have selected room type: " + selectedRoomType);
                 break;
             }
         }
-        // Using enum values by indexing
-        RoomTypeName selectedRoomType = RoomTypeName.values()[response - 1];
 
-        String description = "";
-        while (true) {
-            System.out.print("Enter description > ");
-            if (scanner.hasNextLine()) {
-                description = scanner.nextLine();
-                break;
-            } else {
-                System.out.println("Please input a valid description");
+        // Select the next higher room type name
+        RoomTypeName nextHigherRoomTypeName = null;
+        System.out.println("\nDo you want to specify a next higher room type for this room type? (Y/N)");
+        String reply = scanner.nextLine().trim();
+        if (reply.equalsIgnoreCase("Y")) {
+            while (true) {
+                System.out.println("Please Select Next Higher Room Type");
+                int count = 0;
+                for (RoomTypeName roomTypeName : RoomTypeName.values()) {
+                    count++;
+                    System.out.println(count + ". " + roomTypeName);
+                }
+                System.out.print("Enter next higher room type number> ");
+                response = scanner.nextInt();
+                scanner.nextLine();
+
+                if (response < 1 || response > RoomTypeName.values().length) {
+                    System.out.println("Invalid option. Please select a valid room type number.");
+                } else {
+                    nextHigherRoomTypeName = RoomTypeName.values()[response - 1];
+                    System.out.println("Next higher room type set to: " + nextHigherRoomTypeName);
+                    break;
+                }
             }
         }
-        Double size = 0.0;
-        while (true) {
+
+        // Enter description
+        System.out.print("Enter description > ");
+        String description = scanner.nextLine();
+
+        // Enter size
+        Double size = null;
+        while (size == null) {
             System.out.print("Enter size > ");
             if (scanner.hasNextDouble()) {
                 size = scanner.nextDouble();
                 scanner.nextLine();
-                break;
             } else {
-                System.out.println("Please input a valid size");
+                System.out.println("Please input a valid size.");
+                scanner.nextLine();
             }
         }
-        String bed = "";
-        while (true) {
-            System.out.print("Enter bed > ");
-            if (scanner.hasNextLine()) {
-                bed = scanner.nextLine();
-                break;
-            } else {
-                System.out.println("Please input a valid bed");
-            }
-        }
-        Integer capacity = 0;
-        while (true) {
+
+        // Enter bed type
+        System.out.print("Enter bed type > ");
+        String bed = scanner.nextLine();
+
+        // Enter capacity
+        Integer capacity = null;
+        while (capacity == null) {
             System.out.print("Enter capacity > ");
             if (scanner.hasNextInt()) {
                 capacity = scanner.nextInt();
                 scanner.nextLine();
-                break;
             } else {
-                System.out.println("Please input a valid capacity");
+                System.out.println("Please input a valid capacity.");
+                scanner.nextLine();
             }
         }
+
+        // Enter amenities
         List<String> amenities = new ArrayList<>();
         while (true) {
             System.out.print("Enter an amenity to add: ");
@@ -191,17 +210,18 @@ public class OperationManagerModule {
             amenities.add(amenity);
 
             System.out.print("Do you want to add another amenity? (Y/N): ");
-            String reply = scanner.nextLine().trim().toLowerCase();
-
+            reply = scanner.nextLine().trim().toLowerCase();
             if (!reply.equalsIgnoreCase("y")) {
                 break;
             }
         }
-        // Instantiate Entity
-        RoomTypeEntity newRoomType = new RoomTypeEntity(selectedRoomType, description, size, bed, capacity, amenities);
-        // Call Session Bean
+
+        // Instantiate the RoomTypeEntity with the new field
+        RoomTypeEntity newRoomType = new RoomTypeEntity(selectedRoomType, nextHigherRoomTypeName, description, size, bed, capacity, amenities);
+
+        // Call Session Bean to persist
         String newRoomTypeName = roomTypeEntitySessionBeanRemote.createNewRoomType(newRoomType);
-        System.out.println("You have created a new room type: " + newRoomTypeName);
+        System.out.println("You have successfully created a new room type: " + newRoomTypeName);
     }
 
     // Use case 8
@@ -226,54 +246,43 @@ public class OperationManagerModule {
     // Use case 9
     private void updateRoomTypeDetails() {
         Scanner scanner = new Scanner(System.in);
-        viewAllRoomTypes();
-        Integer response = 0;
-        System.out.print("Enter room type id of the room type you wish to update > ");
-        response = scanner.nextInt();
+        viewAllRoomTypes(); // Display all room types to the user
+
+        System.out.print("Enter room type ID of the room type you wish to update > ");
+        Long roomTypeId = scanner.nextLong();
         scanner.nextLine();
 
-        String newDescription = "";
-        while (true) {
-            System.out.print("Enter description > ");
-            if (scanner.hasNextLine()) {
-                newDescription = scanner.nextLine();
-                break;
-            } else {
-                System.out.println("Please input a valid description!");
-            }
-        }
-        Double newSize = 0.0;
-        while (true) {
+        String newDescription;
+        System.out.print("Enter description > ");
+        newDescription = scanner.nextLine();
+
+        Double newSize = null;
+        while (newSize == null) {
             System.out.print("Enter size > ");
             if (scanner.hasNextDouble()) {
                 newSize = scanner.nextDouble();
                 scanner.nextLine();
-                break;
             } else {
                 System.out.println("Please input a valid size!");
+                scanner.nextLine(); // Consume invalid input
             }
         }
-        String newBed = "";
-        while (true) {
-            System.out.print("Enter bed > ");
-            if (scanner.hasNextLine()) {
-                newBed = scanner.nextLine();
-                break;
-            } else {
-                System.out.println("Please input a valid bed!");
-            }
-        }
-        Integer newCapacity = 0;
-        while (true) {
+
+        System.out.print("Enter bed > ");
+        String newBed = scanner.nextLine();
+
+        Integer newCapacity = null;
+        while (newCapacity == null) {
             System.out.print("Enter capacity > ");
             if (scanner.hasNextInt()) {
                 newCapacity = scanner.nextInt();
                 scanner.nextLine();
-                break;
             } else {
                 System.out.println("Please input a valid capacity!");
+                scanner.nextLine(); // Consume invalid input
             }
         }
+
         List<String> newAmenities = new ArrayList<>();
         while (true) {
             System.out.print("Enter an amenity to add: ");
@@ -282,29 +291,64 @@ public class OperationManagerModule {
 
             System.out.print("Do you want to add another amenity? (Y/N): ");
             String reply = scanner.nextLine().trim().toLowerCase();
-
             if (!reply.equalsIgnoreCase("y")) {
                 break;
             }
         }
-        // Call session bean
+
+        // Prompt for the next higher room type name
+        RoomTypeName newNextHigherRoomTypeName = null;
+        System.out.print("\nDo you want to specify a next higher room type? (Y/N): ");
+        String reply = scanner.nextLine().trim();
+        if (reply.equalsIgnoreCase("Y")) {
+            System.out.println("Select Next Higher Room Type:");
+            int count = 0;
+            for (RoomTypeName roomTypeName : RoomTypeName.values()) {
+                count++;
+                System.out.println(count + ". " + roomTypeName);
+            }
+            System.out.print("Enter next higher room type number > ");
+            int selectedType = scanner.nextInt();
+            scanner.nextLine();
+
+            if (selectedType >= 1 && selectedType <= RoomTypeName.values().length) {
+                newNextHigherRoomTypeName = RoomTypeName.values()[selectedType - 1];
+                System.out.println("Next higher room type set to: " + newNextHigherRoomTypeName);
+            } else {
+                System.out.println("Invalid selection. No next higher room type set.");
+            }
+        }
+
+        // Call session bean to update room type
         try {
-            RoomTypeEntity roomTypeUpdated = roomTypeEntitySessionBeanRemote.updateRoomType(Long.valueOf(response), newDescription, newSize, newBed, newCapacity, newAmenities);
-            System.out.println("*** Updated details of room type: ***\n");
-            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s%n", "Description", "Size", "Bed", "Capacity", "Amenities");
-            System.out.printf("%-20s || %-20.2f || %-20s || %-20d || %-20s%n",
+            RoomTypeEntity roomTypeUpdated = roomTypeEntitySessionBeanRemote.updateRoomType(
+                    roomTypeId,
+                    newDescription,
+                    newSize,
+                    newBed,
+                    newCapacity,
+                    newAmenities,
+                    newNextHigherRoomTypeName);
+
+            System.out.println("\n*** Updated details of room type: ***");
+            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s || %-20s%n",
+                    "Description", "Size", "Bed", "Capacity", "Amenities", "Next Higher Room Type");
+            System.out.printf("%-20s || %-20.2f || %-20s || %-20d || %-20s || %-20s%n",
                     roomTypeUpdated.getDescription(),
                     roomTypeUpdated.getSize(),
                     roomTypeUpdated.getBed(),
                     roomTypeUpdated.getCapacity(),
-                    roomTypeUpdated.getAmenities().toString());
+                    roomTypeUpdated.getAmenities().toString(),
+                    roomTypeUpdated.getNextHigherRoomTypeName() != null ? roomTypeUpdated.getNextHigherRoomTypeName().toString() : "None");
+
         } catch (RoomTypeNotFoundException ex) {
             System.out.println("Invalid Room Type Selected: " + ex.getMessage());
         }
-    }
+    
+}
 
-    // Use case 11
-    private void viewAllRoomTypes() {
+// Use case 11
+private void viewAllRoomTypes() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** HORS System :: Operations Manager :: View all Room Types");
         List<RoomTypeEntity> roomTypes = roomTypeEntitySessionBeanRemote.viewAllRoomTypes();
@@ -450,7 +494,6 @@ public class OperationManagerModule {
             System.out.println("Error updating room: " + ex.getMessage());
         }
     }
-
     // Use case 15
     private void viewAllRooms() {
         Scanner scanner = new Scanner(System.in);
@@ -465,6 +508,4 @@ public class OperationManagerModule {
             System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomTypeCount, room.getRoomId(), room.getRoomType().getRoomTypeName().toString(), room.getRoomNumber());
         }
     }
-   
-
 }

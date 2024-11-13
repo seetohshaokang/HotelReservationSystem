@@ -36,7 +36,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     // JPQL Query
     @Override
     public RoomTypeEntity getRoomTypeByName(RoomTypeName name) throws RoomTypeNotFoundException {
-        Query query = em.createQuery("SELECT rt FROM RoomTypeEntity rt WHERE rt.name = :rtName", RoomTypeEntity.class);
+        Query query = em.createQuery("SELECT rt FROM RoomTypeEntity rt WHERE rt.roomTypeName = :rtName", RoomTypeEntity.class);
         query.setParameter("rtName", name);
 
         try {
@@ -46,17 +46,32 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         }
     }
 
-    @Override
-    public RoomTypeEntity updateRoomType(Long roomTypeId, String newDescription, Double newSize, String newBed, Integer newCapacity, List<String> newAmenities) throws RoomTypeNotFoundException {
-       RoomTypeEntity retrievedRoomType = em.find(RoomTypeEntity.class, roomTypeId); // returns null if not found
-        if(retrievedRoomType == null) {
-            throw new RoomTypeNotFoundException("Room Type is not found");
+    public RoomTypeEntity updateRoomType(Long roomTypeId, String newDescription, Double newSize, String newBed, Integer newCapacity, List<String> newAmenities,
+            RoomTypeName newNextHigherRoomTypeName) 
+            throws RoomTypeNotFoundException {
+        RoomTypeEntity retrievedRoomType = em.find(RoomTypeEntity.class, roomTypeId); // returns null if not found
+        if (retrievedRoomType == null) {
+            throw new RoomTypeNotFoundException("Room Type with ID " + roomTypeId + " not found.");
         } else {
+            // Update fields
             retrievedRoomType.setDescription(newDescription);
             retrievedRoomType.setSize(newSize);
             retrievedRoomType.setBed(newBed);
             retrievedRoomType.setCapacity(newCapacity);
             retrievedRoomType.setAmenities(newAmenities);
+
+            // Update next higher room type if specified
+            if (newNextHigherRoomTypeName != null) {
+                try {
+                    RoomTypeEntity nextHigherRoomType = getRoomTypeByName(newNextHigherRoomTypeName);
+                    retrievedRoomType.setNextHigherRoomTypeName(nextHigherRoomType.getRoomTypeName());
+                } catch (RoomTypeNotFoundException e) {
+                    throw new RoomTypeNotFoundException("Next higher room type with name " + newNextHigherRoomTypeName + " not found.");
+                }
+            } else {
+                retrievedRoomType.setNextHigherRoomTypeName(null); // Set to null if no higher room type is specified
+            }
+
             em.flush();
             return retrievedRoomType;
         }

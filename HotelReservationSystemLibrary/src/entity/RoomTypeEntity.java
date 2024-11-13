@@ -33,8 +33,8 @@ public class RoomTypeEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private RoomTypeName roomTypeName;
     
-    //@Enumerated(EnumType.STRING)
-    //private RoomTypeName nextHighestRT;
+    @Enumerated(EnumType.STRING)
+    private RoomTypeName nextHigherRoomTypeName;
 
     @Column
     private String description;
@@ -63,9 +63,9 @@ public class RoomTypeEntity implements Serializable {
         this.roomRates = new ArrayList<>();
     }
 
-    public RoomTypeEntity(RoomTypeName name, String description, Double size, String bed, Integer capacity, List<String> amenities) {
-        this.roomTypeName = name;
-        // this.nextHighestRT = nextHighest;
+    public RoomTypeEntity(RoomTypeName roomTypeName, RoomTypeName nextHighestRoomTypeName, String description, Double size, String bed, Integer capacity, List<String> amenities) {
+        this.roomTypeName = roomTypeName;
+        this.nextHigherRoomTypeName = nextHighestRoomTypeName;
         this.description = description;
         this.size = size;
         this.bed = bed;
@@ -76,7 +76,7 @@ public class RoomTypeEntity implements Serializable {
         this.rooms = new ArrayList<>();
         this.roomRates = new ArrayList<>();
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -199,6 +199,20 @@ public class RoomTypeEntity implements Serializable {
      */
     public void setIsDisabled(Boolean isDisabled) {
         this.isDisabled = isDisabled;
+    }
+
+    /**
+     * @return the nextHigherRoomTypeName
+     */
+    public RoomTypeName getNextHigherRoomTypeName() {
+        return nextHigherRoomTypeName;
+    }
+
+    /**
+     * @param nextHigherRoomTypeName the nextHigherRoomTypeName to set
+     */
+    public void setNextHigherRoomTypeName(RoomTypeName nextHigherRoomTypeName) {
+        this.nextHigherRoomTypeName = nextHigherRoomTypeName;
     }
 
 }

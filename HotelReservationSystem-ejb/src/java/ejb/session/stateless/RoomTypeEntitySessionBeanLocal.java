@@ -24,7 +24,9 @@ public interface RoomTypeEntitySessionBeanLocal {
     public RoomTypeEntity getRoomTypeByName(RoomTypeName name) throws RoomTypeNotFoundException;
 
     // Use case 9
-    public RoomTypeEntity updateRoomType(Long roomTypeId, String newDescription, Double newSize, String newBed, Integer newCapacity, List<String> newAmenities) throws RoomTypeNotFoundException;
+    public RoomTypeEntity updateRoomType(Long roomTypeId, String newDescription, Double newSize, String newBed, Integer newCapacity, List<String> newAmenities,
+            RoomTypeName newNextHigherRoomTypeName) 
+            throws RoomTypeNotFoundException;
    
 
     // Use case 11  
