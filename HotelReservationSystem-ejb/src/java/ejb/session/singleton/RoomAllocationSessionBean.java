@@ -4,18 +4,11 @@
  */
 package ejb.session.singleton;
 
-import ejb.session.stateful.RoomReservationSessionBean;
-import ejb.session.stateless.RoomEntitySessionBean;
-import entity.ReservationEntity;
-import entity.RoomEntity;
-import entity.RoomTypeEntity;
-import java.time.LocalDate;
-import java.util.List;
+import ejb.session.stateful.RoomReservationSessionBeanLocal;
+import ejb.session.stateless.RoomEntitySessionBeanLocal;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
-import javax.ejb.Schedule;
-import javax.ejb.Timer;
 
 /**
  *
@@ -26,10 +19,10 @@ import javax.ejb.Timer;
 public class RoomAllocationSessionBean {
 
     @EJB
-    private RoomReservationSessionBean roomReservationSessionBean;
+    private RoomReservationSessionBeanLocal roomReservationSessionBean;
 
     @EJB
-    private RoomEntitySessionBean roomEntitySessionBean;
+    private RoomEntitySessionBeanLocal roomEntitySessionBean;
 
     //goatgpt stuff
     /*@EJB
