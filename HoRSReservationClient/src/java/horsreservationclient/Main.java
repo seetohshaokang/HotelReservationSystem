@@ -18,6 +18,8 @@ public class Main {
     @EJB
     private static RoomReservationSessionBeanRemote roomReservationSessionBean;
 
+    
+
     @EJB
     private static RoomEntitySessionBeanRemote roomEntitySessionBean;
 

@@ -9,6 +9,7 @@ import dataaccessobject.RoomsPerRoomType;
 import ejb.session.GuestEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
+
 import entity.GuestEntity;
 import entity.ReservationEntity;
 import entity.RoomEntity;
