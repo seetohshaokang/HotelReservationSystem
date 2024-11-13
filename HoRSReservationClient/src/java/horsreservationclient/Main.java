@@ -6,7 +6,7 @@ package horsreservationclient;
 
 import ejb.session.GuestEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
-import ejb.session.stateful.RoomReservationSessionBeanRemote;
+import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
 import javax.ejb.EJB;
 
 /**

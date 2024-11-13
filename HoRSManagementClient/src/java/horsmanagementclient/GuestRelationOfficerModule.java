@@ -5,7 +5,7 @@
 package horsmanagementclient;
 
 import ejb.session.RoomEntitySessionBeanRemote;
-import ejb.session.stateful.RoomReservationSessionBeanRemote;
+import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
 import entity.EmployeeEntity;
 import entity.RoomEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;

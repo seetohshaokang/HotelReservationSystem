@@ -7,7 +7,7 @@ import ejb.session.PartnerEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomRateEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
-import ejb.session.stateful.RoomReservationSessionBeanRemote;
+import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 
