@@ -20,5 +20,7 @@ public interface ReservationEntitySessionBeanLocal {
     
     public ReservationEntity findReservationById(Long reservationId);
     
-    public void updateReservation(ReservationEntity reservation);
+    public void confirmReservation(ReservationEntity reservation);
+    
+   
 }

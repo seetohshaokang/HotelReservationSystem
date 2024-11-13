@@ -39,9 +39,11 @@ public class ReservationEntity implements Serializable {
     private GuestEntity guest;
     
     // *...1 r/s with partner
+    /*
     @ManyToOne
     @JoinColumn
     private PartnerEntity partner;
+    */
     
     // 1...* r/s with room
     @OneToMany(mappedBy = "reservation", cascade = {}, fetch = FetchType.LAZY)
@@ -53,6 +55,9 @@ public class ReservationEntity implements Serializable {
     private LocalDate checkOutDate;
     @Column
     private Double totalAmount;
+    @Column
+    private LocalDate reservationDate;
+
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
@@ -70,9 +75,11 @@ public class ReservationEntity implements Serializable {
         this.totalAmount = totalAmount;
         this.status = status;
         this.roomReservations = new ArrayList<>();
+        this.reservationDate = LocalDate.now();
     }
 
     // Constructor for partners
+    /*
     public ReservationEntity(PartnerEntity partner, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
         this.partner = partner;
         this.checkInDate = checkInDate;
@@ -81,7 +88,7 @@ public class ReservationEntity implements Serializable {
         this.status = status;
         this.roomReservations = new ArrayList<>();
     }
-    
+    */
     
     @Override
     public int hashCode() {
@@ -169,6 +176,20 @@ public class ReservationEntity implements Serializable {
      */
     public void setRoomReservations(List<RoomReservationEntity> roomReservations) {
         this.roomReservations = roomReservations;
+    }
+
+    /**
+     * @return the reservationDate
+     */
+    public LocalDate getReservationDate() {
+        return reservationDate;
+    }
+
+    /**
+     * @param reservationDate the reservationDate to set
+     */
+    public void setReservationDate(LocalDate reservationDate) {
+        this.reservationDate = reservationDate;
     }
     
     

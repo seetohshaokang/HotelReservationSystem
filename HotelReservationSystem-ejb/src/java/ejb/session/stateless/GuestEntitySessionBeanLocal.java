@@ -5,6 +5,8 @@
 package ejb.session.stateless;
 
 import entity.GuestEntity;
+import entity.ReservationEntity;
+import java.util.List;
 import javax.ejb.Local;
 import util.exception.GuestNotFoundException;
 import util.exception.InvalidInputException;
@@ -22,5 +24,10 @@ public interface GuestEntitySessionBeanLocal {
     public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException;
 
     public GuestEntity retrieveGuestByEmail(String email) throws GuestNotFoundException;
+    
+    // New method to retrieve reservation only if it belongs to the specified guest
+    public ReservationEntity retrieveGuestReservationById(Long reservationId, Long guestId);
+    
+    public List<ReservationEntity> retrieveAllReservations(GuestEntity guest);
 
 }

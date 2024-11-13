@@ -124,7 +124,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
 
         Query query = em.createQuery("SELECT r FROM RoomEntity r "
                 + "WHERE r.status = util.enumeration.RoomStatus.AVAILABLE "
-                + "AND r.roomType.name = :roomTypeName "
+                + "AND r.roomType.roomTypeName = :roomTypeName "
                 + "AND NOT EXISTS ("
                 + "SELECT rr FROM RoomReservationEntity rr "
                 + "WHERE rr.reservedRoom = r "

@@ -29,22 +29,23 @@ public class PartnerEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long partnerId;
-    
+
     @Column(unique = true)
     private String username;
     @Column
     private String password;
-    
+
     @Enumerated(EnumType.STRING)
     private PartnerRole role;
-    
+
     // 1...* r/s with reservation
+    /*
     @OneToMany(mappedBy = "partner", cascade = {}, fetch = FetchType.LAZY)
     private List<ReservationEntity> reservations;
-
+     */
     // JPA Constructor
     public PartnerEntity() {
-        this.reservations = new ArrayList<>();
+        // this.reservations = new ArrayList<>();
     }
 
     // Default Constructor
@@ -52,9 +53,9 @@ public class PartnerEntity implements Serializable {
         this.username = username;
         this.password = password;
         this.role = role;
-        this.reservations = new ArrayList<>();
+        // this.reservations = new ArrayList<>();
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -79,7 +80,7 @@ public class PartnerEntity implements Serializable {
     public String toString() {
         return "entity.PartnerEntity[ id=" + partnerId + " ]";
     }
-    
+
     // Getters and Setters
     public Long getPartnerId() {
         return partnerId;
@@ -105,6 +106,7 @@ public class PartnerEntity implements Serializable {
         this.password = password;
     }
 
+    /*
     public List<ReservationEntity> getReservations() {
         return reservations;
     }
@@ -112,13 +114,14 @@ public class PartnerEntity implements Serializable {
     public void setReservations(List<ReservationEntity> reservations) {
         this.reservations = reservations;
     }
-
+     */
+    
     public PartnerRole getRole() {
         return role;
     }
 
     public void setRole(PartnerRole role) {
         this.role = role;
-    } 
-    
+    }
+
 }

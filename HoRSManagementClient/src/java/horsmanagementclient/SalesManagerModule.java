@@ -205,7 +205,7 @@ public class SalesManagerModule {
             System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s || %-20s || %-20s%n", 
                     "Room Rate Id", "Room Rate Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
             System.out.printf("%-20d || %-20s || %-20s || %-20s || %-20f || %-20s || %-20s%n", 
-                    roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName().toString(), roomRate.getRateType().toString(), roomRate.getRatePerNight(), start, end);
+                    roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getRoomTypeName().toString(), roomRate.getRateType().toString(), roomRate.getRatePerNight(), start, end);
         } catch (RoomRateNotFoundException ex) {
             System.out.println("Invalid room type: " + ex.getMessage());
         }
@@ -308,7 +308,7 @@ public class SalesManagerModule {
             System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s || %-20s%n", "Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
             System.out.printf("%-20s || %-20s || %-20s || %-20.2f || %-20s || %s%n",
                     updated.getName(),
-                    updated.getRoomType().getName().toString(),
+                    updated.getRoomType().getRoomTypeName().toString(),
                     updated.getRateType().toString(),
                     updated.getRatePerNight(),
                     start,
@@ -334,7 +334,7 @@ public class SalesManagerModule {
 
         for (RoomRateEntity roomRate : roomRates) {
             roomRateCount++;
-            System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomRateCount, roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getName().toString());
+            System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomRateCount, roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getRoomTypeName().toString());
         }
     }
 
@@ -349,7 +349,7 @@ public class SalesManagerModule {
 
         for (RoomTypeEntity roomType : roomTypes) {
             roomTypeCount++;
-            System.out.printf("%-20d || %-20d || %-20s%n", roomTypeCount, roomType.getRoomTypeId(), roomType.getName().toString());
+            System.out.printf("%-20d || %-20d || %-20s%n", roomTypeCount, roomType.getRoomTypeId(), roomType.getRoomTypeName().toString());
         }
     }
 

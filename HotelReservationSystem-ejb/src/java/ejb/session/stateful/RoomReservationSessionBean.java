@@ -52,13 +52,11 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
 
     @EJB
     private RoomEntitySessionBeanLocal roomEntitySessionBean;
-    
-    
 
     // Temporarily store the roomAvailability for each roomType
     private List<AvailableRoomsPerRoomType> roomTypeAvailabilityList;
-    
-     @Override
+
+    @Override
     public List<AvailableRoomsPerRoomType> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate) {
         // Create a new list to store room availability for each room type (not cached)
         List<AvailableRoomsPerRoomType> freshRoomTypeAvailabilityList = new ArrayList<>();
@@ -67,11 +65,11 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         for (RoomTypeName roomTypeName : RoomTypeName.values()) {
             // Retrieve available rooms for this room type and date range directly from the database
             List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(checkInDate, checkOutDate, roomTypeName);
-            
+
             // Create an AvailableRoomsPerRoomType object for the room type with available rooms
             AvailableRoomsPerRoomType roomTypeAvailability = new AvailableRoomsPerRoomType(roomTypeName, availableRooms);
             sequence++;
-            
+
             // Optionally, set a sequence number here if needed for sorting or printing
             roomTypeAvailability.setSequence(sequence);
 
@@ -81,45 +79,7 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
 
         return freshRoomTypeAvailabilityList; // Return the fresh data directly without caching
     }
-    
-    /*
-    public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve) {
-        Double totalAmount = 0.0;
-        
-        // Create the reservation for the guest with the total calculated amount
-        Long reservationId = reservationEntitySessionBean.createReservationForGuest(guestId, checkInDate, checkOutDate, totalAmount);
 
-        if (reservationId != null) {
-            System.out.println("Reservation created with ID: " + reservationId);
-        } else {
-            System.out.println("Reservation could not be created; guest does not exist.");
-        }
-
-        // Iterate over each RoomsPerRoomType DTO in the list
-        for (RoomsPerRoomType rooms : roomsToReserve) { // For each room type to reserve
-            RoomTypeName roomTypeName = rooms.getRoomTypeName(); // Get room type name
-            int numberOfRooms = rooms.getNumRooms(); // Get required rooms
-
-            // Directly query the database to check room availability
-            List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(checkInDate, checkOutDate, roomTypeName);
-
-            // Check if enough rooms are available
-            if (availableRooms.size() < numberOfRooms) {
-                System.out.println("Not enough rooms available for room type: " + roomTypeName + ". Requested: " + numberOfRooms + ", Available: " + availableRooms.size());
-                return null; // Optionally, handle partial reservations if needed
-            }
-
-            // Calculate the rate for the requested number of rooms for this room type
-            Double roomRate = getWalkInRate(checkInDate, checkOutDate, roomTypeName);
-            if (roomRate == null) {
-                System.out.println("Rate not available for room type: " + roomTypeName);
-                return null;
-            }
-            totalAmount += roomRate * numberOfRooms;
-        }
-        return reservationId;
-    }    
-    */
     public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve) {
         Double totalAmount = 0.0;
         ReservationEntity reservation = null;
@@ -166,18 +126,16 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         }
         // Update the reservation's total amount
         reservation.setTotalAmount(totalAmount);
-        reservationEntitySessionBean.updateReservation(reservation);
+        reservationEntitySessionBean.confirmReservation(reservation);
 
         System.out.println("Reservation created with ID: " + reservationId);
         return reservationId;
     }
-    
+
     @Override // Computes walk in rate for 1 room for duration for that room type
     public Double getWalkInRate(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName rtName) {
         // Calculate the number of days stayed
-
         long numberOfDays = checkInDate.until(checkOutDate, ChronoUnit.DAYS);
-
         try {
             // Retrieve the published rate for the specified room type
             RoomRateEntity publishedRate = roomRateEntitySessionBean.getRoomRateByRateAndRoomType(rtName, RateType.PUBLISHED);
@@ -197,5 +155,5 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
     public List<AvailableRoomsPerRoomType> getRoomTypeAvailabilityList() {
         return roomTypeAvailabilityList;
     }
-    
+
 }
