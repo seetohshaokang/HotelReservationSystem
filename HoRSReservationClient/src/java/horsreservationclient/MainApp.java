@@ -125,7 +125,7 @@ public class MainApp {
         }
     }
 
-    // Same as Guest Relo Officer search hotel case
+    // Same as Guest Relo Officer search hotel case, with reservationrate instead of walkinrate
     private void searchHotelRoom() {
         Scanner scanner = new Scanner(System.in);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -167,7 +167,7 @@ public class MainApp {
         for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
             RoomTypeName roomTypeName = roomTypeAvailability.getRoomTypeName();
             List<RoomEntity> availableRooms = roomTypeAvailability.getAvailableRooms();
-            Double totalRate = roomReservationSessionBeanRemote.getWalkInRate(checkInDate, checkOutDate, roomTypeName);
+            Double totalRate = roomReservationSessionBeanRemote.getReservationRate(checkInDate, checkOutDate, roomTypeName);
 
             System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
         }

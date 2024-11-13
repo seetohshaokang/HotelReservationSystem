@@ -5,6 +5,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,11 +41,9 @@ public class RoomRateEntity implements Serializable {
     @Column(nullable = false)
     private Double ratePerNight;
     
-    @Temporal(TemporalType.DATE)
-    private Date startDate; // Only for peak and promotion rates
+    private LocalDate startDate; // Only for peak and promotion rates
     
-    @Temporal(TemporalType.DATE)
-    private Date endDate; // Only for peak and promotion rates
+    private LocalDate endDate; // Only for peak and promotion rates
 
     // *...1 r/s with roomtype
     @ManyToOne
@@ -128,28 +127,28 @@ public class RoomRateEntity implements Serializable {
     /**
      * @return the startDate
      */
-    public Date getStartDate() {
+    public LocalDate getStartDate() {
         return startDate;
     }
 
     /**
      * @param startDate the startDate to set
      */
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
     /**
      * @return the endDate
      */
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
     /**
      * @param endDate the endDate to set
      */
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
@@ -167,5 +166,16 @@ public class RoomRateEntity implements Serializable {
         this.roomType = roomType;
     }
     
-    
+    // Method to check if a rate is valid for a specific date
+    public boolean isValidForDate(LocalDate date) {
+        // Check if the rate has a validity period
+        if (rateType == RateType.PEAK || rateType == RateType.PROMOTION) {
+            // Valid if date is within the start and end date range
+            return (startDate != null && endDate != null &&
+                    (date.isEqual(startDate) || date.isAfter(startDate)) &&
+                    (date.isEqual(endDate) || date.isBefore(endDate)));
+        }
+        // Normal and Published rates are always valid (assuming no date restrictions)
+        return true;
+    }
 }

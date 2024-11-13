@@ -7,7 +7,7 @@ package ejb.session.stateless;
 import ejb.session.RoomRateEntitySessionBeanRemote;
 import entity.RoomRateEntity;
 import entity.RoomTypeEntity;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -33,7 +33,7 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     private EntityManager em;
 
     @Override
-    public String createNewRoomRate(String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException {
+    public String createNewRoomRate(String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, LocalDate start, LocalDate end) throws RoomTypeNotFoundException {
         RoomTypeEntity roomType = null;
         try {
             roomType = em.find(RoomTypeEntity.class, roomTypeId);
@@ -56,7 +56,7 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     }
 
     @Override
-    public RoomRateEntity updateRoomRate(Long id, String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, Date start, Date end) throws RoomTypeNotFoundException, RoomRateNotFoundException {
+    public RoomRateEntity updateRoomRate(Long id, String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, LocalDate start, LocalDate end) throws RoomTypeNotFoundException, RoomRateNotFoundException {
         RoomRateEntity roomRate = em.find(RoomRateEntity.class, id);
         Long oldRoomTypeId = roomRate.getRoomType().getRoomTypeId();
 
@@ -127,6 +127,15 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
 
         } catch (NoResultException ex) {
             throw new RoomRateNotFoundException("Room Rate with room type name: " + roomTypeName.toString() + " and rate type " + rateType.toString() + " does not exist!");
-        } 
+        }
+    }
+
+    @Override
+    public List<RoomRateEntity> getRoomRatesByRoomType(RoomTypeName roomTypeName) {
+        Query query = em.createQuery(
+                "SELECT rr FROM RoomRateEntity rr WHERE rr.roomType.roomTypeName = :roomTypeName");
+        query.setParameter("roomTypeName", roomTypeName);
+
+        return query.getResultList();
     }
 }

@@ -9,14 +9,15 @@ import ejb.session.RoomTypeEntitySessionBeanRemote;
 import entity.EmployeeEntity;
 import entity.RoomRateEntity;
 import entity.RoomTypeEntity;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import util.enumeration.EmployeeRole;
 import util.enumeration.RateType;
-import util.enumeration.RoomTypeName;
 import util.exception.InvalidAccessRightException;
 import util.exception.RoomRateNotFoundException;
 import util.exception.RoomTypeNotFoundException;
@@ -152,7 +153,7 @@ public class SalesManagerModule {
             }
         }
 
-        Date startDate = null, endDate = null;
+        LocalDate startDate = null, endDate = null;
         if (response == 3 || response == 4) {
             while (true) {
                 System.out.print("Enter start date (YYYY-MM-DD) > ");
@@ -160,7 +161,7 @@ public class SalesManagerModule {
                 try {
                     startDate = parseDate(input);
                     break;
-                } catch (ParseException e) {
+                } catch (DateTimeParseException e) {
                     System.out.println("Please input a valid start date in the format YYYY-MM-DD!");
                 }
             }
@@ -170,7 +171,7 @@ public class SalesManagerModule {
                 try {
                     endDate = parseDate(input2);
                     break;
-                } catch (ParseException e) {
+                } catch (DateTimeParseException e) {
                     System.out.println("Please input a valid end date in the format YYYY-MM-DD!");
                 }
             }
@@ -202,9 +203,9 @@ public class SalesManagerModule {
                 start = "NA";
                 end = "NA";
             }
-            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s || %-20s || %-20s%n", 
+            System.out.printf("%-20s || %-20s || %-20s || %-20s || %-20s || %-20s || %-20s%n",
                     "Room Rate Id", "Room Rate Name", "Room Type", "Rate Type", "Rate per night", "Start Date", "End Date");
-            System.out.printf("%-20d || %-20s || %-20s || %-20s || %-20f || %-20s || %-20s%n", 
+            System.out.printf("%-20d || %-20s || %-20s || %-20s || %-20f || %-20s || %-20s%n",
                     roomRate.getRoomRateId(), roomRate.getName(), roomRate.getRoomType().getRoomTypeName().toString(), roomRate.getRateType().toString(), roomRate.getRatePerNight(), start, end);
         } catch (RoomRateNotFoundException ex) {
             System.out.println("Invalid room type: " + ex.getMessage());
@@ -269,8 +270,8 @@ public class SalesManagerModule {
                 System.out.println("Please input a valid Rate per night!");
             }
         }
-        Date startDate = null;
-        Date endDate = null;
+        LocalDate startDate = null;
+        LocalDate endDate = null;
         // Input start date and end date (For peak and promotion rate types only)
         if (response == 3 || response == 4) {
             while (true) {
@@ -279,7 +280,7 @@ public class SalesManagerModule {
                 try {
                     startDate = parseDate(input);
                     break;
-                } catch (ParseException e) {
+                } catch (DateTimeParseException e) {
                     System.out.println("Please input a valid start date in the format YYYY-MM-DD!");
                 }
             }
@@ -289,7 +290,7 @@ public class SalesManagerModule {
                 try {
                     endDate = parseDate(input2);
                     break;
-                } catch (ParseException e) {
+                } catch (DateTimeParseException e) {
                     System.out.println("Please input a valid end date in the format YYYY-MM-DD!");
                 }
             }
@@ -354,9 +355,8 @@ public class SalesManagerModule {
     }
 
     // Used in createNewRoomRate()
-    public static Date parseDate(String dateStr) throws ParseException {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        dateFormat.setLenient(false);  // Ensures strict parsing
-        return dateFormat.parse(dateStr);
+    public static LocalDate parseDate(String dateStr) throws DateTimeParseException {
+        DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return LocalDate.parse(dateStr, dateFormat);
     }
 }

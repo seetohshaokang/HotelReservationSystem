@@ -41,8 +41,8 @@ public class SalesManagerSessionBean implements SalesManagerSessionBeanRemote, S
             // Step 2: Modify the fields
             roomRate.setName(newName);
             roomRate.setRatePerNight(newRatePerNight);
-            roomRate.setStartDate(newStartDate);
-            roomRate.setEndDate(newEndDate);
+            //roomRate.setStartDate(newStartDate);
+            //roomRate.setEndDate(newEndDate);
 
             // Step 3: Persist the changes
             roomRate = em.merge(roomRate);

@@ -80,6 +80,7 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         return freshRoomTypeAvailabilityList; // Return the fresh data directly without caching
     }
 
+    @Override
     public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve) {
         Double totalAmount = 0.0;
         ReservationEntity reservation = null;
@@ -150,8 +151,54 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
             return null;
         }
     }
+    
+    @Override
+    public Double getReservationRate(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName rtName) {
+        double totalFee = 0.0;
+
+        // Iterate through each date in the stay period
+        for (LocalDate date = checkInDate; !date.isAfter(checkOutDate); date = date.plusDays(1)) {
+            Double dailyRate = getPrevailingRateForDate(date, rtName);
+            if (dailyRate != null) {
+                totalFee += dailyRate;
+            }
+        }
+
+        return totalFee;
+    }
+
+    // helper method for getReservationRate
+    private Double getPrevailingRateForDate(LocalDate date, RoomTypeName rtName) {
+        // Fetch all rates for the given room type
+        List<RoomRateEntity> roomRates = roomRateEntitySessionBean.getRoomRatesByRoomType(rtName);
+
+        Double promotionRate = null;
+        Double peakRate = null;
+        Double normalRate = null;
+
+        // Loop through each rate to find the applicable ones
+        for (RoomRateEntity rate : roomRates) {
+            if (rate.getRateType() == RateType.PROMOTION && rate.isValidForDate(date)) {
+                promotionRate = rate.getRatePerNight();
+            } else if (rate.getRateType() == RateType.PEAK && rate.isValidForDate(date)) {
+                peakRate = rate.getRatePerNight();
+            } else if (rate.getRateType() == RateType.NORMAL) {
+                normalRate = rate.getRatePerNight();
+            }
+        }
+
+        // Determine the prevailing rate based on the hierarchy
+        if (promotionRate != null) {
+            return promotionRate;
+        } else if (peakRate != null) {
+            return peakRate;
+        } else {
+            return normalRate; // Return normal rate if no promotion or peak rate
+        }
+    }
 
     // Getter for the stored roomTypeAvailabilityList
+    @Override
     public List<AvailableRoomsPerRoomType> getRoomTypeAvailabilityList() {
         return roomTypeAvailabilityList;
     }

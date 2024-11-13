@@ -22,8 +22,13 @@ import util.enumeration.RoomTypeName;
 public interface RoomReservationSessionBeanRemote {
 
     public List<AvailableRoomsPerRoomType> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate);
-    
-    public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
 
     public Double getWalkInRate(LocalDate checkInDate, LocalDate checkoutDate, RoomTypeName rtName);
+
+    public Double getReservationRate(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName rtName);
+
+    public List<AvailableRoomsPerRoomType> getRoomTypeAvailabilityList();
+
+    public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
+
 }
