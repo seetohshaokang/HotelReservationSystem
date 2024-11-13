@@ -26,8 +26,7 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
 
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
-    
-  
+
     // Method to create a new newReservation for a guest, verifying the guest exists
     public Long createReservationForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount) {
         // Retrieve guest from database
@@ -43,6 +42,18 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         em.persist(newReservation);
         em.flush();
         return newReservation.getReservationId();
+    }
+
+    @Override
+    public ReservationEntity findReservationById(Long reservationId) {
+        ReservationEntity reservation = em.find(ReservationEntity.class, reservationId);
+        return reservation;
+    }
+
+    @Override
+    public void updateReservation(ReservationEntity reservation) {
+        ReservationEntity managedReservation = em.merge(reservation);
+        em.flush();
     }
 
 }

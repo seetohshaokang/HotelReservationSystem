@@ -25,5 +25,6 @@ public interface RoomReservationSessionBeanLocal {
 
     public Double getWalkInRate(LocalDate checkInDate, LocalDate checkoutDate, RoomTypeName rtName);
 
+
     
 }

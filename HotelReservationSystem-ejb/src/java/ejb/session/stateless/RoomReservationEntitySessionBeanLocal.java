@@ -15,7 +15,6 @@ import javax.ejb.Local;
  */
 @Local
 public interface RoomReservationEntitySessionBeanLocal {
-    
+
     public RoomReservationEntity createNewRoomReservation(RoomEntity room, ReservationEntity reservation);
-    
 }

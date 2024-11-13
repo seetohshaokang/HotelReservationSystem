@@ -43,6 +43,8 @@ public class RoomReservationEntity implements Serializable {
     public RoomReservationEntity(RoomEntity reservedRoom, ReservationEntity reservation) {
         this.reservedRoom = reservedRoom;
         this.reservation = reservation;
+        this.checkInDate = reservation.getCheckInDate();
+        this.checkOutDate = reservation.getCheckOutDate();
     }
     public Long getRoomReservationid() {
         return roomReservationid;
