@@ -11,6 +11,7 @@ import entity.RoomEntity;
 import entity.RoomRateEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
 import dataaccessobject.RoomsPerRoomType;
+import ejb.session.stateful.RoomReservationSessionBeanRemote;
 import ejb.session.stateless.ReservationEntitySessionBeanLocal;
 import ejb.session.stateless.RoomReservationEntitySessionBeanLocal;
 import entity.GuestEntity;
