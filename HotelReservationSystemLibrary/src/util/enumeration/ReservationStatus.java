@@ -9,5 +9,5 @@ package util.enumeration;
  * @author shaokangseetoh
  */
 public enum ReservationStatus {
-    PENDING, RESERVED, CHECKED_IN, CHECKED_OUT, CANCELLED
+    PENDING, RESERVED, ALLOCATED, CHECKED_IN, CHECKED_OUT, CANCELLED
 }
