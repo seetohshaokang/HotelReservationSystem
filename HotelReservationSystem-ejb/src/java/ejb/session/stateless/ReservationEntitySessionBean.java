@@ -51,9 +51,12 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
     }
 
     @Override
-    public void updateReservation(ReservationEntity reservation) {
+    public void confirmReservation(ReservationEntity reservation) {
+        reservation.setStatus(ReservationStatus.RESERVED);
         ReservationEntity managedReservation = em.merge(reservation);
         em.flush();
     }
+    
+    
 
 }

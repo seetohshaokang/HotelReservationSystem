@@ -78,5 +78,33 @@ public class RoomReservationEntity implements Serializable {
     public String toString() {
         return "entity.RoomReservation[ id=" + roomReservationid + " ]";
     }
+
+    /**
+     * @return the reservedRoom
+     */
+    public RoomEntity getReservedRoom() {
+        return reservedRoom;
+    }
+
+    /**
+     * @param reservedRoom the reservedRoom to set
+     */
+    public void setReservedRoom(RoomEntity reservedRoom) {
+        this.reservedRoom = reservedRoom;
+    }
+
+    /**
+     * @return the reservation
+     */
+    public ReservationEntity getReservation() {
+        return reservation;
+    }
+
+    /**
+     * @param reservation the reservation to set
+     */
+    public void setReservation(ReservationEntity reservation) {
+        this.reservation = reservation;
+    }
     
 }

@@ -31,7 +31,7 @@ public class RoomTypeEntity implements Serializable {
     private Long roomTypeId;
 
     @Enumerated(EnumType.STRING)
-    private RoomTypeName name;
+    private RoomTypeName roomTypeName;
     
     //@Enumerated(EnumType.STRING)
     //private RoomTypeName nextHighestRT;
@@ -64,7 +64,7 @@ public class RoomTypeEntity implements Serializable {
     }
 
     public RoomTypeEntity(RoomTypeName name, String description, Double size, String bed, Integer capacity, List<String> amenities) {
-        this.name = name;
+        this.roomTypeName = name;
         // this.nextHighestRT = nextHighest;
         this.description = description;
         this.size = size;
@@ -111,12 +111,12 @@ public class RoomTypeEntity implements Serializable {
         this.roomTypeId = roomTypeId;
     }
 
-    public RoomTypeName getName() {
-        return name;
+    public RoomTypeName getRoomTypeName() {
+        return roomTypeName;
     }
 
-    public void setName(RoomTypeName name) {
-        this.name = name;
+    public void setRoomTypeName(RoomTypeName name) {
+        this.roomTypeName = name;
     }
 
     public String getDescription() {

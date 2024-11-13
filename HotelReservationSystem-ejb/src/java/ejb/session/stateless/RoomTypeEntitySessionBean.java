@@ -30,7 +30,7 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
     public String createNewRoomType(RoomTypeEntity newRoomType) {
         em.persist(newRoomType);
         em.flush();
-        return newRoomType.getName().toString();
+        return newRoomType.getRoomTypeName().toString();
     }
 
     // JPQL Query

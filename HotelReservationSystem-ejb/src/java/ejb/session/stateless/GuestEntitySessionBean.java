@@ -6,6 +6,8 @@ package ejb.session.stateless;
 
 import ejb.session.GuestEntitySessionBeanRemote;
 import entity.GuestEntity;
+import entity.ReservationEntity;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -70,4 +72,19 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
 
     }
 
+    @Override
+    public List<ReservationEntity> retrieveAllReservations(GuestEntity guest) {
+        Long guestId = guest.getGuestId();
+        GuestEntity retrievedGuest = em.find(GuestEntity.class, guestId);
+        return retrievedGuest.getReservations();
+    }
+    
+    // New method to retrieve reservation only if it belongs to the specified guest
+    public ReservationEntity retrieveGuestReservationById(Long reservationId, Long guestId) {
+        ReservationEntity reservation = em.find(ReservationEntity.class, reservationId);
+        if (reservation != null && reservation.getGuest() != null && reservation.getGuest().getGuestId().equals(guestId)) {
+            return reservation; // Return reservation if it belongs to the guest
+        }
+        return null; // Return null if reservation not found or doesn't belong to guest
+    }
 }

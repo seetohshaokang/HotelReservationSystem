@@ -313,7 +313,7 @@ public class OperationManagerModule {
 
         for (RoomTypeEntity roomType : roomTypes) {
             roomTypeCount++;
-            System.out.printf("%-20d || %-20d || %-20s%n", roomTypeCount, roomType.getRoomTypeId(), roomType.getName().toString());
+            System.out.printf("%-20d || %-20d || %-20s%n", roomTypeCount, roomType.getRoomTypeId(), roomType.getRoomTypeName().toString());
         }
     }
 
@@ -374,7 +374,7 @@ public class OperationManagerModule {
         try {
             RoomEntity newRoom = roomEntitySessionBeanRemote.createNewRoom(selectedRoomType, floor, sequence, selectedRoomStatus);
             System.out.println("New room has been created with room type "
-                    + newRoom.getRoomType().getName().toString()
+                    + newRoom.getRoomType().getRoomTypeName().toString()
                     + " and room number: " + newRoom.getRoomNumber());
         } catch (RoomTypeNotFoundException ex) {
             System.out.println("Invalid creation of new room: " + ex.getMessage());
@@ -462,7 +462,7 @@ public class OperationManagerModule {
 
         for (RoomEntity room : rooms) {
             roomTypeCount++;
-            System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomTypeCount, room.getRoomId(), room.getRoomType().getName().toString(), room.getRoomNumber());
+            System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomTypeCount, room.getRoomId(), room.getRoomType().getRoomTypeName().toString(), room.getRoomNumber());
         }
     }
    

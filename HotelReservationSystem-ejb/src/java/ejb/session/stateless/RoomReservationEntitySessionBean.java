@@ -42,4 +42,5 @@ public class RoomReservationEntitySessionBean implements RoomReservationEntitySe
         return newRR;
     }
     
+    
 }

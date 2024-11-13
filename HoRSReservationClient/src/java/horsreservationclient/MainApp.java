@@ -10,7 +10,9 @@ import ejb.session.GuestEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.stateful.RoomReservationSessionBeanRemote;
 import entity.GuestEntity;
+import entity.ReservationEntity;
 import entity.RoomEntity;
+import entity.RoomReservationEntity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -196,7 +198,7 @@ public class MainApp {
                 } else if (response == 2) {
                     // viewMyReservationDetails();
                 } else if (response == 3) {
-                    // viewAllMyReservations();
+                    viewAllMyReservations();
                 } else if (response == 4) {
                     break; // Exit the loop and log out
                 } else {
@@ -295,9 +297,59 @@ public class MainApp {
     }
 
     private void viewMyReservationDetails() {
+        if (loggedInGuest == null) {
+        System.out.println("Please log in to view your reservation details.");
+        return;
+    }
+
+    Scanner scanner = new Scanner(System.in);
+    System.out.print("Enter Reservation ID to view details: ");
+    Long reservationId;
+    try {
+        reservationId = Long.parseLong(scanner.nextLine().trim());
+    } catch (NumberFormatException e) {
+        System.out.println("Invalid Reservation ID. Please enter a valid number.");
+        return;
+    }
+
+    // Retrieve the reservation details by ID, checking that it belongs to the logged-in guest
+    ReservationEntity reservation = guestEntitySessionBeanRemote.retrieveGuestReservationById(reservationId, loggedInGuest.getGuestId());
+
+    if (reservation == null) {
+        System.out.println("Reservation not found or you do not have access to this reservation.");
+    } else {
+        System.out.println("\n*** Reservation Details ***");
+        System.out.println("Reservation ID: " + reservation.getReservationId());
+        System.out.println("Reservation Date: " + reservation.getReservationDate());
+        System.out.println("Check-in Date: " + reservation.getCheckInDate());
+        System.out.println("Check-out Date: " + reservation.getCheckOutDate());
+        System.out.println("Total Amount: $" + reservation.getTotalAmount());
+        System.out.println("Status: " + reservation.getStatus());
+    }
     }
 
     private void viewAllMyReservations() {
-    }
+        if (loggedInGuest == null) {
+            System.out.println("Please log in to view your reservations.");
+            return;
+        }
 
+        // Retrieve all reservations for the logged-in guest
+        List<ReservationEntity> reservations = guestEntitySessionBeanRemote.retrieveAllReservations(loggedInGuest);
+
+        if (reservations.isEmpty()) {
+            System.out.println("You have no reservations.");
+        } else {
+            System.out.println("*** My Reservations ***");
+
+            // Display the serial number, reservation ID, and reservation date for each reservation
+            int serialNumber = 1;
+            System.out.printf("%-5s %-15s %-20s%n", "S/N", "Reservation ID", "Reservation Date");
+            System.out.println("--------------------------------------------------");
+
+            for (ReservationEntity reservation : reservations) {
+                System.out.printf("%-5d %-15d %-20s%n", serialNumber++, reservation.getReservationId(), reservation.getReservationDate());
+            }
+        }
+    }
 }
