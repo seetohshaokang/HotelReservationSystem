@@ -17,21 +17,20 @@ import util.exception.InvalidLoginCredentialException;
  */
 @Remote
 public interface EmployeeEntitySessionBeanRemote {
-   // Use case: System Administrator :: create new employee
-    public Long createNewEmployee(EmployeeEntity newEmployee);
-    
+    // Use case: System Administrator :: create new employee
+
+    public Long createNewEmployee(EmployeeEntity newEmployee) throws EmployeeExistException;
+
     // Use case: System Administrator :: retrieve all employees
     public List<EmployeeEntity> retrieveAllEmployees();
-    
+
     // Use case: Employee -> Login
     public EmployeeEntity employeeLogin(String username, String password) throws InvalidLoginCredentialException;
-    
-    
+
     // Search methods
     public EmployeeEntity retrieveEmployeeByUsername(String username) throws EmployeeNotFoundException;
-    
+
     public EmployeeEntity retrieveEmployeeByEmployeeId(Long employeeId) throws EmployeeNotFoundException;
-    
+
     // Update and delete operations not required for employee.
 }
-

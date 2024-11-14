@@ -58,42 +58,42 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     @Override
     public RoomRateEntity updateRoomRate(Long id, String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, LocalDate start, LocalDate end) throws RoomTypeNotFoundException, RoomRateNotFoundException {
         RoomRateEntity roomRate = em.find(RoomRateEntity.class, id);
+        if (roomRate == null) {
+            throw new RoomRateNotFoundException("Room rate not found.");
+        }
         Long oldRoomTypeId = roomRate.getRoomType().getRoomTypeId();
 
         if (roomTypeId != oldRoomTypeId) {
             RoomTypeEntity newRoomType = null;
             try {
                 newRoomType = em.find(RoomTypeEntity.class, roomTypeId);
+            } catch (Exception ex) {
+                throw new RoomTypeNotFoundException("Room Type does not exist!");
+            }
+        }
+
+        roomRate.setName(name);
+        roomRate.setRateType(selectedRateType);
+        roomRate.setRatePerNight(ratePerNight);;
+        roomRate.setStartDate(start);
+        roomRate.setEndDate(end);
+        if (roomTypeId != roomRate.getRoomType().getRoomTypeId()) {     // if room type has changed, reassign
+            try {
+                // Find New room Type
+                RoomTypeEntity newRoomType = em.find(RoomTypeEntity.class, roomTypeId);
+                // Find old room type
+                RoomTypeEntity oldRoomType = em.find(RoomTypeEntity.class, oldRoomTypeId);
+                // Remove roomrate from old room type
+                oldRoomType.getRoomRates().remove(roomRate);
+                // Add roomrate to new room type
+                newRoomType.getRoomRates().add(roomRate);
+                // Update room type of roomrate
+                roomRate.setRoomType(newRoomType);
             } catch (NoResultException | NonUniqueResultException ex) {
                 throw new RoomTypeNotFoundException("Room Type does not exist!");
             }
         }
 
-        if (roomRate == null) {
-            throw new RoomRateNotFoundException("Room rate not found.");
-        } else {
-            roomRate.setName(name);
-            roomRate.setRateType(selectedRateType);
-            roomRate.setRatePerNight(ratePerNight);;
-            roomRate.setStartDate(start);
-            roomRate.setEndDate(end);
-            if (roomTypeId != roomRate.getRoomType().getRoomTypeId()) {     // if room type has changed, reassign
-                try {
-                    // Find New room Type
-                    RoomTypeEntity newRoomType = em.find(RoomTypeEntity.class, roomTypeId);
-                    // Find old room type
-                    RoomTypeEntity oldRoomType = em.find(RoomTypeEntity.class, oldRoomTypeId);
-                    // Remove roomrate from old room type
-                    oldRoomType.getRoomRates().remove(roomRate);
-                    // Add roomrate to new room type
-                    newRoomType.getRoomRates().add(roomRate);
-                    // Update room type of roomrate
-                    roomRate.setRoomType(newRoomType);
-                } catch (NoResultException | NonUniqueResultException ex) {
-                    throw new RoomTypeNotFoundException("Room Type does not exist!");
-                }
-            }
-        }
         return roomRate;
     }
 
@@ -153,8 +153,7 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
         if (roomRate == null) {
             throw new RoomRateNotFoundException("Room rate ID " + roomRateId + " does not exist!");
         }
-        roomRate.setIsDisabled(true); // Assuming there is a `isDisabled` field in the RoomRateEntity class
-        em.merge(roomRate);
+        roomRate.setIsDisabled(true); 
     }
 
     // Deletes the room rate if it is not in use
@@ -163,6 +162,8 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
         if (roomRate == null) {
             throw new RoomRateNotFoundException("Room rate ID " + roomRateId + " does not exist!");
         }
+        RoomTypeEntity rt = roomRate.getRoomType();
+        rt.getRoomRates().remove(roomRate);
         em.remove(roomRate);
     }
 

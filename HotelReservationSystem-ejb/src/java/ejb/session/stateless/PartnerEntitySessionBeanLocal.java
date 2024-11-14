@@ -7,6 +7,8 @@ package ejb.session.stateless;
 import entity.PartnerEntity;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.PartnerExistException;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
@@ -16,10 +18,12 @@ import javax.ejb.Local;
 public interface PartnerEntitySessionBeanLocal {
     
     // System Administrator
-    public Long createNewPartner(PartnerEntity partnerEntity);
+    public Long createNewPartner(PartnerEntity partnerEntity) throws PartnerExistException;
     // System Administrator
     public List<PartnerEntity> viewAllPartners();
     
     // Method to update partner reservations;
+
+    public PartnerEntity retrievePartnerByUsername(String username) throws PartnerNotFoundException;
     
 }

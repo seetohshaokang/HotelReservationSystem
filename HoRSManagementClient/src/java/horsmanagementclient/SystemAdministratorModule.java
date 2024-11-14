@@ -12,7 +12,9 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeRole;
+import util.exception.EmployeeExistException;
 import util.exception.InvalidAccessRightException;
+import util.exception.PartnerExistException;
 
 /**
  *
@@ -115,8 +117,12 @@ public class SystemAdministratorModule {
         // newEmployee.setUsername(scanner.nextLine().trim());
         // System.out.print("Enter password > ");
         // newEmployee.setPassword(scanner.nextLine().trim());
+        try {
         Long newEmployeeId = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
         System.out.println("New employee created successfully!: " + newEmployee.getUsername().toString() + "\n");
+        } catch (EmployeeExistException e) {
+            System.out.println("Error creating employee: " + e.getMessage());
+        }
     }
 
     private void doViewAllEmployees() {
@@ -148,9 +154,11 @@ public class SystemAdministratorModule {
         System.out.print("Enter password > ");
         newPartner.setPassword(scanner.nextLine().trim());
 
-        Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
+        try { Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
         System.out.println("New partner created successfully!: " + newPartner.getUsername().toString() + "\n");
-
+        } catch (PartnerExistException ex) {
+            System.out.println("Error creating partner: " + ex.getMessage());
+        }
         System.out.print("Press any key to continue...> ");
         scanner.nextLine();
     }

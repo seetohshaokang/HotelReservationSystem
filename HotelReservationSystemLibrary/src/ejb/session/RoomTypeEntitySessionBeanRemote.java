@@ -23,6 +23,8 @@ public interface RoomTypeEntitySessionBeanRemote {
     // Use case 8
     public RoomTypeEntity getRoomTypeByName(RoomTypeName name) throws RoomTypeNotFoundException;
 
+    public RoomTypeEntity getRoomTypeById(Long id) throws RoomTypeNotFoundException;
+
     // Use case 9
     public RoomTypeEntity updateRoomType(Long roomTypeId, String newDescription, Double newSize, String newBed, Integer newCapacity, List<String> newAmenities,
             RoomTypeName newNextHigherRoomTypeName)
@@ -34,6 +36,6 @@ public interface RoomTypeEntitySessionBeanRemote {
     public boolean isRoomTypeInUse(Long roomTypeId);
 
     public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException;
-    
+
     public Integer getRoomTypeCount(RoomTypeName roomTypeName) throws RoomTypeNotFoundException;
 }

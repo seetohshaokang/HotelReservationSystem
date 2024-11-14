@@ -7,6 +7,8 @@ package ejb.session;
 import entity.PartnerEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.PartnerExistException;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
@@ -14,8 +16,13 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface PartnerEntitySessionBeanRemote {
+
     // System Administrator
-    public Long createNewPartner(PartnerEntity partnerEntity);
+    public Long createNewPartner(PartnerEntity partnerEntity) throws PartnerExistException;
+
     // System Administrator
     public List<PartnerEntity> viewAllPartners();
+
+    // Method to update partner reservations;
+    public PartnerEntity retrievePartnerByUsername(String username) throws PartnerNotFoundException;
 }

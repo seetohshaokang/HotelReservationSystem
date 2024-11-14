@@ -38,4 +38,6 @@ public interface RoomTypeEntitySessionBeanLocal {
     
     public Integer getRoomTypeCount(RoomTypeName roomTypeName)throws RoomTypeNotFoundException;
 
+    public RoomTypeEntity getRoomTypeById(Long id) throws RoomTypeNotFoundException;
+
 }
