@@ -76,9 +76,13 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
     public List<ReservationEntity> retrieveAllReservations(GuestEntity guest) {
         Long guestId = guest.getGuestId();
         GuestEntity retrievedGuest = em.find(GuestEntity.class, guestId);
+
+        // Initialize the reservations list to avoid LazyInitializationException
+        retrievedGuest.getReservations().size();
+
         return retrievedGuest.getReservations();
     }
-    
+
     // New method to retrieve reservation only if it belongs to the specified guest
     public ReservationEntity retrieveGuestReservationById(Long reservationId, Long guestId) {
         ReservationEntity reservation = em.find(ReservationEntity.class, reservationId);
