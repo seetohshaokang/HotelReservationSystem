@@ -79,9 +79,9 @@ public class GuestRelationOfficerModule {
                 } else if (response == 2) {
                     walkInReserveRoom();
                 } else if (response == 3) {
-                    checkInReservation();
+                    // checkInReservation();
                 } else if (response == 4) {
-                    checkOutReservation();
+                    // checkOutReservation();
                 } else if (response == 5) {
                     break;
                 } else {
@@ -134,10 +134,10 @@ public class GuestRelationOfficerModule {
         // Print each AvailableRoomsPerRoomType object with details
         for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
             RoomTypeName roomTypeName = roomTypeAvailability.getRoomTypeName();
-            List<RoomEntity> availableRooms = roomTypeAvailability.getAvailableRooms();
+            int availableRoomsCount = roomTypeAvailability.getAvailableRoomsCount();
             Double totalRate = roomReservationSessionBeanRemote.getWalkInRate(checkInDate, checkOutDate, roomTypeName);
 
-            System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
+            System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRoomsCount, (totalRate != null ? totalRate : 0.0));
         }
     }
 
@@ -186,7 +186,7 @@ public class GuestRelationOfficerModule {
         System.out.println("\nAvailable Room Types:");
         System.out.printf("%-20s || %-20s%n", "Room Type", "Available Rooms");
         for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
-            System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRooms().size());
+            System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRoomsCount());
         }
 
         // Prompt for a single room type and quantity
@@ -231,6 +231,7 @@ public class GuestRelationOfficerModule {
         }
     }
 
+    /*
     private void checkInReservation() {
         Scanner scanner = new Scanner(System.in);
 
@@ -412,4 +413,5 @@ public class GuestRelationOfficerModule {
         }
     }
 
+     */
 }

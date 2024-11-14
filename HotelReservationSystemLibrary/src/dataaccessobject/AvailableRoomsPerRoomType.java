@@ -22,18 +22,21 @@ import util.enumeration.RoomTypeName;
 public class AvailableRoomsPerRoomType implements Serializable { // Container class
 
     private static final long serialVersionUID = 1L;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomTypeAvailabilityId;
     
     @Enumerated(EnumType.STRING)
     private RoomTypeName roomTypeName;
-    private List<RoomEntity> availableRooms;
+    
+    private Integer availableRoomsCount; // Stores the count of available rooms instead of the list
     private Integer sequence;
 
-    public AvailableRoomsPerRoomType(RoomTypeName roomTypeName, List<RoomEntity> availableRooms) {
+    // Constructor to initialize with room type name and available rooms count
+    public AvailableRoomsPerRoomType(RoomTypeName roomTypeName, Integer availableRoomsCount) {
         this.roomTypeName = roomTypeName;
-        this.availableRooms = availableRooms;
+        this.availableRoomsCount = availableRoomsCount;
     }
     
     public Long getRoomTypeAvailabilityId() {
@@ -53,15 +56,11 @@ public class AvailableRoomsPerRoomType implements Serializable { // Container cl
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the roomTypeAvailabilityId fields are not set
         if (!(object instanceof AvailableRoomsPerRoomType)) {
             return false;
         }
         AvailableRoomsPerRoomType other = (AvailableRoomsPerRoomType) object;
-        if ((this.roomTypeAvailabilityId == null && other.roomTypeAvailabilityId != null) || (this.roomTypeAvailabilityId != null && !this.roomTypeAvailabilityId.equals(other.roomTypeAvailabilityId))) {
-            return false;
-        }
-        return true;
+        return (this.roomTypeAvailabilityId != null || other.roomTypeAvailabilityId == null) && (this.roomTypeAvailabilityId == null || this.roomTypeAvailabilityId.equals(other.roomTypeAvailabilityId));
     }
 
     @Override
@@ -70,17 +69,17 @@ public class AvailableRoomsPerRoomType implements Serializable { // Container cl
     }
 
     /**
-     * @return the availableRooms
+     * @return the availableRoomsCount
      */
-    public List<RoomEntity> getAvailableRooms() {
-        return availableRooms;
+    public Integer getAvailableRoomsCount() {
+        return availableRoomsCount;
     }
 
     /**
-     * @param availableRooms the availableRooms to set
+     * @param availableRoomsCount the availableRoomsCount to set
      */
-    public void setAvailableRooms(List<RoomEntity> availableRooms) {
-        this.availableRooms = availableRooms;
+    public void setAvailableRoomsCount(Integer availableRoomsCount) {
+        this.availableRoomsCount = availableRoomsCount;
     }
 
     /**

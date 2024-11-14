@@ -68,8 +68,6 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
 
     // Temporarily store the roomAvailability for each roomType
     private List<AvailableRoomsPerRoomType> roomTypeAvailabilityList;
-    
-    
 
     @Override
     public List<AvailableRoomsPerRoomType> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate) {
@@ -78,11 +76,28 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         Integer sequence = 0;
 
         for (RoomTypeName roomTypeName : RoomTypeName.values()) {
-            // Retrieve available rooms for this room type and date range directly from the database
-            List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(checkInDate, checkOutDate, roomTypeName);
+            // Retrieve total rooms for the room type
+            int totalRoomsForType = 0;
+            try {
+                totalRoomsForType = roomTypeEntitySessionBean.getRoomTypeCount(roomTypeName);
+            } catch (RoomTypeNotFoundException e) {
+                System.out.println("Room Type Not Found"); // remember to propagate later
+            }
 
-            // Create an AvailableRoomsPerRoomType object for the room type with available rooms
-            AvailableRoomsPerRoomType roomTypeAvailability = new AvailableRoomsPerRoomType(roomTypeName, availableRooms);
+            // Retrieve reservations that overlap with the provided date range and room type
+            List<ReservationEntity> overlappingReservations = roomEntitySessionBean.retrieveOverlappingReservations(checkInDate, checkOutDate, roomTypeName);
+
+            // Calculate the number of occupied rooms by summing up the room count for each overlapping reservation
+            int occupiedRoomsCount = 0;
+            for (ReservationEntity reservation : overlappingReservations) {
+                occupiedRoomsCount += reservation.getNumberRooms(); // Assuming getNumberRooms() returns the count of rooms for the reservation
+            }
+
+            // Calculate available rooms by subtracting occupied rooms from the total rooms for that type
+            int availableRoomsCount = totalRoomsForType - occupiedRoomsCount;
+
+            // Create an AvailableRoomsPerRoomType object for the room type with the available rooms count
+            AvailableRoomsPerRoomType roomTypeAvailability = new AvailableRoomsPerRoomType(roomTypeName, availableRoomsCount);
             sequence++;
 
             // Optionally, set a sequence number here if needed for sorting or printing
@@ -95,26 +110,31 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         return freshRoomTypeAvailabilityList; // Return the fresh data directly without caching
     }
 
-    @Override
     public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve) {
         Double totalAmount = 0.0;
         ReservationEntity reservation = null;
+        Long reservationId = null;
 
-        // Create the reservation without room reservations initially
-        Long reservationId = reservationEntitySessionBean.createReservationForGuest(guestId, checkInDate, checkOutDate, totalAmount);
-
-        if (reservationId == null) {
-            System.out.println("Reservation could not be created; guest does not exist.");
+        // Retrieve the guest entity
+        GuestEntity guest = em.find(GuestEntity.class, guestId);
+        if (guest == null) {
+            System.out.println("Guest with ID " + guestId + " does not exist.");
             return null;
         }
 
-        // Fetch the created reservation entity
-        reservation = reservationEntitySessionBean.findReservationById(reservationId);
-
-        // Iterate over each RoomsPerRoomType DTO in the list
+        // Iterate over each RoomsPerRoomType DTO in the list to create reservations for each room type requested
         for (RoomsPerRoomType rooms : roomsToReserve) {
             RoomTypeName roomTypeName = rooms.getRoomTypeName();
             int numberOfRooms = rooms.getNumRooms();
+
+            // Retrieve the RoomTypeEntity for the specified room type name
+            RoomTypeEntity roomType = null;
+            try {
+                roomType = roomTypeEntitySessionBean.getRoomTypeByName(roomTypeName);
+            } catch (RoomTypeNotFoundException ex) {
+                System.out.println("Room Type Not Found"); // Remember to propagate exception if needed
+                return null;
+            }
 
             // Retrieve the latest availability for the required room type
             List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(checkInDate, checkOutDate, roomTypeName);
@@ -130,16 +150,22 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
                 System.out.println("Rate not available for room type: " + roomTypeName);
                 return null;
             }
+
+            // Calculate total amount for this room type and add to the reservation's total amount
             totalAmount += roomRate * numberOfRooms;
 
-            // Reserve the specific rooms by creating RoomReservationEntity records
-            for (int i = 0; i < numberOfRooms; i++) {
-                RoomEntity roomToReserve = availableRooms.get(i);
+            // Create the reservation for this room type
+            reservationId = reservationEntitySessionBean.createReservationForGuest(guestId, checkInDate, checkOutDate, totalAmount, roomType, numberOfRooms);
 
-                // Create a RoomReservationEntity for each room
-                RoomReservationEntity roomReservation = roomReservationEntitySessionBean.createNewRoomReservation(roomToReserve, reservation);
+            if (reservationId == null) {
+                System.out.println("Reservation could not be created for guest.");
+                return null;
             }
+
+            // Fetch the created reservation entity for further operations, if needed
+            reservation = reservationEntitySessionBean.findReservationById(reservationId);
         }
+
         // Update the reservation's total amount
         reservation.setTotalAmount(totalAmount);
         reservationEntitySessionBean.confirmReservation(reservation);
@@ -160,23 +186,20 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
     public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve) {
         Double totalAmount = 0.0;
         ReservationEntity reservation = null;
+        Long reservationId = null;
 
-        // Create a reservation for the visitor without room reservations initially
-        Long reservationId = reservationEntitySessionBean.createReservationForVisitor(visitor, checkInDate, checkOutDate, totalAmount);
-
-        if (reservationId == null) {
-            System.out.println("Reservation could not be created for visitor.");
-            return null;
-        }
-
-        // Fetch the created reservation entity
-        reservation = reservationEntitySessionBean.findReservationById(reservationId);
-
-        // Iterate over each RoomsPerRoomType DTO in the list
+        // Iterate over each RoomsPerRoomType DTO in the list to create reservations for each room type requested
         for (RoomsPerRoomType rooms : roomsToReserve) {
             RoomTypeName roomTypeName = rooms.getRoomTypeName();
             int numberOfRooms = rooms.getNumRooms();
 
+            // Retrieve the RoomTypeEntity for the specified room type name
+            RoomTypeEntity roomType = null;
+            try {
+                roomType = roomTypeEntitySessionBean.getRoomTypeByName(roomTypeName);
+            } catch (RoomTypeNotFoundException ex) {
+                System.out.println("Room Type Not Found"); // Remember to propagate exception
+            }
             // Retrieve the latest availability for the required room type
             List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(checkInDate, checkOutDate, roomTypeName);
 
@@ -191,15 +214,20 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
                 System.out.println("Rate not available for room type: " + roomTypeName);
                 return null;
             }
+
+            // Calculate total amount for this room type and add to the reservation's total amount
             totalAmount += roomRate * numberOfRooms;
 
-            // Reserve the specific rooms by creating RoomReservationEntity records
-            for (int i = 0; i < numberOfRooms; i++) {
-                RoomEntity roomToReserve = availableRooms.get(i);
+            // Create the reservation for this room type
+            reservationId = reservationEntitySessionBean.createReservationForVisitor(visitor, checkInDate, checkOutDate, totalAmount, roomType, numberOfRooms);
 
-                // Create a RoomReservationEntity for each room
-                RoomReservationEntity roomReservation = roomReservationEntitySessionBean.createNewRoomReservation(roomToReserve, reservation);
+            if (reservationId == null) {
+                System.out.println("Reservation could not be created for visitor.");
+                return null;
             }
+
+            // Fetch the created reservation entity for further operations, if needed
+            reservation = reservationEntitySessionBean.findReservationById(reservationId);
         }
 
         // Update the reservation's total amount
@@ -289,34 +317,6 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         return roomTypeAvailabilityList;
     }
 
-    /* // For testing purposes.
-    public void allocateRoomsForThatDay(LocalDate checkInDate) {
-        // Step 1: Retrieve a list of room reservation entities with the given checkInDate.
-        List<RoomReservationEntity> reservationsForDate = roomReservationEntitySessionBean.findRoomReservationsByDate(checkInDate);
-
-        // Step 2: Iterate through the list of room reservation entities.
-        for (RoomReservationEntity reservation : reservationsForDate) {
-            RoomEntity reservedRoom = reservation.getReservedRoom();
-
-            // Step 3: Check if the room associated with this reservation is disabled.
-            if (reservedRoom.getStatus() == RoomStatus.DISABLED) {
-                System.out.println("Room " + reservedRoom.getRoomNumber() + " is disabled and cannot be allocated.");
-                // Mark the reservation as not assigned (or another status as needed).
-                reservation.setIsAssigned(false); // Example: mark as unassigned or canceled
-                continue; // Skip further processing for this reservation
-            }
-
-            // Step 4: If the room is available, proceed with allocation.
-            if (reservedRoom.getStatus() == RoomStatus.AVAILABLE) {
-                // Mark the room reservation as assigned.
-                reservation.setIsAssigned(true);
-                // Update the room status to not available (occupied).
-                reservedRoom.setStatus(RoomStatus.NOT_AVAILABLE);
-            }
-        }
-    }
-     */
-    
     public void updateReservationToCheckedIn(ReservationEntity reservation) {
         ReservationStatus newStatus = ReservationStatus.CHECKED_IN;
         reservation.setReservationStatus(newStatus);
@@ -324,18 +324,13 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         em.flush();
         System.out.println("Reservation ID " + reservation.getReservationId() + " status updated to " + newStatus);
     }
-    
+
     public void updateReservationToCheckedOut(ReservationEntity reservation) {
         ReservationStatus newStatus = ReservationStatus.CHECKED_OUT;
         reservation.setReservationStatus(newStatus);
         em.merge(reservation);
         em.flush();
         System.out.println("Reservation ID " + reservation.getReservationId() + " status updated to " + newStatus);
-    }
-
-
-    public void persist(Object object) {
-        em.persist(object);
     }
 
 }

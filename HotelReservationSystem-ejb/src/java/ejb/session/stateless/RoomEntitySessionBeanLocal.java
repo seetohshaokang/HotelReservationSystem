@@ -4,6 +4,7 @@
  */
 package ejb.session.stateless;
 
+import entity.ReservationEntity;
 import entity.RoomEntity;
 import entity.RoomTypeEntity;
 import java.time.LocalDate;
@@ -40,4 +41,8 @@ public interface RoomEntitySessionBeanLocal {
     public void disableRoom(Long roomId) throws RoomNotFoundException;
 
     public void deleteRoom(Long roomId) throws RoomNotFoundException;
+    
+    public List<ReservationEntity> retrieveOverlappingReservations(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName);
+    
+    public List<RoomEntity> retrieveAvailableRooms(RoomTypeName roomTypeName);
 }

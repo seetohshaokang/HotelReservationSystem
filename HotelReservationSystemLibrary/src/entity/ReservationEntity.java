@@ -70,6 +70,7 @@ public class ReservationEntity implements Serializable {
     }
 
     // Working constructor
+    /*
     public ReservationEntity(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
         this.visitor = visitor;
         this.checkInDate = checkInDate;
@@ -79,6 +80,7 @@ public class ReservationEntity implements Serializable {
         this.roomReservations = new ArrayList<>();
         this.reservationDate = LocalDate.now();
     }
+    */
 
     // Ideal Constructor
     public ReservationEntity(VisitorEntity visitor, RoomTypeEntity roomType, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, Integer numberRooms) {
@@ -223,6 +225,20 @@ public class ReservationEntity implements Serializable {
      */
     public void setNumberRooms(Integer numberRooms) {
         this.numberRooms = numberRooms;
+    }
+
+    /**
+     * @return the roomType
+     */
+    public RoomTypeEntity getRoomType() {
+        return roomType;
+    }
+
+    /**
+     * @param roomType the roomType to set
+     */
+    public void setRoomType(RoomTypeEntity roomType) {
+        this.roomType = roomType;
     }
 
 }

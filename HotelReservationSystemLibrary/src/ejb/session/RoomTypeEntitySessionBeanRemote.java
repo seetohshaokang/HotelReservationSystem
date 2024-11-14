@@ -34,4 +34,6 @@ public interface RoomTypeEntitySessionBeanRemote {
     public boolean isRoomTypeInUse(Long roomTypeId);
 
     public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException;
+    
+    public Integer getRoomTypeCount(RoomTypeName roomTypeName) throws RoomTypeNotFoundException;
 }

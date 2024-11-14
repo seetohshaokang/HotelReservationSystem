@@ -6,6 +6,7 @@ package ejb.session.stateless;
 
 import entity.GuestEntity;
 import entity.ReservationEntity;
+import entity.RoomTypeEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,14 +19,16 @@ import javax.ejb.Local;
 @Local
 public interface ReservationEntitySessionBeanLocal {
 
-    public Long createReservationForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount);
+    public Long createReservationForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, RoomTypeEntity roomType, Integer numberRooms);
     
     public ReservationEntity findReservationById(Long reservationId);
     
-    public Long createReservationForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount);
+    public Long createReservationForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, RoomTypeEntity roomType, Integer numberRooms);
     
     public void confirmReservation(ReservationEntity reservation);
     
     public List<ReservationEntity> findReservationsByCheckInDate(LocalDate checkInDate);
+    
+    public List<ReservationEntity> getAllReservations();
    
 }
