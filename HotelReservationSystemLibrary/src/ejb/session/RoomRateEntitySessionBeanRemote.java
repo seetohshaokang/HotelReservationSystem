@@ -32,4 +32,10 @@ public interface RoomRateEntitySessionBeanRemote {
 
     public List<RoomRateEntity> getRoomRatesByRoomType(RoomTypeName roomTypeName);
 
+    public boolean isRoomRateInUse(Long roomRateId);
+
+    public void disableRoomRate(Long roomRateId) throws RoomRateNotFoundException;
+
+    public void deleteRoomRate(Long roomRateId) throws RoomRateNotFoundException;
+
 }

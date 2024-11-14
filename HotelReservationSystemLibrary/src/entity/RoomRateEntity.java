@@ -44,6 +44,9 @@ public class RoomRateEntity implements Serializable {
     private LocalDate startDate; // Only for peak and promotion rates
     
     private LocalDate endDate; // Only for peak and promotion rates
+    
+    @Column(nullable = false)
+    private Boolean isDisabled = false;
 
     // *...1 r/s with roomtype
     @ManyToOne
@@ -177,5 +180,19 @@ public class RoomRateEntity implements Serializable {
         }
         // Normal and Published rates are always valid (assuming no date restrictions)
         return true;
+    }
+
+    /**
+     * @return the isDisabled
+     */
+    public Boolean getIsDisabled() {
+        return isDisabled;
+    }
+
+    /**
+     * @param isDisabled the isDisabled to set
+     */
+    public void setIsDisabled(Boolean isDisabled) {
+        this.isDisabled = isDisabled;
     }
 }

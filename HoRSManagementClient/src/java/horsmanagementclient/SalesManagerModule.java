@@ -321,7 +321,33 @@ public class SalesManagerModule {
     }
 
     private void deleteRoomRate() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Scanner scanner = new Scanner(System.in);
+
+        // Display available room rates for selection
+        viewAllRoomRates();
+        System.out.print("Enter the ID of the room rate to delete > ");
+        Long roomRateId = scanner.nextLong();
+        scanner.nextLine();
+
+        try {
+            // Check if the room rate is currently in use
+            boolean isRoomRateInUse = roomRateEntitySessionBeanRemote.isRoomRateInUse(roomRateId);
+
+            if (isRoomRateInUse) {
+                // If in use, mark as disabled instead of deleting
+                roomRateEntitySessionBeanRemote.disableRoomRate(roomRateId);
+                System.out.println("Room rate " + roomRateId + " is currently in use and has been marked as disabled.");
+            } else {
+                // If not in use, delete the room rate
+                roomRateEntitySessionBeanRemote.deleteRoomRate(roomRateId);
+                System.out.println("Room rate " + roomRateId + " has been successfully deleted.");
+            }
+
+        } catch (RoomRateNotFoundException ex) {
+            System.out.println("Room rate not found: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("An error occurred while deleting the room rate: " + ex.getMessage());
+        }
     }
 
     // Use case 21

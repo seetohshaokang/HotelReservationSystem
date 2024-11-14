@@ -27,9 +27,15 @@ public interface RoomRateEntitySessionBeanLocal {
     public String createNewRoomRate(String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, LocalDate start, LocalDate end) throws RoomTypeNotFoundException;
 
     public RoomRateEntity updateRoomRate(Long id, String name, Long roomTypeId, RateType selectedRateType, Double ratePerNight, LocalDate start, LocalDate end) throws RoomTypeNotFoundException, RoomRateNotFoundException;
-    
+
     public RoomRateEntity getRoomRateByRateAndRoomType(RoomTypeName roomTypeName, RateType rateType) throws RoomRateNotFoundException;
 
     public List<RoomRateEntity> getRoomRatesByRoomType(RoomTypeName roomTypeName);
-    
+
+    public boolean isRoomRateInUse(Long roomRateId);
+
+    public void disableRoomRate(Long roomRateId) throws RoomRateNotFoundException;
+
+    public void deleteRoomRate(Long roomRateId) throws RoomRateNotFoundException;
+
 }
