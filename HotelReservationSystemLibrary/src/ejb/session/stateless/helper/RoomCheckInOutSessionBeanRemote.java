@@ -9,6 +9,7 @@ import entity.RoomEntity;
 import entity.RoomReservationEntity;
 import java.util.List;
 import javax.ejb.Remote;
+import util.enumeration.ReservationStatus;
 
 /**
  *
@@ -16,7 +17,14 @@ import javax.ejb.Remote;
  */
 @Remote
 public interface RoomCheckInOutSessionBeanRemote {
+
     public List<ReservationEntity> findReservedReservationsByEmail(String email);
-     public void checkInRoomReservation(RoomReservationEntity roomReservation);
+
+    public void checkInRoomReservation(RoomReservationEntity roomReservation);
+
     public void replaceRoomReservation(RoomReservationEntity roomReservation, RoomEntity replacementRoom);
+
+    public List<ReservationEntity> findReservationsByEmailAndStatus(String email, ReservationStatus status);
+    
+    public void checkOutRoomReservation(RoomReservationEntity roomReservation);
 }

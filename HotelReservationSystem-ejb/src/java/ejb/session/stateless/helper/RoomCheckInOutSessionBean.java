@@ -88,5 +88,49 @@ public class RoomCheckInOutSessionBean implements RoomCheckInOutSessionBeanRemot
         System.out.println("Room reservation updated. Replacement room " + replacementRoom.getRoomNumber()
                 + " has been assigned to reservation ID: " + roomReservation.getReservation().getReservationId());
     }
+    
+    public List<ReservationEntity> findReservationsByEmailAndStatus(String email, ReservationStatus status) {
+        Query query = em.createQuery(
+                "SELECT r FROM ReservationEntity r "
+                + "JOIN r.visitor v "
+                + "WHERE v.email = :email "
+                + "AND r.status = :status", ReservationEntity.class);
+        
+        query.setParameter("email", email);
+        query.setParameter("status", status);
+
+        return query.getResultList();
+    }
+    
+    public void checkOutRoomReservation(RoomReservationEntity roomReservation) {
+        if (!roomReservation.getIsAssigned()) {
+            throw new IllegalArgumentException("Room reservation is not assigned and cannot be checked out.");
+        }
+
+        RoomEntity room = roomReservation.getReservedRoom();
+        if (room.getStatus() == RoomStatus.OCCUPIED) {
+            // Set room status to AVAILABLE
+            room.setStatus(RoomStatus.AVAILABLE);
+            em.merge(room);
+
+            // Update reservation status to COMPLETED if this is the last room reservation
+            ReservationEntity reservation = roomReservation.getReservation();
+            boolean allRoomsCheckedOut = reservation.getRoomReservations().stream()
+                    .allMatch(rr -> rr.getReservedRoom().getStatus() == RoomStatus.AVAILABLE);
+            
+            if (allRoomsCheckedOut) {
+                reservation.setStatus(ReservationStatus.CHECKED_OUT);
+                em.merge(reservation);
+            }
+
+            em.flush();
+
+            System.out.println("Room " + room.getRoomNumber() + " has been checked out for reservation ID: "
+                    + reservation.getReservationId());
+        } else {
+            System.out.println("Room " + room.getRoomNumber() + " is not occupied and cannot be checked out.");
+            throw new IllegalStateException("Room " + room.getRoomNumber() + " is not occupied and cannot be checked out.");
+        }
+    }
 
 }
