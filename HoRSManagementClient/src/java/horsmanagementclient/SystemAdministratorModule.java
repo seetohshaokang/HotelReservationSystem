@@ -129,12 +129,13 @@ public class SystemAdministratorModule {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** HORS System :: System Administrator :: View All Employees");
+        System.out.println("--------------------------------------------------------------");
         List<EmployeeEntity> employeeEntities = employeeEntitySessionBeanRemote.retrieveAllEmployees();
 
-        System.out.printf("%10s%30s\n", "Username", "Role");
+        System.out.printf("%-20s || %-30s\n", "Username", "Role");
 
         for (EmployeeEntity employeeEntity : employeeEntities) {
-            System.out.printf("%10s%30s\n", employeeEntity.getUsername(), employeeEntity.getRole().toString());
+            System.out.printf("%-20s || %-30s\n", employeeEntity.getUsername(), employeeEntity.getRole().toString());
         }
 
         System.out.print("Press any key to continue...> ");
@@ -170,9 +171,9 @@ public class SystemAdministratorModule {
         List<PartnerEntity> partnerEntities = partnerEntitySessionBeanRemote.viewAllPartners();
 
         if (!partnerEntities.isEmpty()) {
-            System.out.printf("%10s\n", "Username");
+            System.out.printf("%-10s\n", "Username");
             for (PartnerEntity partnerEntity : partnerEntities) {
-                System.out.printf("%10s\n", partnerEntity.getUsername());
+                System.out.printf("%-10s\n", partnerEntity.getUsername());
             }
         } else {
             System.out.println("No partners created yet.");
