@@ -117,29 +117,6 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         return query.getResultList();
     }
 
-    @Override
-    public List<RoomEntity> retrieveAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName) {
-
-        System.out.println("Check-In Date: " + checkInDate);
-        System.out.println("Check-Out Date: " + checkOutDate);
-
-        // Remove checking of rooms availability status as it reflects real time availability not reservation availability
-        Query query = em.createQuery("SELECT r FROM RoomEntity r "
-                + "WHERE r.roomType.roomTypeName = :roomTypeName "
-                + "AND NOT EXISTS ("
-                + "SELECT rr FROM RoomReservationEntity rr "
-                + "WHERE rr.reservedRoom = r "
-                + "AND rr.checkInDate < :checkOutDate "
-                + "AND rr.checkOutDate > :checkInDate)");
-        // NOT EXIST clause will be true even if there are no room reservations associated with room.
-
-        query.setParameter("checkInDate", checkInDate);
-        query.setParameter("checkOutDate", checkOutDate);
-        query.setParameter("roomTypeName", roomTypeName);
-
-        List<RoomEntity> availableRooms = query.getResultList();
-        return availableRooms;
-    }
 
     public boolean isRoomInUse(Long roomId) throws RoomNotFoundException {
         RoomEntity room = em.find(RoomEntity.class, roomId);

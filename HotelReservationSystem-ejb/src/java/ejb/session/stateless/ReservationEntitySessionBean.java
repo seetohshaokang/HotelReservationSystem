@@ -7,6 +7,8 @@ package ejb.session.stateless;
 import ejb.session.ReservationEntitySessionBeanRemote;
 import entity.GuestEntity;
 import entity.ReservationEntity;
+import entity.RoomEntity;
+import entity.RoomReservationEntity;
 import entity.RoomTypeEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
@@ -99,6 +101,21 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
 
     }
 
+    public RoomReservationEntity addRoomReservationToReservation(RoomEntity room, ReservationEntity reservation) {
+        // Create the RoomReservationEntity with the provided room and reservation
+        RoomReservationEntity roomReservation = new RoomReservationEntity(room, reservation);
 
+        // Persist the RoomReservationEntity
+        em.persist(roomReservation);
+
+        // Add to the reservation's list of room reservations
+        reservation.getRoomReservations().add(roomReservation);
+
+        // Update the reservation in persistence context
+        em.merge(reservation);
+        em.flush();
+
+        return roomReservation;
+    }
 
 }

@@ -110,7 +110,7 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         return freshRoomTypeAvailabilityList; // Return the fresh data directly without caching
     }
 
-    public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve) {
+    public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, RoomsPerRoomType rooms) {
         Double totalAmount = 0.0;
         ReservationEntity reservation = null;
         Long reservationId = null;
@@ -122,49 +122,61 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
             return null;
         }
 
-        // Iterate over each RoomsPerRoomType DTO in the list to create reservations for each room type requested
-        for (RoomsPerRoomType rooms : roomsToReserve) {
-            RoomTypeName roomTypeName = rooms.getRoomTypeName();
-            int numberOfRooms = rooms.getNumRooms();
+        // Extract the room type name and requested number of rooms from the RoomsPerRoomType object
+        RoomTypeName roomTypeName = rooms.getRoomTypeName();
+        int numberOfRooms = rooms.getNumRooms();
 
-            // Retrieve the RoomTypeEntity for the specified room type name
-            RoomTypeEntity roomType = null;
-            try {
-                roomType = roomTypeEntitySessionBean.getRoomTypeByName(roomTypeName);
-            } catch (RoomTypeNotFoundException ex) {
-                System.out.println("Room Type Not Found"); // Remember to propagate exception if needed
-                return null;
-            }
-
-            // Retrieve the latest availability for the required room type
-            List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(checkInDate, checkOutDate, roomTypeName);
-
-            if (availableRooms.size() < numberOfRooms) {
-                System.out.println("Not enough rooms available for room type: " + roomTypeName + ". Requested: " + numberOfRooms + ", Available: " + availableRooms.size());
-                return null;
-            }
-
-            // Calculate the rate for the requested number of rooms for this room type
-            Double roomRate = getWalkInRate(checkInDate, checkOutDate, roomTypeName);
-            if (roomRate == null) {
-                System.out.println("Rate not available for room type: " + roomTypeName);
-                return null;
-            }
-
-            // Calculate total amount for this room type and add to the reservation's total amount
-            totalAmount += roomRate * numberOfRooms;
-
-            // Create the reservation for this room type
-            reservationId = reservationEntitySessionBean.createReservationForGuest(guestId, checkInDate, checkOutDate, totalAmount, roomType, numberOfRooms);
-
-            if (reservationId == null) {
-                System.out.println("Reservation could not be created for guest.");
-                return null;
-            }
-
-            // Fetch the created reservation entity for further operations, if needed
-            reservation = reservationEntitySessionBean.findReservationById(reservationId);
+        // Retrieve the RoomTypeEntity for the specified room type name
+        RoomTypeEntity roomType = null;
+        try {
+            roomType = roomTypeEntitySessionBean.getRoomTypeByName(roomTypeName);
+        } catch (RoomTypeNotFoundException ex) {
+            System.out.println("Room Type Not Found");
+            return null;
         }
+
+        // Retrieve overlapping reservations for the given date range and room type
+        List<ReservationEntity> overlappingReservations = roomEntitySessionBean.retrieveOverlappingReservations(checkInDate, checkOutDate, roomTypeName);
+
+        // Calculate the total number of rooms occupied by summing up the number of rooms in each overlapping reservation
+        int occupiedRoomsCount = 0;
+        for (ReservationEntity overlappingReservation : overlappingReservations) {
+            occupiedRoomsCount += overlappingReservation.getNumberRooms();
+        }
+
+        // Calculate available rooms by subtracting the occupied rooms from the total rooms for that type
+        int totalRoomsForType;
+        try {
+            totalRoomsForType = roomTypeEntitySessionBean.getRoomTypeCount(roomTypeName);
+        } catch (RoomTypeNotFoundException e) {
+            System.out.println("Room Type Not Found");
+            return null;
+        }
+        int availableRoomsCount = totalRoomsForType - occupiedRoomsCount;
+
+        if (availableRoomsCount < numberOfRooms) {
+            System.out.println("Not enough rooms available for room type: " + roomTypeName + ". Requested: " + numberOfRooms + ", Available: " + availableRoomsCount);
+            return null;
+        }
+
+        // Calculate the rate for the requested number of rooms for this room type
+        Double roomRate = getWalkInRate(checkInDate, checkOutDate, roomTypeName);
+        if (roomRate == null) {
+            System.out.println("Rate not available for room type: " + roomTypeName);
+            return null;
+        }
+
+        // Calculate total amount for this room type and create the reservation
+        totalAmount = roomRate * numberOfRooms;
+        reservationId = reservationEntitySessionBean.createReservationForGuest(guestId, checkInDate, checkOutDate, totalAmount, roomType, numberOfRooms);
+
+        if (reservationId == null) {
+            System.out.println("Reservation could not be created for guest.");
+            return null;
+        }
+
+        // Fetch the created reservation entity for further processing
+        reservation = reservationEntitySessionBean.findReservationById(reservationId);
 
         // Update the reservation's total amount
         reservation.setTotalAmount(totalAmount);
@@ -183,52 +195,66 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         return reservationId;
     }
 
-    public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve) {
+    public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, RoomsPerRoomType rooms) {
         Double totalAmount = 0.0;
         ReservationEntity reservation = null;
         Long reservationId = null;
 
-        // Iterate over each RoomsPerRoomType DTO in the list to create reservations for each room type requested
-        for (RoomsPerRoomType rooms : roomsToReserve) {
-            RoomTypeName roomTypeName = rooms.getRoomTypeName();
-            int numberOfRooms = rooms.getNumRooms();
+        // Extract the room type name and requested number of rooms from the RoomsPerRoomType object
+        RoomTypeName roomTypeName = rooms.getRoomTypeName();
+        int numberOfRooms = rooms.getNumRooms();
 
-            // Retrieve the RoomTypeEntity for the specified room type name
-            RoomTypeEntity roomType = null;
-            try {
-                roomType = roomTypeEntitySessionBean.getRoomTypeByName(roomTypeName);
-            } catch (RoomTypeNotFoundException ex) {
-                System.out.println("Room Type Not Found"); // Remember to propagate exception
-            }
-            // Retrieve the latest availability for the required room type
-            List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(checkInDate, checkOutDate, roomTypeName);
-
-            if (availableRooms.size() < numberOfRooms) {
-                System.out.println("Not enough rooms available for room type: " + roomTypeName + ". Requested: " + numberOfRooms + ", Available: " + availableRooms.size());
-                return null;
-            }
-
-            // Calculate the rate for the requested number of rooms for this room type
-            Double roomRate = getWalkInRate(checkInDate, checkOutDate, roomTypeName);
-            if (roomRate == null) {
-                System.out.println("Rate not available for room type: " + roomTypeName);
-                return null;
-            }
-
-            // Calculate total amount for this room type and add to the reservation's total amount
-            totalAmount += roomRate * numberOfRooms;
-
-            // Create the reservation for this room type
-            reservationId = reservationEntitySessionBean.createReservationForVisitor(visitor, checkInDate, checkOutDate, totalAmount, roomType, numberOfRooms);
-
-            if (reservationId == null) {
-                System.out.println("Reservation could not be created for visitor.");
-                return null;
-            }
-
-            // Fetch the created reservation entity for further operations, if needed
-            reservation = reservationEntitySessionBean.findReservationById(reservationId);
+        // Retrieve the RoomTypeEntity for the specified room type name
+        RoomTypeEntity roomType = null;
+        try {
+            roomType = roomTypeEntitySessionBean.getRoomTypeByName(roomTypeName);
+        } catch (RoomTypeNotFoundException ex) {
+            System.out.println("Room Type Not Found"); // Remember to propagate exception
+            return null;
         }
+
+        // Retrieve overlapping reservations for the given date range and room type
+        List<ReservationEntity> overlappingReservations = roomEntitySessionBean.retrieveOverlappingReservations(checkInDate, checkOutDate, roomTypeName);
+
+        // Calculate the total number of rooms occupied by summing up the number of rooms in each overlapping reservation
+        int occupiedRoomsCount = 0;
+        for (ReservationEntity overlappingReservation : overlappingReservations) {
+            occupiedRoomsCount += overlappingReservation.getNumberRooms();
+        }
+
+        // Calculate available rooms by subtracting the occupied rooms from the total rooms for that type
+        int totalRoomsForType;
+        try {
+            totalRoomsForType = roomTypeEntitySessionBean.getRoomTypeCount(roomTypeName);
+        } catch (RoomTypeNotFoundException e) {
+            System.out.println("Room Type Not Found"); // Remember to propagate later
+            return null;
+        }
+        int availableRoomsCount = totalRoomsForType - occupiedRoomsCount;
+
+        if (availableRoomsCount < numberOfRooms) {
+            System.out.println("Not enough rooms available for room type: " + roomTypeName + ". Requested: " + numberOfRooms + ", Available: " + availableRoomsCount);
+            return null;
+        }
+
+        // Calculate the rate for the requested number of rooms for this room type
+        Double roomRate = getWalkInRate(checkInDate, checkOutDate, roomTypeName);
+        if (roomRate == null) {
+            System.out.println("Rate not available for room type: " + roomTypeName);
+            return null;
+        }
+
+        // Calculate total amount for this room type and create the reservation
+        totalAmount = roomRate * numberOfRooms;
+        reservationId = reservationEntitySessionBean.createReservationForVisitor(visitor, checkInDate, checkOutDate, totalAmount, roomType, numberOfRooms);
+
+        if (reservationId == null) {
+            System.out.println("Reservation could not be created for visitor.");
+            return null;
+        }
+
+        // Fetch the created reservation entity for further processing
+        reservation = reservationEntitySessionBean.findReservationById(reservationId);
 
         // Update the reservation's total amount
         reservation.setTotalAmount(totalAmount);

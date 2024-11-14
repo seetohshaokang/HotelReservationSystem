@@ -26,19 +26,18 @@ public interface RoomReservationSessionBeanRemote {
     public List<AvailableRoomsPerRoomType> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate);
 
     public Double getWalkInRate(LocalDate checkInDate, LocalDate checkoutDate, RoomTypeName rtName);
-    
+
     public Double getReservationRate(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName rtName);
 
     public List<AvailableRoomsPerRoomType> getRoomTypeAvailabilityList();
 
-    public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
-    
-    public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
-    
+    public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, RoomsPerRoomType rooms);
+
+    public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, RoomsPerRoomType rooms);
     // public void allocateRoomsForThatDay(LocalDate checkInDate);
 
     public void updateReservationToCheckedIn(ReservationEntity reservation);
 
     public void updateReservationToCheckedOut(ReservationEntity reservation);
-    
+
 }

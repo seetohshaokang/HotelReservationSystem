@@ -22,6 +22,8 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
+import javax.ejb.Schedule;
+import javax.ejb.Timer;
 import util.enumeration.ReservationStatus;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
@@ -52,32 +54,16 @@ public class RoomAllocationSessionBean {
     @EJB
     private RoomEntitySessionBeanLocal roomEntitySessionBean;
 
-    //goatgpt stuff
-    /*@EJB
-    private ExceptionReportSessionBean exceptionReportSessionBean;
-
-    // Scheduled method to run daily at 2 a.m.
-    @Schedule(hour = "2", minute = "0", second = "0", info = "Daily room allocation job")
-    public void allocateRooms(Timer timer) {
+    // Daily scheduled task to allocate rooms for reservations checking in on the current date
+    @Schedule(hour = "2", minute = "0", second = "0", info = "Daily Room Allocation Job at 2 a.m.")
+    public void allocateRoomsDaily(Timer timer) {
         System.out.println("Executing daily room allocation job at 2 a.m.");
 
-        try {
-            List<ReservationEntity> reservations = roomReservationSessionBean.getPendingReservations();
-
-            for (ReservationEntity roomReservation : reservations) {
-                try {
-                    allocateRoomForReservation(roomReservation);
-                } catch (Exception e) {
-                    exceptionReportSessionBean.logException("Error allocating room for roomReservation ID "
-                            + roomReservation.getReservationId() + ": " + e.getMessage());
-                }
-            }
-
-        } catch (Exception e) {
-            exceptionReportSessionBean.logException("Error in daily room allocation job: " + e.getMessage());
-        }
+        // Get today's date to allocate rooms for today's check-ins
+        LocalDate today = LocalDate.now();
+        allocateRoomsForThatDay(today);
     }
-     */
+
     // Allocate rooms for a particular day
     public void allocateRoomsForThatDay(LocalDate checkInDate) {
         // Step 1: Retrieve a list of reservations with the given check-in date
@@ -95,27 +81,23 @@ public class RoomAllocationSessionBean {
         int numberOfRoomsNeeded = reservation.getNumberRooms();
         LocalDate checkInDate = reservation.getCheckInDate();
         LocalDate checkOutDate = reservation.getCheckOutDate();
-        List<RoomEntity> allocatedRooms = new ArrayList<>();
 
         // Retrieve available rooms for the specified room type
         List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(roomTypeName);
 
-        // Check if there are enough available rooms of the requested type
         if (availableRooms.size() >= numberOfRoomsNeeded) {
             for (int i = 0; i < numberOfRoomsNeeded; i++) {
                 RoomEntity room = availableRooms.get(i);
 
-                // Create a RoomReservationEntity for each room using the constructor
-                RoomReservationEntity roomReservation = new RoomReservationEntity(room, reservation);
-                room.setStatus(RoomStatus.OCCUPIED); // Assume status changes on allocation
+                // Use the new method to add room reservations
+                reservationEntitySessionBean.addRoomReservationToReservation(room, reservation);
 
-                // Add the RoomReservationEntity to the reservation
-                reservation.getRoomReservations().add(roomReservation);
-                allocatedRooms.add(room);
+                // Mark room as occupied
+                room.setStatus(RoomStatus.OCCUPIED);
             }
             System.out.println("Rooms allocated for reservation with ID: " + reservation.getReservationId());
         } else {
-            // Attempt to upgrade to a higher room type if there aren't enough rooms
+            // Handle upgrading to the next higher room type, similar to the original implementation
             RoomTypeName nextHigherRoomType = reservation.getRoomType().getNextHigherRoomTypeName();
             if (nextHigherRoomType != null) {
                 List<RoomEntity> higherAvailableRooms = roomEntitySessionBean.retrieveAvailableRooms(nextHigherRoomType);
@@ -124,26 +106,21 @@ public class RoomAllocationSessionBean {
                     for (int i = 0; i < numberOfRoomsNeeded; i++) {
                         RoomEntity upgradedRoom = higherAvailableRooms.get(i);
 
-                        // Create RoomReservationEntity with upgraded room
-                        RoomReservationEntity roomReservation = new RoomReservationEntity(upgradedRoom, reservation);
-                        upgradedRoom.setStatus(RoomStatus.OCCUPIED);
+                        // Use the new method to add upgraded room reservations
+                        reservationEntitySessionBean.addRoomReservationToReservation(upgradedRoom, reservation);
 
-                        reservation.getRoomReservations().add(roomReservation);
-                        allocatedRooms.add(upgradedRoom);
+                        upgradedRoom.setStatus(RoomStatus.OCCUPIED);
                     }
-                    exceptionReportSessionBean.createTypeOneException(availableRooms.get(0), allocatedRooms.get(0));
+                    exceptionReportSessionBean.createTypeOneException(availableRooms.get(0), higherAvailableRooms.get(0));
                     System.out.println("Upgraded rooms allocated for reservation with ID: " + reservation.getReservationId());
                 } else {
-                    // No rooms available in the higher room type
                     exceptionReportSessionBean.createTypeTwoException(availableRooms.get(0));
                     System.out.println("No available rooms found for the requested type or next higher type.");
                 }
             } else {
-                // No next higher room type available
                 exceptionReportSessionBean.createTypeTwoException(availableRooms.get(0));
                 System.out.println("No higher room type available for reservation.");
             }
         }
     }
-
 }

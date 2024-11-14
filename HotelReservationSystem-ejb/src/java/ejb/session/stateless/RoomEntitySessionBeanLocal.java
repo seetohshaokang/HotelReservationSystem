@@ -34,8 +34,6 @@ public interface RoomEntitySessionBeanLocal {
     // Insert delete room here
     public List<RoomEntity> viewAllRooms();
 
-    public List<RoomEntity> retrieveAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName);
-
     public boolean isRoomInUse(Long roomId) throws RoomNotFoundException;
 
     public void disableRoom(Long roomId) throws RoomNotFoundException;

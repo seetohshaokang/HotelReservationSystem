@@ -6,6 +6,8 @@ package ejb.session;
 
 import entity.GuestEntity;
 import entity.ReservationEntity;
+import entity.RoomEntity;
+import entity.RoomReservationEntity;
 import entity.RoomTypeEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
@@ -30,5 +32,7 @@ public interface ReservationEntitySessionBeanRemote {
     public List<ReservationEntity> findReservationsByCheckInDate(LocalDate checkInDate);
 
     public List<ReservationEntity> getAllReservations();
+    
+    public RoomReservationEntity addRoomReservationToReservation(RoomEntity room, ReservationEntity reservation);
 
 }

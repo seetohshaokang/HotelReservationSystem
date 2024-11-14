@@ -215,12 +215,10 @@ public class GuestRelationOfficerModule {
             }
         }
 
-        // Prepare reservation details
-        List<RoomsPerRoomType> roomsToReserve = new ArrayList<>();
-        RoomsPerRoomType rooms = new RoomsPerRoomType();
-        rooms.setRoomTypeName(roomTypeName);
-        rooms.setNumRooms(numberOfRooms);
-        roomsToReserve.add(rooms);
+        // Prepare the RoomsPerRoomType object
+        RoomsPerRoomType roomsToReserve = new RoomsPerRoomType();
+        roomsToReserve.setRoomTypeName(roomTypeName);
+        roomsToReserve.setNumRooms(numberOfRooms);
 
         // Make the reservation for the visitor
         Long reservationId = roomReservationSessionBeanRemote.reserveRoomForVisitor(visitor, checkInDate, checkOutDate, roomsToReserve);
