@@ -7,6 +7,7 @@ package ejb.session.stateless.helper;
 import entity.RoomEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
 import dataaccessobject.RoomsPerRoomType;
+import entity.ReservationEntity;
 import entity.RoomTypeEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
@@ -36,4 +37,8 @@ public interface RoomReservationSessionBeanRemote {
     
     // public void allocateRoomsForThatDay(LocalDate checkInDate);
 
+    public void updateReservationToCheckedIn(ReservationEntity reservation);
+
+    public void updateReservationToCheckedOut(ReservationEntity reservation);
+    
 }

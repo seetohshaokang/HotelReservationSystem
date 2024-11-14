@@ -32,10 +32,12 @@ public interface RoomReservationSessionBeanLocal {
     public List<AvailableRoomsPerRoomType> getRoomTypeAvailabilityList();
 
     public Long reserveRoomForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
-    
-    public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
-    
-    // public void allocateRoomsForThatDay(LocalDate checkInDate);
 
+    public Long reserveRoomForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, List<RoomsPerRoomType> roomsToReserve);
+
+    // public void allocateRoomsForThatDay(LocalDate checkInDate);
+    public void updateReservationToCheckedIn(ReservationEntity reservation);
+
+    public void updateReservationToCheckedOut(ReservationEntity reservation);
 
 }

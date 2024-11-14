@@ -22,7 +22,7 @@ public class RoomReservationEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roomReservationid;
     
     @ManyToOne
@@ -112,7 +112,7 @@ public class RoomReservationEntity implements Serializable {
     /**
      * @return the isAssigned
      */
-    public boolean isIsAssigned() {
+    public boolean getIsAssigned() {
         return isAssigned;
     }
 

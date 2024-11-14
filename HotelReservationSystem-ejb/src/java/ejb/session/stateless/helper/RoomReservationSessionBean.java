@@ -29,8 +29,11 @@ import java.util.Map;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.RateType;
+import util.enumeration.ReservationStatus;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
 import util.exception.RoomRateNotFoundException;
@@ -60,9 +63,13 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
 
     @EJB
     private RoomEntitySessionBeanLocal roomEntitySessionBean;
+    @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
+    private EntityManager em;
 
     // Temporarily store the roomAvailability for each roomType
     private List<AvailableRoomsPerRoomType> roomTypeAvailabilityList;
+    
+    
 
     @Override
     public List<AvailableRoomsPerRoomType> searchAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate) {
@@ -309,4 +316,26 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         }
     }
      */
+    
+    public void updateReservationToCheckedIn(ReservationEntity reservation) {
+        ReservationStatus newStatus = ReservationStatus.CHECKED_IN;
+        reservation.setStatus(newStatus);
+        em.merge(reservation);
+        em.flush();
+        System.out.println("Reservation ID " + reservation.getReservationId() + " status updated to " + newStatus);
+    }
+    
+    public void updateReservationToCheckedOut(ReservationEntity reservation) {
+        ReservationStatus newStatus = ReservationStatus.CHECKED_OUT;
+        reservation.setStatus(newStatus);
+        em.merge(reservation);
+        em.flush();
+        System.out.println("Reservation ID " + reservation.getReservationId() + " status updated to " + newStatus);
+    }
+
+
+    public void persist(Object object) {
+        em.persist(object);
+    }
+
 }

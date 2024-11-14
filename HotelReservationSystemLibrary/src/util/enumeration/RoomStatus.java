@@ -9,5 +9,5 @@ package util.enumeration;
  * @author shaokangseetoh
  */
 public enum RoomStatus {
-    AVAILABLE, NOT_AVAILABLE, DISABLED
+    AVAILABLE, OCCUPIED, DISABLED
 }

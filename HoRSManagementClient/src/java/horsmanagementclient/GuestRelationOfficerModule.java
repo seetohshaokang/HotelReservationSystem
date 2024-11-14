@@ -11,6 +11,9 @@ import entity.RoomEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
 import dataaccessobject.RoomsPerRoomType;
 import ejb.session.stateless.helper.ExceptionReportSessionBeanRemote;
+import ejb.session.stateless.helper.RoomCheckInOutSessionBeanRemote;
+import entity.ReservationEntity;
+import entity.RoomReservationEntity;
 import entity.RoomTypeEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
@@ -21,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import util.enumeration.EmployeeRole;
+import util.enumeration.ReservationStatus;
+import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
 import util.exception.InvalidAccessRightException;
 
@@ -32,7 +37,7 @@ public class GuestRelationOfficerModule {
 
     // Insert relevant sessionbeans;
     private RoomReservationSessionBeanRemote roomReservationSessionBeanRemote;
-
+    private RoomCheckInOutSessionBeanRemote roomCheckInOutSessionBean;
 
     // State for employee
     private EmployeeEntity currentEmployee;
@@ -40,8 +45,9 @@ public class GuestRelationOfficerModule {
     public GuestRelationOfficerModule() {
     }
 
-    public GuestRelationOfficerModule(RoomReservationSessionBeanRemote roomReservationSessionBeanRemote, EmployeeEntity currentEmployee) {
+    public GuestRelationOfficerModule(RoomReservationSessionBeanRemote roomReservationSessionBeanRemote, RoomCheckInOutSessionBeanRemote roomCheckInOutSessionBean, EmployeeEntity currentEmployee) {
         this.roomReservationSessionBeanRemote = roomReservationSessionBeanRemote;
+        this.roomCheckInOutSessionBean = roomCheckInOutSessionBean;
         this.currentEmployee = currentEmployee;
     }
 
@@ -135,7 +141,7 @@ public class GuestRelationOfficerModule {
             System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
         }
     }
-    
+
     private void walkInReserveRoom() {
         Scanner scanner = new Scanner(System.in);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -224,6 +230,125 @@ public class GuestRelationOfficerModule {
         } else {
             System.out.println("Reservation failed. Please ensure your requested rooms are available.");
         }
+    }
+
+    private void checkInReservation() {
+        Scanner scanner = new Scanner(System.in);
+
+        // Prompt for visitor/guest email
+        System.out.print("Enter Visitor/Guest Email: ");
+        String email = scanner.nextLine().trim();
+
+        try {
+            // Retrieve reserved reservations by email
+            List<ReservationEntity> reservedReservations = roomCheckInOutSessionBean.findReservedReservationsByEmail(email);
+
+            if (reservedReservations.isEmpty()) {
+                System.out.println("No reserved reservations found for email: " + email);
+                return;
+            }
+
+            System.out.println("\nReserved Reservations for Email: " + email);
+            for (ReservationEntity reservation : reservedReservations) {
+                System.out.println("Reservation ID: " + reservation.getReservationId()
+                        + " | Check-In Date: " + reservation.getCheckInDate()
+                        + " | Check-Out Date: " + reservation.getCheckOutDate());
+            }
+
+            System.out.print("\nEnter Reservation ID to check-in: ");
+            Long reservationId = scanner.nextLong();
+            scanner.nextLine(); // Consume newline
+
+            // Find the reservation to check-in
+            ReservationEntity reservationToCheckIn = reservedReservations.stream()
+                    .filter(res -> res.getReservationId().equals(reservationId))
+                    .findFirst()
+                    .orElse(null);
+
+            if (reservationToCheckIn == null) {
+                System.out.println("Invalid Reservation ID. Please ensure the reservation ID is correct.");
+                return;
+            }
+
+            // Process each room reservation associated with this reservation
+            for (RoomReservationEntity roomReservation : reservationToCheckIn.getRoomReservations()) {
+                RoomEntity reservedRoom = roomReservation.getReservedRoom();
+
+                try {
+                    // Check if the room is disabled and requires replacement
+                    if (reservedRoom.getStatus() == RoomStatus.DISABLED) {
+                        System.out.println("Room " + reservedRoom.getRoomNumber()
+                                + " cannot be allocated due to its status. Searching for a replacement...");
+
+                        // Use check-in and check-out dates to search for available rooms per room type
+                        List<AvailableRoomsPerRoomType> roomTypeAvailabilityList = roomReservationSessionBeanRemote.searchAvailableRooms(
+                                reservationToCheckIn.getCheckInDate(), reservationToCheckIn.getCheckOutDate());
+
+                        // Display available room types with at least one available room
+                        System.out.println("\nAvailable Room Types for Replacement:");
+                        List<RoomTypeName> availableRoomTypes = new ArrayList<>();
+                        for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
+                            if (!roomTypeAvailability.getAvailableRooms().isEmpty()) {
+                                System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRooms().size());
+                                availableRoomTypes.add(roomTypeAvailability.getRoomTypeName());
+                            }
+                        }
+
+                        if (availableRoomTypes.isEmpty()) {
+                            System.out.println("No available rooms found for replacement. Manual intervention may be required.");
+                            continue;
+                        }
+
+                        // Prompt the Guest Relation Officer to select a room type for replacement
+                        RoomTypeName selectedRoomType = null;
+                        while (selectedRoomType == null) {
+                            System.out.print("Select a room type for replacement: ");
+                            String roomTypeInput = scanner.nextLine().trim();
+                            try {
+                                RoomTypeName inputType = RoomTypeName.valueOf(roomTypeInput.toUpperCase());
+                                if (availableRoomTypes.contains(inputType)) {
+                                    selectedRoomType = inputType;
+                                } else {
+                                    System.out.println("Selected room type has no available rooms. Please choose another.");
+                                }
+                            } catch (IllegalArgumentException e) {
+                                System.out.println("Invalid room type. Please try again.");
+                            }
+                        }
+
+                        // Find and assign the first available room in the selected room type
+                        for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
+                            if (roomTypeAvailability.getRoomTypeName().equals(selectedRoomType)) {
+                                RoomEntity replacementRoom = roomTypeAvailability.getAvailableRooms().get(0);
+                                roomCheckInOutSessionBean.replaceRoomReservation(roomReservation, replacementRoom);
+                                System.out.println("Replacement room " + replacementRoom.getRoomNumber()
+                                        + " of type " + selectedRoomType + " has been assigned for check-in.");
+                                break; // Replacement found and assigned, exit loop
+                            }
+                        }
+
+                    } else if (reservedRoom.getStatus() == RoomStatus.AVAILABLE) {
+                        // Proceed with standard check-in for assigned room
+                        roomCheckInOutSessionBean.checkInRoomReservation(roomReservation);
+                        System.out.println("Room " + reservedRoom.getRoomNumber() + " checked-in successfully.");
+                    }
+                } catch (Exception ex) {
+                    System.out.println("Error checking in room " + reservedRoom.getRoomNumber() + ": " + ex.getMessage());
+                }
+            }
+
+            // Update reservation status to CHECKED_IN after all room reservations are processed
+            roomReservationSessionBeanRemote.updateReservationToCheckedIn(reservationToCheckIn);
+
+            System.out.println("Reservation ID " + reservationId + " has been checked in successfully.");
+
+        } catch (Exception ex) {
+            System.out.println("An error occurred while checking in the reservation: " + ex.getMessage());
+        }
+    }
+
+    private void checkOutReservation() {
+
     }
 
 }

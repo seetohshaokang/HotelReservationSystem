@@ -11,6 +11,7 @@ import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomRateEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
 import ejb.session.stateless.helper.ExceptionReportSessionBeanRemote;
+import ejb.session.stateless.helper.RoomCheckInOutSessionBeanRemote;
 import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
 
 /**
@@ -18,6 +19,9 @@ import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
  * @author shaokangseetoh
  */
 public class Main {
+
+    @EJB
+    private static RoomCheckInOutSessionBeanRemote roomCheckInOutSessionBean;
 
     @EJB
     private static ExceptionReportSessionBeanRemote exceptionReportSessionBean;
@@ -50,7 +54,8 @@ public class Main {
                 roomEntitySessionBeanRemote,
                 roomRateEntitySessionBeanRemote,
                 roomReservationSessionBean,
-                exceptionReportSessionBean
+                exceptionReportSessionBean,
+                roomCheckInOutSessionBean
         );
         mainApp.runApp();
     }

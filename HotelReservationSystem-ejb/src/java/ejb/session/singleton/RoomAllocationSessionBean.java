@@ -20,7 +20,6 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.LocalBean;
-import util.enumeration.ReservationStatus;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
 
@@ -137,7 +136,7 @@ public class RoomAllocationSessionBean {
             } else if (reservedRoom.getStatus() == RoomStatus.AVAILABLE) {
                 // Step 5: If the room is available, proceed with allocation.
                 roomReservation.setIsAssigned(true);
-                reservedRoom.setStatus(RoomStatus.NOT_AVAILABLE); // Mark the room as occupied
+                // Dont change room status yet
                 System.out.println("Room " + reservedRoom.getRoomNumber() + " allocated to reservation.");
             }
         }
