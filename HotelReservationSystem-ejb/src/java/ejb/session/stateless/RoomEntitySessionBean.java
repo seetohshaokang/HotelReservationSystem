@@ -139,4 +139,46 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         List<RoomEntity> availableRooms = query.getResultList();
         return availableRooms;
     }
+    
+    public boolean isRoomInUse(Long roomId) throws RoomNotFoundException {
+        RoomEntity room = em.find(RoomEntity.class, roomId);
+        if (room == null) {
+            throw new RoomNotFoundException("Room ID " + roomId + " does not exist!");
+        }
+        
+        // Check if room has active reservations or is currently occupied
+        if (room.getStatus() == RoomStatus.OCCUPIED || !room.getRoomReservations().isEmpty()) {
+            return true;
+        }
+        
+        return false;
+    }
+
+    @Override
+    public void disableRoom(Long roomId) throws RoomNotFoundException {
+        RoomEntity room = em.find(RoomEntity.class, roomId);
+        if (room == null) {
+            throw new RoomNotFoundException("Room ID " + roomId + " does not exist!");
+        }
+        
+        room.setStatus(RoomStatus.DISABLED); // Assuming DISABLED status exists in RoomStatus enum
+        em.merge(room);
+        em.flush();
+    }
+
+    @Override
+    public void deleteRoom(Long roomId) throws RoomNotFoundException {
+        RoomEntity room = em.find(RoomEntity.class, roomId);
+        if (room == null) {
+            throw new RoomNotFoundException("Room ID " + roomId + " does not exist!");
+        }
+
+        // Check if room is not in use before deleting
+        if (isRoomInUse(roomId)) {
+            throw new IllegalStateException("Room is currently in use and cannot be deleted.");
+        }
+
+        em.remove(room);
+        em.flush();
+    }
 }

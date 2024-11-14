@@ -91,7 +91,7 @@ public class OperationManagerModule {
                 } else if (response == 3) {
                     updateRoomTypeDetails();
                 } else if (response == 4) {
-                    System.out.println("Feature not implemented yet");
+                    deleteRoomType();
                 } else if (response == 5) {
                     viewAllRoomTypes();
                 } else if (response == 6) {
@@ -99,7 +99,7 @@ public class OperationManagerModule {
                 } else if (response == 7) {
                     updateRoomDetails();
                 } else if (response == 8) {
-                    System.out.println("Feature not implemented yet");
+                    deleteRoom();
                 } else if (response == 9) {
                     viewAllRooms();
                 } else if (response == 10) {
@@ -351,41 +351,30 @@ public class OperationManagerModule {
 
     }
 
-    private void viewRoomAllocationExceptionReport() {
+    // Use case 10
+    private void deleteRoomType() {
         Scanner scanner = new Scanner(System.in);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        System.out.println("*** HORS System :: Operation Manager :: View Room Allocation Exception Report ***\n");
+        // Display available room types for selection
+        viewAllRoomTypes();
+        System.out.print("Enter the S/N of the room type to delete > ");
+        int roomTypeSelection = scanner.nextInt();
+        scanner.nextLine();
+        RoomTypeName selectedRoomTypeName = RoomTypeName.values()[roomTypeSelection - 1];
 
-        LocalDate reportDate = null;
+        try {
+            // Retrieve the room type by name
+            RoomTypeEntity roomTypeToDelete = roomTypeEntitySessionBeanRemote.getRoomTypeByName(selectedRoomTypeName);
 
-        // Prompt user to enter the date for which they want to view the exception report
-        while (reportDate == null) {
-            System.out.print("Enter the date for the report (yyyy-MM-dd): ");
-            String inputDate = scanner.nextLine().trim();
-            try {
-                reportDate = LocalDate.parse(inputDate, formatter);
-            } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
-            }
-        }
+            // Call the session bean to handle deletion or disabling of the room type
+            roomTypeEntitySessionBeanRemote.deleteRoomType(roomTypeToDelete.getRoomTypeId());
+            System.out.println("Room type " + selectedRoomTypeName + " has been processed (deleted if unused, disabled if in use).");
 
-        // Call the session bean to retrieve the exception reports for the specified date
-        List<ExceptionReportEntity> exceptionReports = exceptionReportSessionBean.generateExceptionReport(reportDate);
-
-        if (exceptionReports.isEmpty()) {
-            System.out.println("No exception reports found for " + reportDate + ".");
-        } else {
-            System.out.println("\nException Reports for " + reportDate + ":");
-            System.out.printf("%-10s | %-50s%n", "Report ID", "Exception Message");
-            System.out.println("--------------------------------------------------------");
-
-            // Display each exception report's details
-            for (ExceptionReportEntity report : exceptionReports) {
-                System.out.printf("%-10d | %-50s%n", report.getExceptionReportId(), report.getExceptionMessage());
-            }
+        } catch (RoomTypeNotFoundException ex) {
+            System.out.println("Room type not found: " + ex.getMessage());
         }
     }
+
     // Use case 11
     private void viewAllRoomTypes() {
         Scanner scanner = new Scanner(System.in);
@@ -534,6 +523,38 @@ public class OperationManagerModule {
         }
     }
 
+    // Use case 14
+    private void deleteRoom() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("*** HORS System :: Operation Manager :: Delete Room ***\n");
+
+        // Display all rooms for selection
+        viewAllRooms();
+
+        System.out.print("Enter the Room ID of the room you wish to delete > ");
+        Long roomId = scanner.nextLong();
+        scanner.nextLine();
+
+        try {
+            // Check if the room is in use
+            boolean isRoomInUse = roomEntitySessionBeanRemote.isRoomInUse(roomId);
+
+            if (isRoomInUse) {
+                // If the room is in use, mark it as disabled
+                roomEntitySessionBeanRemote.disableRoom(roomId);
+                System.out.println("Room " + roomId + " is currently in use and has been marked as disabled.");
+            } else {
+                // If the room is not in use, delete it
+                roomEntitySessionBeanRemote.deleteRoom(roomId);
+                System.out.println("Room " + roomId + " has been successfully deleted.");
+            }
+        } catch (RoomNotFoundException ex) {
+            System.out.println("Room not found: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.out.println("An error occurred while attempting to delete the room: " + ex.getMessage());
+        }
+    }
+
     // Use case 15
     private void viewAllRooms() {
         Scanner scanner = new Scanner(System.in);
@@ -546,6 +567,43 @@ public class OperationManagerModule {
         for (RoomEntity room : rooms) {
             roomTypeCount++;
             System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomTypeCount, room.getRoomId(), room.getRoomType().getRoomTypeName().toString(), room.getRoomNumber());
+        }
+    }
+
+    // Use case 16
+    private void viewRoomAllocationExceptionReport() {
+        Scanner scanner = new Scanner(System.in);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        System.out.println("*** HORS System :: Operation Manager :: View Room Allocation Exception Report ***\n");
+
+        LocalDate reportDate = null;
+
+        // Prompt user to enter the date for which they want to view the exception report
+        while (reportDate == null) {
+            System.out.print("Enter the date for the report (yyyy-MM-dd): ");
+            String inputDate = scanner.nextLine().trim();
+            try {
+                reportDate = LocalDate.parse(inputDate, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+            }
+        }
+
+        // Call the session bean to retrieve the exception reports for the specified date
+        List<ExceptionReportEntity> exceptionReports = exceptionReportSessionBean.generateExceptionReport(reportDate);
+
+        if (exceptionReports.isEmpty()) {
+            System.out.println("No exception reports found for " + reportDate + ".");
+        } else {
+            System.out.println("\nException Reports for " + reportDate + ":");
+            System.out.printf("%-10s | %-50s%n", "Report ID", "Exception Message");
+            System.out.println("--------------------------------------------------------");
+
+            // Display each exception report's details
+            for (ExceptionReportEntity report : exceptionReports) {
+                System.out.printf("%-10d | %-50s%n", report.getExceptionReportId(), report.getExceptionMessage());
+            }
         }
     }
 

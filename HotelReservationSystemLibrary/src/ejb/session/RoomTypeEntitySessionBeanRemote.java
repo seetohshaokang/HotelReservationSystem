@@ -30,4 +30,8 @@ public interface RoomTypeEntitySessionBeanRemote {
 
     // Use case 11  
     public List<RoomTypeEntity> viewAllRoomTypes();
+
+    public boolean isRoomTypeInUse(Long roomTypeId);
+
+    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException;
 }

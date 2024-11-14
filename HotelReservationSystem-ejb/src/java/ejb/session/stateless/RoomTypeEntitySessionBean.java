@@ -82,5 +82,33 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         Query query = em.createQuery("SELECT rt FROM RoomTypeEntity rt");
         return query.getResultList();
     }
+    
+    // Method to check if the room type is in use
+    public boolean isRoomTypeInUse(Long roomTypeId) {
+        Query query = em.createQuery("SELECT COUNT(r) FROM RoomEntity r WHERE r.roomType.roomTypeId = :roomTypeId");
+        query.setParameter("roomTypeId", roomTypeId);
+        Long count = (Long) query.getSingleResult();
+        return count > 0;
+    }
+
+    // Method to delete or disable a room type based on its usage
+    public void deleteRoomType(Long roomTypeId) throws RoomTypeNotFoundException {
+        RoomTypeEntity roomType = em.find(RoomTypeEntity.class, roomTypeId);
+        if (roomType == null) {
+            throw new RoomTypeNotFoundException("Room type ID " + roomTypeId + " does not exist.");
+        }
+
+        if (isRoomTypeInUse(roomTypeId)) {
+            // Mark room type as disabled if it is in use
+            roomType.setIsDisabled(true); // Assuming RoomTypeEntity has an 'isDisabled' field
+            em.merge(roomType);
+            System.out.println("Room type " + roomType.getRoomTypeName() + " is in use and has been disabled.");
+        } else {
+            // Delete the room type if it is not in use
+            em.remove(roomType);
+            System.out.println("Room type " + roomType.getRoomTypeName() + " has been deleted.");
+        }
+        em.flush();
+    }
 
 }

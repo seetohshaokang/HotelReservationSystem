@@ -23,16 +23,21 @@ import util.exception.RoomTypeNotFoundException;
  */
 @Local
 public interface RoomEntitySessionBeanLocal {
-    
-    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus)throws RoomTypeNotFoundException, ExistingRoomException, DisabledException;
-    
+
+    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException;
+
     public RoomEntity searchRoomByRoomNumber(String roomNumber) throws NoExistingRoomException;
-    
-    public RoomEntity updateRoom(Long roomId, Long roomTypeId , String newRoomNumber, RoomStatus newStatus)throws RoomNotFoundException, RoomTypeNotFoundException;
-    
+
+    public RoomEntity updateRoom(Long roomId, Long roomTypeId, String newRoomNumber, RoomStatus newStatus) throws RoomNotFoundException, RoomTypeNotFoundException;
+
     // Insert delete room here
-    
     public List<RoomEntity> viewAllRooms();
-    
+
     public List<RoomEntity> retrieveAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName);
+
+    public boolean isRoomInUse(Long roomId) throws RoomNotFoundException;
+
+    public void disableRoom(Long roomId) throws RoomNotFoundException;
+
+    public void deleteRoom(Long roomId) throws RoomNotFoundException;
 }
