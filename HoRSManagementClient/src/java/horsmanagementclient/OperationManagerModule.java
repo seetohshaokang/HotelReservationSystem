@@ -2,12 +2,16 @@ package horsmanagementclient;
 
 import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
+import ejb.session.stateless.helper.ExceptionReportSessionBeanRemote;
 import entity.EmployeeEntity;
+import entity.ExceptionReportEntity;
 import entity.PartnerEntity;
 import entity.RoomEntity;
 import entity.RoomTypeEntity;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -33,6 +37,7 @@ public class OperationManagerModule {
     // Insert relevant sessionbeans
     private RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote;
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
+    private ExceptionReportSessionBeanRemote exceptionReportSessionBean;
 
     // State for login
     private EmployeeEntity currentEmployee;
@@ -40,11 +45,10 @@ public class OperationManagerModule {
     public OperationManagerModule() {
     }
 
-    public OperationManagerModule(RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote,
-            EmployeeEntity currentEmployee) {
+    public OperationManagerModule(RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, ExceptionReportSessionBeanRemote exceptionReportSessionBean, EmployeeEntity currentEmployee) {
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
+        this.exceptionReportSessionBean = exceptionReportSessionBean;
         this.currentEmployee = currentEmployee;
     }
 
@@ -99,7 +103,7 @@ public class OperationManagerModule {
                 } else if (response == 9) {
                     viewAllRooms();
                 } else if (response == 10) {
-                    System.out.println("Feature not implemented yet");
+                    viewRoomAllocationExceptionReport();
                 } else if (response == 11) {
                     break;
                 } else {
@@ -344,11 +348,46 @@ public class OperationManagerModule {
         } catch (RoomTypeNotFoundException ex) {
             System.out.println("Invalid Room Type Selected: " + ex.getMessage());
         }
-    
-}
 
-// Use case 11
-private void viewAllRoomTypes() {
+    }
+
+    private void viewRoomAllocationExceptionReport() {
+        Scanner scanner = new Scanner(System.in);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        System.out.println("*** HORS System :: Operation Manager :: View Room Allocation Exception Report ***\n");
+
+        LocalDate reportDate = null;
+
+        // Prompt user to enter the date for which they want to view the exception report
+        while (reportDate == null) {
+            System.out.print("Enter the date for the report (yyyy-MM-dd): ");
+            String inputDate = scanner.nextLine().trim();
+            try {
+                reportDate = LocalDate.parse(inputDate, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
+            }
+        }
+
+        // Call the session bean to retrieve the exception reports for the specified date
+        List<ExceptionReportEntity> exceptionReports = exceptionReportSessionBean.generateExceptionReport(reportDate);
+
+        if (exceptionReports.isEmpty()) {
+            System.out.println("No exception reports found for " + reportDate + ".");
+        } else {
+            System.out.println("\nException Reports for " + reportDate + ":");
+            System.out.printf("%-10s | %-50s%n", "Report ID", "Exception Message");
+            System.out.println("--------------------------------------------------------");
+
+            // Display each exception report's details
+            for (ExceptionReportEntity report : exceptionReports) {
+                System.out.printf("%-10d | %-50s%n", report.getExceptionReportId(), report.getExceptionMessage());
+            }
+        }
+    }
+    // Use case 11
+    private void viewAllRoomTypes() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** HORS System :: Operations Manager :: View all Room Types");
         List<RoomTypeEntity> roomTypes = roomTypeEntitySessionBeanRemote.viewAllRoomTypes();
@@ -494,6 +533,7 @@ private void viewAllRoomTypes() {
             System.out.println("Error updating room: " + ex.getMessage());
         }
     }
+
     // Use case 15
     private void viewAllRooms() {
         Scanner scanner = new Scanner(System.in);
@@ -508,4 +548,5 @@ private void viewAllRoomTypes() {
             System.out.printf("%-20d || %-20d || %-20s || %-20s%n", roomTypeCount, room.getRoomId(), room.getRoomType().getRoomTypeName().toString(), room.getRoomNumber());
         }
     }
+
 }

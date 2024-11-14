@@ -9,10 +9,12 @@ import entity.GuestEntity;
 import entity.ReservationEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import util.enumeration.ReservationStatus;
 
 /**
@@ -72,6 +74,19 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         reservation.setStatus(ReservationStatus.RESERVED);
         ReservationEntity managedReservation = em.merge(reservation);
         em.flush();
+    }
+    
+    // For room allocation
+    public List<ReservationEntity> findReservationsByCheckInDate(LocalDate checkInDate) {
+        // Create a JPQL query to retrieve reservations with the specified check-in date
+        Query query = em.createQuery(
+            "SELECT r FROM ReservationEntity r WHERE r.checkInDate = :checkInDate", ReservationEntity.class);
+        
+        // Set the query parameter
+        query.setParameter("checkInDate", checkInDate);
+
+        // Execute the query and return the result list
+        return query.getResultList();
     }
 
 }

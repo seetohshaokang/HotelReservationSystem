@@ -7,6 +7,7 @@ import ejb.session.PartnerEntitySessionBeanRemote;
 import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.RoomRateEntitySessionBeanRemote;
 import ejb.session.RoomTypeEntitySessionBeanRemote;
+import ejb.session.stateless.helper.ExceptionReportSessionBeanRemote;
 import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
@@ -28,6 +29,7 @@ public class MainApp {
     private RoomEntitySessionBeanRemote roomEntitySessionBeanRemote;
     private RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote;
     private RoomReservationSessionBeanRemote roomReservationSessionBeanRemote;
+    private ExceptionReportSessionBeanRemote exceptionReportSessionBean;
 
     // Modules for construction later
     private SystemAdministratorModule systemAdminModule;
@@ -41,19 +43,14 @@ public class MainApp {
     public MainApp() {
     }
 
-    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote,
-            PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote,
-            RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote,
-            RoomEntitySessionBeanRemote roomEntitySessionBeanRemote,
-            RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote,
-            RoomReservationSessionBeanRemote roomReservationSessionBean) {
-
+    public MainApp(EmployeeEntitySessionBeanRemote employeeEntitySessionBeanRemote, PartnerEntitySessionBeanRemote partnerEntitySessionBeanRemote, RoomTypeEntitySessionBeanRemote roomTypeEntitySessionBeanRemote, RoomEntitySessionBeanRemote roomEntitySessionBeanRemote, RoomRateEntitySessionBeanRemote roomRateEntitySessionBeanRemote, RoomReservationSessionBeanRemote roomReservationSessionBeanRemote, ExceptionReportSessionBeanRemote exceptionReportSessionBean) {
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBeanRemote;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBeanRemote;
         this.roomTypeEntitySessionBeanRemote = roomTypeEntitySessionBeanRemote;
         this.roomEntitySessionBeanRemote = roomEntitySessionBeanRemote;
         this.roomRateEntitySessionBeanRemote = roomRateEntitySessionBeanRemote;
-        this.roomReservationSessionBeanRemote = roomReservationSessionBean;
+        this.roomReservationSessionBeanRemote = roomReservationSessionBeanRemote;
+        this.exceptionReportSessionBean = exceptionReportSessionBean;
     }
 
     public void runApp() {
@@ -76,7 +73,7 @@ public class MainApp {
                         doLogin();
                         System.out.println("Login Successful");
                         systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployee);
-                        operationManagerModule = new OperationManagerModule(roomTypeEntitySessionBeanRemote, roomEntitySessionBeanRemote, currentEmployee);
+                        operationManagerModule = new OperationManagerModule(roomTypeEntitySessionBeanRemote, roomEntitySessionBeanRemote, exceptionReportSessionBean, currentEmployee);
                         salesManagerModule = new SalesManagerModule(roomRateEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployee);
                         guestRelationOfficerModule = new GuestRelationOfficerModule(roomReservationSessionBeanRemote, currentEmployee);
                         // Create guest relation officer module

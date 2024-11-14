@@ -8,6 +8,7 @@ import entity.GuestEntity;
 import entity.ReservationEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.Remote;
 
 /**
@@ -18,13 +19,13 @@ import javax.ejb.Remote;
 public interface ReservationEntitySessionBeanRemote {
 
     public Long createReservationForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount);
-    
+
     public Long createReservationForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount);
 
     public ReservationEntity findReservationById(Long reservationId);
 
     public void confirmReservation(ReservationEntity reservation);
-    
 
-    
+    public List<ReservationEntity> findReservationsByCheckInDate(LocalDate checkInDate);
+
 }

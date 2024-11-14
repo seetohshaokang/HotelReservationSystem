@@ -10,6 +10,7 @@ import entity.EmployeeEntity;
 import entity.RoomEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
 import dataaccessobject.RoomsPerRoomType;
+import ejb.session.stateless.helper.ExceptionReportSessionBeanRemote;
 import entity.RoomTypeEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
@@ -31,6 +32,7 @@ public class GuestRelationOfficerModule {
 
     // Insert relevant sessionbeans;
     private RoomReservationSessionBeanRemote roomReservationSessionBeanRemote;
+
 
     // State for employee
     private EmployeeEntity currentEmployee;
@@ -133,7 +135,7 @@ public class GuestRelationOfficerModule {
             System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
         }
     }
-
+    
     private void walkInReserveRoom() {
         Scanner scanner = new Scanner(System.in);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -182,37 +184,38 @@ public class GuestRelationOfficerModule {
             System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRooms().size());
         }
 
-        // Gather room reservation details from the visitor
-        List<RoomsPerRoomType> roomsToReserve = new ArrayList<>();
+        // Prompt for a single room type and quantity
+        System.out.print("Enter the room type name to reserve: ");
+        RoomTypeName roomTypeName;
         while (true) {
-            System.out.print("Enter room type name to reserve (or type 'done' to finish): ");
             String roomTypeNameInput = scanner.nextLine().trim();
-            if (roomTypeNameInput.equalsIgnoreCase("done")) {
-                break;
-            }
-
-            RoomTypeName roomTypeName;
             try {
                 roomTypeName = RoomTypeName.valueOf(roomTypeNameInput.toUpperCase());
+                break;
             } catch (IllegalArgumentException e) {
                 System.out.println("Invalid room type. Please try again.");
-                continue;
+                System.out.print("Enter the room type name to reserve: ");
             }
+        }
 
-            System.out.print("Enter the number of rooms to reserve for " + roomTypeName + ": ");
-            int numberOfRooms;
+        System.out.print("Enter the number of rooms to reserve for " + roomTypeName + ": ");
+        int numberOfRooms;
+        while (true) {
             try {
                 numberOfRooms = Integer.parseInt(scanner.nextLine().trim());
+                break;
             } catch (NumberFormatException e) {
                 System.out.println("Invalid number of rooms. Please enter a valid integer.");
-                continue;
+                System.out.print("Enter the number of rooms to reserve for " + roomTypeName + ": ");
             }
-
-            RoomsPerRoomType rooms = new RoomsPerRoomType();
-            rooms.setRoomTypeName(roomTypeName);
-            rooms.setNumRooms(numberOfRooms);
-            roomsToReserve.add(rooms);
         }
+
+        // Prepare reservation details
+        List<RoomsPerRoomType> roomsToReserve = new ArrayList<>();
+        RoomsPerRoomType rooms = new RoomsPerRoomType();
+        rooms.setRoomTypeName(roomTypeName);
+        rooms.setNumRooms(numberOfRooms);
+        roomsToReserve.add(rooms);
 
         // Make the reservation for the visitor
         Long reservationId = roomReservationSessionBeanRemote.reserveRoomForVisitor(visitor, checkInDate, checkOutDate, roomsToReserve);
@@ -223,27 +226,4 @@ public class GuestRelationOfficerModule {
         }
     }
 
-    /*
-    public void allocateRoomsForSpecificDate() {
-        Scanner scanner = new Scanner(System.in);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
-        LocalDate allocationDate = null;
-
-        // Prompt user for a valid date
-        while (allocationDate == null) {
-            System.out.print("Enter the date for room allocation (yyyy-MM-dd): ");
-            String dateInput = scanner.nextLine();
-            try {
-                allocationDate = LocalDate.parse(dateInput, formatter);
-            } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Please enter the date in yyyy-MM-dd format.");
-            }
-        }
-
-        // Call the room allocation method for the specified date
-        roomReservationSessionBeanRemote.allocateRoomsForThatDay(allocationDate);
-        System.out.println("Room allocation for date " + allocationDate + " has been processed.");
-    }
-     */
 }

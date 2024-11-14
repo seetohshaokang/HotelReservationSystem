@@ -11,6 +11,7 @@ import entity.RoomEntity;
 import entity.RoomRateEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
 import dataaccessobject.RoomsPerRoomType;
+import ejb.session.singleton.RoomAllocationSessionBean;
 import ejb.session.stateless.ReservationEntitySessionBeanLocal;
 import ejb.session.stateless.RoomReservationEntitySessionBeanLocal;
 import entity.GuestEntity;
@@ -19,6 +20,7 @@ import entity.RoomReservationEntity;
 import entity.RoomTypeEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +42,9 @@ import util.exception.RoomTypeNotFoundException;
  */
 @Stateless
 public class RoomReservationSessionBean implements RoomReservationSessionBeanRemote, RoomReservationSessionBeanLocal {
+
+    @EJB
+    private RoomAllocationSessionBean roomAllocationSessionBean;
 
     @EJB
     private RoomReservationEntitySessionBeanLocal roomReservationEntitySessionBean;
@@ -133,6 +138,15 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         reservationEntitySessionBean.confirmReservation(reservation);
 
         System.out.println("Reservation created with ID: " + reservationId);
+
+        // Check if reservation's check-in date is today and time is after 2 a.m.
+        LocalDate today = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        if (checkInDate.equals(today) && currentTime.isAfter(LocalTime.of(2, 0))) {
+            // Process reservation immediately
+            roomAllocationSessionBean.processReservation(reservation);
+        }
+
         return reservationId;
     }
 
@@ -186,6 +200,15 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         reservationEntitySessionBean.confirmReservation(reservation);
 
         System.out.println("Reservation created for visitor with ID: " + reservationId);
+
+        // Check if reservation's check-in date is today and time is after 2 a.m.
+        LocalDate today = LocalDate.now();
+        LocalTime currentTime = LocalTime.now();
+        if (checkInDate.equals(today) && currentTime.isAfter(LocalTime.of(2, 0))) {
+            // Process reservation immediately
+            roomAllocationSessionBean.processReservation(reservation);
+        }
+
         return reservationId;
     }
 

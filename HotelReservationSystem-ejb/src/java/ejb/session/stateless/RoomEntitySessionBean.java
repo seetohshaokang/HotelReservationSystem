@@ -121,15 +121,15 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
 
         System.out.println("Check-In Date: " + checkInDate);
         System.out.println("Check-Out Date: " + checkOutDate);
-
+        
+        // Remove checking of rooms availability status as it reflects real time availability not reservation availability
         Query query = em.createQuery("SELECT r FROM RoomEntity r "
-                + "WHERE r.status = util.enumeration.RoomStatus.AVAILABLE "
-                + "AND r.roomType.roomTypeName = :roomTypeName "
-                + "AND NOT EXISTS ("
-                + "SELECT rr FROM RoomReservationEntity rr "
-                + "WHERE rr.reservedRoom = r "
-                + "AND rr.checkInDate < :checkOutDate "
-                + "AND rr.checkOutDate > :checkInDate)");
+            + "WHERE r.roomType.roomTypeName = :roomTypeName "
+            + "AND NOT EXISTS ("
+            + "SELECT rr FROM RoomReservationEntity rr "
+            + "WHERE rr.reservedRoom = r "
+            + "AND rr.checkInDate < :checkOutDate "
+            + "AND rr.checkOutDate > :checkInDate)");
         // NOT EXIST clause will be true even if there are no room reservations associated with room.
 
         query.setParameter("checkInDate", checkInDate);

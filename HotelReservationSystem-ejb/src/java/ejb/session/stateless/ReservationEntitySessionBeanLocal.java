@@ -8,6 +8,7 @@ import entity.GuestEntity;
 import entity.ReservationEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
+import java.util.List;
 import javax.ejb.Local;
 
 /**
@@ -25,5 +26,6 @@ public interface ReservationEntitySessionBeanLocal {
     
     public void confirmReservation(ReservationEntity reservation);
     
+    public List<ReservationEntity> findReservationsByCheckInDate(LocalDate checkInDate);
    
 }
