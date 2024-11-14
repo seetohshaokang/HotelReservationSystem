@@ -358,5 +358,4 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         em.flush();
         System.out.println("Reservation ID " + reservation.getReservationId() + " status updated to " + newStatus);
     }
-
 }
