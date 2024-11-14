@@ -74,7 +74,7 @@ public class MainApp {
                 } else if (response == 2) {
                     registerAsGuest();
                 } else if (response == 3) {
-                    searchHotelRoom();
+                    // searchHotelRoom();
                 } else if (response == 4) {
                     break;
                 } else {
@@ -126,6 +126,7 @@ public class MainApp {
     }
 
     // Same as Guest Relo Officer search hotel case, with reservationrate instead of walkinrate
+    /*
     private void searchHotelRoom() {
         Scanner scanner = new Scanner(System.in);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -172,7 +173,7 @@ public class MainApp {
             System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
         }
     }
-
+     */
     private void menuGuest() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
@@ -194,9 +195,9 @@ public class MainApp {
                 scanner.nextLine(); // Consume newline
 
                 if (response == 1) {
-                    reserveHotelRoom();
+                    // reserveHotelRoom();
                 } else if (response == 2) {
-                    // viewMyReservationDetails();
+                    viewMyReservationDetails();
                 } else if (response == 3) {
                     viewAllMyReservations();
                 } else if (response == 4) {
@@ -212,6 +213,7 @@ public class MainApp {
         }
     }
 
+    /*
     private void reserveHotelRoom() {
         if (loggedInGuest == null) {
             System.out.println("Please login before making a reservation.");
@@ -295,37 +297,38 @@ public class MainApp {
             System.out.println("Reservation failed. Please ensure your requested rooms are available.");
         }
     }
+     */
 
     private void viewMyReservationDetails() {
         if (loggedInGuest == null) {
-        System.out.println("Please log in to view your reservation details.");
-        return;
-    }
+            System.out.println("Please log in to view your reservation details.");
+            return;
+        }
 
-    Scanner scanner = new Scanner(System.in);
-    System.out.print("Enter Reservation ID to view details: ");
-    Long reservationId;
-    try {
-        reservationId = Long.parseLong(scanner.nextLine().trim());
-    } catch (NumberFormatException e) {
-        System.out.println("Invalid Reservation ID. Please enter a valid number.");
-        return;
-    }
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter Reservation ID to view details: ");
+        Long reservationId;
+        try {
+            reservationId = Long.parseLong(scanner.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid Reservation ID. Please enter a valid number.");
+            return;
+        }
 
-    // Retrieve the reservation details by ID, checking that it belongs to the logged-in guest
-    ReservationEntity reservation = guestEntitySessionBeanRemote.retrieveGuestReservationById(reservationId, loggedInGuest.getGuestId());
+        // Retrieve the reservation details by ID, checking that it belongs to the logged-in guest
+        ReservationEntity reservation = guestEntitySessionBeanRemote.retrieveGuestReservationById(reservationId, loggedInGuest.getGuestId());
 
-    if (reservation == null) {
-        System.out.println("Reservation not found or you do not have access to this reservation.");
-    } else {
-        System.out.println("\n*** Reservation Details ***");
-        System.out.println("Reservation ID: " + reservation.getReservationId());
-        System.out.println("Reservation Date: " + reservation.getReservationDate());
-        System.out.println("Check-in Date: " + reservation.getCheckInDate());
-        System.out.println("Check-out Date: " + reservation.getCheckOutDate());
-        System.out.println("Total Amount: $" + reservation.getTotalAmount());
-        System.out.println("Status: " + reservation.getStatus());
-    }
+        if (reservation == null) {
+            System.out.println("Reservation not found or you do not have access to this reservation.");
+        } else {
+            System.out.println("\n*** Reservation Details ***");
+            System.out.println("Reservation ID: " + reservation.getReservationId());
+            System.out.println("Reservation Date: " + reservation.getReservationDate());
+            System.out.println("Check-in Date: " + reservation.getCheckInDate());
+            System.out.println("Check-out Date: " + reservation.getCheckOutDate());
+            System.out.println("Total Amount: $" + reservation.getTotalAmount());
+            System.out.println("Status: " + reservation.getReservationStatus());
+        }
     }
 
     private void viewAllMyReservations() {

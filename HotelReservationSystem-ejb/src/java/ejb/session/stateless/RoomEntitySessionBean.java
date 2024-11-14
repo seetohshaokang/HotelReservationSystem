@@ -5,6 +5,7 @@
 package ejb.session.stateless;
 
 import ejb.session.RoomEntitySessionBeanRemote;
+import entity.ReservationEntity;
 import entity.RoomEntity;
 import entity.RoomTypeEntity;
 import java.time.LocalDate;
@@ -116,41 +117,18 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         return query.getResultList();
     }
 
-    @Override
-    public List<RoomEntity> retrieveAvailableRooms(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName) {
 
-        System.out.println("Check-In Date: " + checkInDate);
-        System.out.println("Check-Out Date: " + checkOutDate);
-        
-        // Remove checking of rooms availability status as it reflects real time availability not reservation availability
-        Query query = em.createQuery("SELECT r FROM RoomEntity r "
-            + "WHERE r.roomType.roomTypeName = :roomTypeName "
-            + "AND NOT EXISTS ("
-            + "SELECT rr FROM RoomReservationEntity rr "
-            + "WHERE rr.reservedRoom = r "
-            + "AND rr.checkInDate < :checkOutDate "
-            + "AND rr.checkOutDate > :checkInDate)");
-        // NOT EXIST clause will be true even if there are no room reservations associated with room.
-
-        query.setParameter("checkInDate", checkInDate);
-        query.setParameter("checkOutDate", checkOutDate);
-        query.setParameter("roomTypeName", roomTypeName);
-
-        List<RoomEntity> availableRooms = query.getResultList();
-        return availableRooms;
-    }
-    
     public boolean isRoomInUse(Long roomId) throws RoomNotFoundException {
         RoomEntity room = em.find(RoomEntity.class, roomId);
         if (room == null) {
             throw new RoomNotFoundException("Room ID " + roomId + " does not exist!");
         }
-        
+
         // Check if room has active reservations or is currently occupied
         if (room.getStatus() == RoomStatus.OCCUPIED || !room.getRoomReservations().isEmpty()) {
             return true;
         }
-        
+
         return false;
     }
 
@@ -160,7 +138,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         if (room == null) {
             throw new RoomNotFoundException("Room ID " + roomId + " does not exist!");
         }
-        
+
         room.setStatus(RoomStatus.DISABLED); // Assuming DISABLED status exists in RoomStatus enum
         em.merge(room);
         em.flush();
@@ -180,5 +158,31 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
 
         em.remove(room);
         em.flush();
+    }
+
+    @Override
+    public List<ReservationEntity> retrieveOverlappingReservations(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName) {
+        // Query the list of overlappingreservations
+        Query query = em.createQuery(
+                "SELECT r FROM ReservationEntity r "
+                + "WHERE r.roomType.roomTypeName = :roomTypeName "
+                + "AND r.checkInDate < :checkOutDate "
+                + "AND r.checkOutDate > :checkInDate", ReservationEntity.class);
+        query.setParameter("checkInDate", checkInDate);
+        query.setParameter("checkOutDate", checkOutDate);
+        query.setParameter("roomTypeName", roomTypeName);
+
+        // Retrieve list of reservations that overlap with the specified timeframe
+        List<ReservationEntity> overlappingReservations = query.getResultList();
+        return overlappingReservations;
+    }
+
+    @Override
+    public List<RoomEntity> retrieveAvailableRooms(RoomTypeName roomTypeName) {
+        Query query = em.createQuery("SELECT r FROM RoomEntity r WHERE r.roomType.roomTypeName = :roomTypeName AND r.status = :status");
+        query.setParameter("roomTypeName", roomTypeName);
+        query.setParameter("status", RoomStatus.AVAILABLE);
+
+        return query.getResultList();
     }
 }

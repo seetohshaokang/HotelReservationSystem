@@ -81,7 +81,7 @@ public class GuestRelationOfficerModule {
                 } else if (response == 3) {
                     checkInReservation();
                 } else if (response == 4) {
-                    checkOutReservation();
+                    // checkOutReservation();
                 } else if (response == 5) {
                     break;
                 } else {
@@ -134,10 +134,10 @@ public class GuestRelationOfficerModule {
         // Print each AvailableRoomsPerRoomType object with details
         for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
             RoomTypeName roomTypeName = roomTypeAvailability.getRoomTypeName();
-            List<RoomEntity> availableRooms = roomTypeAvailability.getAvailableRooms();
+            int availableRoomsCount = roomTypeAvailability.getAvailableRoomsCount();
             Double totalRate = roomReservationSessionBeanRemote.getWalkInRate(checkInDate, checkOutDate, roomTypeName);
 
-            System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
+            System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRoomsCount, (totalRate != null ? totalRate : 0.0));
         }
     }
 
@@ -186,7 +186,7 @@ public class GuestRelationOfficerModule {
         System.out.println("\nAvailable Room Types:");
         System.out.printf("%-20s || %-20s%n", "Room Type", "Available Rooms");
         for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
-            System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRooms().size());
+            System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRoomsCount());
         }
 
         // Prompt for a single room type and quantity
@@ -215,12 +215,10 @@ public class GuestRelationOfficerModule {
             }
         }
 
-        // Prepare reservation details
-        List<RoomsPerRoomType> roomsToReserve = new ArrayList<>();
-        RoomsPerRoomType rooms = new RoomsPerRoomType();
-        rooms.setRoomTypeName(roomTypeName);
-        rooms.setNumRooms(numberOfRooms);
-        roomsToReserve.add(rooms);
+        // Prepare the RoomsPerRoomType object
+        RoomsPerRoomType roomsToReserve = new RoomsPerRoomType();
+        roomsToReserve.setRoomTypeName(roomTypeName);
+        roomsToReserve.setNumRooms(numberOfRooms);
 
         // Make the reservation for the visitor
         Long reservationId = roomReservationSessionBeanRemote.reserveRoomForVisitor(visitor, checkInDate, checkOutDate, roomsToReserve);
@@ -274,63 +272,23 @@ public class GuestRelationOfficerModule {
                 RoomEntity reservedRoom = roomReservation.getReservedRoom();
 
                 try {
-                    // Check if the room is disabled and requires replacement
+                    // If the room is disabled, print a statement for manual allocation
                     if (reservedRoom.getStatus() == RoomStatus.DISABLED) {
                         System.out.println("Room " + reservedRoom.getRoomNumber()
-                                + " cannot be allocated due to its status. Searching for a replacement...");
+                                + " cannot be allocated due to its DISABLED status. Please perform manual allocation.");
+                        continue; // Skip to the next room reservation without checking in this room
+                    }
 
-                        // Use check-in and check-out dates to search for available rooms per room type
-                        List<AvailableRoomsPerRoomType> roomTypeAvailabilityList = roomReservationSessionBeanRemote.searchAvailableRooms(
-                                reservationToCheckIn.getCheckInDate(), reservationToCheckIn.getCheckOutDate());
-
-                        // Display available room types with at least one available room
-                        System.out.println("\nAvailable Room Types for Replacement:");
-                        List<RoomTypeName> availableRoomTypes = new ArrayList<>();
-                        for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
-                            if (!roomTypeAvailability.getAvailableRooms().isEmpty()) {
-                                System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRooms().size());
-                                availableRoomTypes.add(roomTypeAvailability.getRoomTypeName());
-                            }
-                        }
-
-                        if (availableRoomTypes.isEmpty()) {
-                            System.out.println("No available rooms found for replacement. Manual intervention may be required.");
-                            continue;
-                        }
-
-                        // Prompt the Guest Relation Officer to select a room type for replacement
-                        RoomTypeName selectedRoomType = null;
-                        while (selectedRoomType == null) {
-                            System.out.print("Select a room type for replacement: ");
-                            String roomTypeInput = scanner.nextLine().trim();
-                            try {
-                                RoomTypeName inputType = RoomTypeName.valueOf(roomTypeInput.toUpperCase());
-                                if (availableRoomTypes.contains(inputType)) {
-                                    selectedRoomType = inputType;
-                                } else {
-                                    System.out.println("Selected room type has no available rooms. Please choose another.");
-                                }
-                            } catch (IllegalArgumentException e) {
-                                System.out.println("Invalid room type. Please try again.");
-                            }
-                        }
-
-                        // Find and assign the first available room in the selected room type
-                        for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
-                            if (roomTypeAvailability.getRoomTypeName().equals(selectedRoomType)) {
-                                RoomEntity replacementRoom = roomTypeAvailability.getAvailableRooms().get(0);
-                                roomCheckInOutSessionBean.replaceRoomReservation(roomReservation, replacementRoom);
-                                System.out.println("Replacement room " + replacementRoom.getRoomNumber()
-                                        + " of type " + selectedRoomType + " has been assigned for check-in.");
-                                break; // Replacement found and assigned, exit loop
-                            }
-                        }
-
-                    } else if (reservedRoom.getStatus() == RoomStatus.AVAILABLE) {
-                        // Proceed with standard check-in for assigned room
+                    // Proceed with standard check-in if the room is available
+                    if (reservedRoom.getStatus() == RoomStatus.AVAILABLE) {
                         roomCheckInOutSessionBean.checkInRoomReservation(roomReservation);
                         System.out.println("Room " + reservedRoom.getRoomNumber() + " checked-in successfully.");
+                    } else {
+                        // If the room is not available, prompt manual allocation
+                        System.out.println("Room " + reservedRoom.getRoomNumber()
+                                + " is not available for check-in. Please perform manual allocation.");
                     }
+
                 } catch (Exception ex) {
                     System.out.println("Error checking in room " + reservedRoom.getRoomNumber() + ": " + ex.getMessage());
                 }
@@ -345,7 +303,7 @@ public class GuestRelationOfficerModule {
             System.out.println("An error occurred while checking in the reservation: " + ex.getMessage());
         }
     }
-
+    /*
     private void checkOutReservation() {
         Scanner scanner = new Scanner(System.in);
 
@@ -412,4 +370,5 @@ public class GuestRelationOfficerModule {
         }
     }
 
+     */
 }

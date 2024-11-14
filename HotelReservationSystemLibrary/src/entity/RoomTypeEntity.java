@@ -32,7 +32,7 @@ public class RoomTypeEntity implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private RoomTypeName roomTypeName;
-    
+
     @Enumerated(EnumType.STRING)
     private RoomTypeName nextHigherRoomTypeName;
 
@@ -57,10 +57,14 @@ public class RoomTypeEntity implements Serializable {
     @OneToMany(mappedBy = "roomType", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomRateEntity> roomRates;
 
+    @OneToMany(mappedBy = "roomType", cascade = {}, fetch = FetchType.LAZY)
+    private List<ReservationEntity> reservations;
+
     // JPA Constructor
     public RoomTypeEntity() {
         this.rooms = new ArrayList<>();
         this.roomRates = new ArrayList<>();
+        this.reservations = new ArrayList<>();
     }
 
     public RoomTypeEntity(RoomTypeName roomTypeName, RoomTypeName nextHighestRoomTypeName, String description, Double size, String bed, Integer capacity, List<String> amenities) {
@@ -75,8 +79,9 @@ public class RoomTypeEntity implements Serializable {
         // Relationship fields
         this.rooms = new ArrayList<>();
         this.roomRates = new ArrayList<>();
+        this.reservations = new ArrayList<>();
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;

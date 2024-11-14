@@ -111,4 +111,12 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
         em.flush();
     }
 
+    // Method to return total number of rooms for room type
+    @Override
+    public Integer getRoomTypeCount(RoomTypeName roomTypeName) throws RoomTypeNotFoundException {
+        RoomTypeEntity roomType = getRoomTypeByName(roomTypeName);
+        System.out.println("" + roomType.getRooms().size());
+        return roomType.getRooms().size();
+    }
+
 }
