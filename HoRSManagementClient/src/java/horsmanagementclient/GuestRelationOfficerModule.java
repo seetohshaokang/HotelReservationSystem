@@ -235,7 +235,6 @@ public class GuestRelationOfficerModule {
         // Prompt for visitor/guest email
         System.out.print("Enter Visitor/Guest Email: ");
         String email = scanner.nextLine().trim();
-
         try {
             // Retrieve reserved reservations by email
             List<ReservationEntity> reservedReservations = roomCheckInOutSessionBean.findReservedReservationsByEmail(email);
@@ -251,7 +250,6 @@ public class GuestRelationOfficerModule {
                         + " | Check-In Date: " + reservation.getCheckInDate()
                         + " | Check-Out Date: " + reservation.getCheckOutDate());
             }
-
             System.out.print("\nEnter Reservation ID to check-in: ");
             Long reservationId = scanner.nextLong();
             scanner.nextLine(); // Consume newline
@@ -296,7 +294,6 @@ public class GuestRelationOfficerModule {
 
             // Update reservation status to CHECKED_IN after all room reservations are processed
             roomReservationSessionBeanRemote.updateReservationToCheckedIn(reservationToCheckIn);
-
             System.out.println("Reservation ID " + reservationId + " has been checked in successfully.");
 
         } catch (Exception ex) {
