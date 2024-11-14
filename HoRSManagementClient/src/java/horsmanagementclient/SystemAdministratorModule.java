@@ -8,6 +8,7 @@ import ejb.session.EmployeeEntitySessionBeanRemote;
 import ejb.session.PartnerEntitySessionBeanRemote;
 import entity.EmployeeEntity;
 import entity.PartnerEntity;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeRole;
@@ -29,8 +30,8 @@ public class SystemAdministratorModule {
 
     // Constructor 
     public SystemAdministratorModule(
-            EmployeeEntitySessionBeanRemote employeeEntitySessionBean, 
-            PartnerEntitySessionBeanRemote partnerEntitySessionBean, 
+            EmployeeEntitySessionBeanRemote employeeEntitySessionBean,
+            PartnerEntitySessionBeanRemote partnerEntitySessionBean,
             EmployeeEntity currentEmployee) {
         this.employeeEntitySessionBeanRemote = employeeEntitySessionBean;
         this.partnerEntitySessionBeanRemote = partnerEntitySessionBean;
@@ -55,11 +56,9 @@ public class SystemAdministratorModule {
             System.out.println("4: View all partners");
             System.out.println("-------------------------");
             System.out.println("5: Back\n");
-            response = 0;
 
-            while (response < 1 || response > 5) {
-
-                System.out.print("> ");
+            System.out.print("> ");
+            try {
                 response = scanner.nextInt();
 
                 if (response == 1) {
@@ -71,16 +70,17 @@ public class SystemAdministratorModule {
                 } else if (response == 4) {
                     doViewAllPartners();
                 } else if (response == 5) {
-                    break;
+                    System.out.println("Returning to main menu...");
+                    return; // Exit the method
                 } else {
-                    System.out.println("Invalid Option, please try again!\n");
+                    System.out.println("Invalid option, please enter a number between 1 and 5.\n");
                 }
-            }
-
-            if (response == 5) {
-                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input, please enter a number between 1 and 5.\n");
+                scanner.next(); // Clear the invalid input
             }
         }
+
     }
 
     private void doCreateEmployee() {
@@ -116,7 +116,7 @@ public class SystemAdministratorModule {
         // System.out.print("Enter password > ");
         // newEmployee.setPassword(scanner.nextLine().trim());
         Long newEmployeeId = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
-        System.out.println("New employee created successfully!: " + newEmployeeId + "\n");
+        System.out.println("New employee created successfully!: " + newEmployee.getUsername().toString() + "\n");
     }
 
     private void doViewAllEmployees() {
@@ -125,51 +125,51 @@ public class SystemAdministratorModule {
         System.out.println("*** HORS System :: System Administrator :: View All Employees");
         List<EmployeeEntity> employeeEntities = employeeEntitySessionBeanRemote.retrieveAllEmployees();
 
-        System.out.printf("%10s%20s\n", "Username", "Role");
+        System.out.printf("%10s%30s\n", "Username", "Role");
 
         for (EmployeeEntity employeeEntity : employeeEntities) {
-
-            System.out.printf("%10s%20s\n", employeeEntity.getUsername(), employeeEntity.getRole().toString());
-
+            System.out.printf("%10s%30s\n", employeeEntity.getUsername(), employeeEntity.getRole().toString());
         }
 
         System.out.print("Press any key to continue...> ");
         scanner.nextLine();
     }
-    
+
     private void doCreateNewPartner() {
-        
+
         Scanner scanner = new Scanner(System.in);
         PartnerEntity newPartner = new PartnerEntity();
-        
+
         System.out.println("*** HORS System :: System Administrator :: Create new partner");
-        
+
         System.out.print("Enter username > ");
         newPartner.setUsername(scanner.nextLine().trim());
-        
+
         System.out.print("Enter password > ");
         newPartner.setPassword(scanner.nextLine().trim());
-                
+
         Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
-        System.out.println("New partner created successfully!: " + newPartnerId + "\n");
-        
+        System.out.println("New partner created successfully!: " + newPartner.getUsername().toString() + "\n");
+
+        System.out.print("Press any key to continue...> ");
         scanner.nextLine();
     }
-    
+
     private void doViewAllPartners() {
-        
+
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** HORS System :: System Administrator :: View all Partners");
         List<PartnerEntity> partnerEntities = partnerEntitySessionBeanRemote.viewAllPartners();
-        
-        System.out.printf("%10s\n", "Username");
-        
-        for(PartnerEntity partnerEntity : partnerEntities) {
-            
-            System.out.printf("%10s\n", partnerEntity.getUsername());
-            
+
+        if (!partnerEntities.isEmpty()) {
+            System.out.printf("%10s\n", "Username");
+            for (PartnerEntity partnerEntity : partnerEntities) {
+                System.out.printf("%10s\n", partnerEntity.getUsername());
+            }
+        } else {
+            System.out.println("No partners created yet.");
         }
-        
+
         System.out.print("Press any key to continue...> ");
         scanner.nextLine();
     }

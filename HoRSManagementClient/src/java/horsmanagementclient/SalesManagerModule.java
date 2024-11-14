@@ -75,7 +75,7 @@ public class SalesManagerModule {
                 } else if (response == 3) {
                     updateRoomRateDetails();
                 } else if (response == 4) {
-                    //deleteRoomRate();
+                    deleteRoomRate();
                 } else if (response == 5) {
                     viewAllRoomRates();
                 } else if (response == 6) {

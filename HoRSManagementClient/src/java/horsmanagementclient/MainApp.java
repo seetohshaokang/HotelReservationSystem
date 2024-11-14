@@ -10,6 +10,7 @@ import ejb.session.RoomTypeEntitySessionBeanRemote;
 import ejb.session.stateless.helper.ExceptionReportSessionBeanRemote;
 import ejb.session.stateless.helper.RoomCheckInOutSessionBeanRemote;
 import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
+import java.util.InputMismatchException;
 import util.exception.InvalidAccessRightException;
 import util.exception.InvalidLoginCredentialException;
 
@@ -56,8 +57,6 @@ public class MainApp {
         this.roomCheckInOutSessionBean = roomCheckInOutSessionBean;
     }
 
-
-
     public void runApp() {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
@@ -66,36 +65,35 @@ public class MainApp {
             System.out.println("*** Welcome to HORS - Management System ***");
             System.out.println("1: Login");
             System.out.println("2: Exit\n");
-            response = 0;
 
-            while (response < 1 || response > 2) {
+            while (true) {
                 System.out.print("> ");
+                try {
+                    response = scanner.nextInt();
 
-                response = scanner.nextInt();
-
-                if (response == 1) {
-                    try {
-                        doLogin();
-                        System.out.println("Login Successful");
-                        systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployee);
-                        operationManagerModule = new OperationManagerModule(roomTypeEntitySessionBeanRemote, roomEntitySessionBeanRemote, exceptionReportSessionBean, currentEmployee);
-                        salesManagerModule = new SalesManagerModule(roomRateEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployee);
-                        guestRelationOfficerModule = new GuestRelationOfficerModule(roomReservationSessionBeanRemote, roomCheckInOutSessionBean, currentEmployee);
-                        // Create guest relation officer module
-                        menuMain();
-                    } catch (InvalidLoginCredentialException ex) {
-                        System.out.println("Invalid Login Credentials: " + ex.getMessage() + "\n");
-
+                    if (response == 1) {
+                        try {
+                            doLogin();
+                            System.out.println("Login Successful");
+                            systemAdminModule = new SystemAdministratorModule(employeeEntitySessionBeanRemote, partnerEntitySessionBeanRemote, currentEmployee);
+                            operationManagerModule = new OperationManagerModule(roomTypeEntitySessionBeanRemote, roomEntitySessionBeanRemote, exceptionReportSessionBean, currentEmployee);
+                            salesManagerModule = new SalesManagerModule(roomRateEntitySessionBeanRemote, roomTypeEntitySessionBeanRemote, currentEmployee);
+                            guestRelationOfficerModule = new GuestRelationOfficerModule(roomReservationSessionBeanRemote, roomCheckInOutSessionBean, currentEmployee);
+                            menuMain();
+                        } catch (InvalidLoginCredentialException ex) {
+                            System.out.println("Invalid Login Credentials: " + ex.getMessage() + "\n");
+                        }
+                        break;
+                    } else if (response == 2) {
+                        System.out.println("Exiting the system.");
+                        return;
+                    } else {
+                        System.out.println("Invalid Option, please try again!\n");
                     }
-                } else if (response == 2) {
-                    break;
-                } else {
-                    System.out.println("Invalid Option, please try again!\n");
+                } catch (InputMismatchException e) {
+                    System.out.println("Invalid input, please enter 1 or 2.\n");
+                    scanner.next(); // Clear the invalid input
                 }
-
-            }
-            if (response == 2) {
-                break;
             }
         }
     }
@@ -125,63 +123,53 @@ public class MainApp {
 
         while (true) {
             System.out.println("*** HORS - Management System ***\n");
-            System.out.println("You are login as " + currentEmployee.getUsername() + " with " + currentEmployee.getRole().toString() + " rights\n");
+            System.out.println("You are logged in as " + currentEmployee.getUsername() + " with " + currentEmployee.getRole().toString() + " rights\n");
 
             System.out.println("1. System Administrator Operations");
             System.out.println("2. Operation Manager Operations");
             System.out.println("3. Sales Manager Operations");
             System.out.println("4. Guest Relation Officer Operations");
             System.out.println("5. Logout\n");
-            response = 0;
-
-            while (response < 1 || response > 5) {
-                System.out.print("> ");
-
+            System.out.print("> ");
+            try {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-
                     try {
                         systemAdminModule.menuSystemAdministrator();
                     } catch (InvalidAccessRightException ex) {
-                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                        System.out.println("Invalid access rights: " + ex.getMessage() + "\n");
                     }
-
                 } else if (response == 2) {
-
                     try {
                         operationManagerModule.menuOperationManager();
                     } catch (InvalidAccessRightException ex) {
-                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                        System.out.println("Invalid access rights: " + ex.getMessage() + "\n");
                     }
-
-                    System.out.println(" ");
                 } else if (response == 3) {
-
                     try {
                         salesManagerModule.menuSalesManager();
                     } catch (InvalidAccessRightException ex) {
-                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                        System.out.println("Invalid access rights: " + ex.getMessage() + "\n");
                     }
-
                 } else if (response == 4) {
-
                     try {
                         guestRelationOfficerModule.menuGuestRelationOfficer();
                     } catch (InvalidAccessRightException ex) {
-                        System.out.println("Invalid option, please try again!: " + ex.getMessage() + "\n");
+                        System.out.println("Invalid access rights: " + ex.getMessage() + "\n");
                     }
-
                 } else if (response == 5) {
-                    break; // Break inner while loop
+                    System.out.println("Logging out...");
+                    return; // Exit the method
                 } else {
                     System.out.println("Invalid option, please try again!\n");
-                    System.out.println(" ");
                 }
-            }
-            if (response == 5) {
-                break; // Break outer while loop
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input, please enter a number between 1 and 5.\n");
+                scanner.next(); // Clear the invalid input
             }
         }
+
     }
+
 }

@@ -55,7 +55,7 @@ public class GuestRelationOfficerModule {
     public void menuGuestRelationOfficer() throws InvalidAccessRightException {
 
         if (currentEmployee.getRole() != EmployeeRole.GUEST_RELATION_OFFICER) {
-            throw new InvalidAccessRightException("You dont' have GUEST RELATION OFFICER rights to access the guest relation officer module.");
+            throw new InvalidAccessRightException("You don't have GUEST RELATION OFFICER rights to access the guest relation officer module.");
 
         }
         Scanner scanner = new Scanner(System.in);
