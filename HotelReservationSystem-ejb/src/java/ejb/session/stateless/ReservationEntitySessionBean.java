@@ -19,6 +19,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.ReservationStatus;
+import util.enumeration.RoomStatus;
 
 /**
  *
@@ -104,10 +105,9 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
     public RoomReservationEntity addRoomReservationToReservation(RoomEntity room, ReservationEntity reservation) {
         // Create the RoomReservationEntity with the provided room and reservation
         RoomReservationEntity roomReservation = new RoomReservationEntity(room, reservation);
-
+        roomReservation.setIsAssigned(true);
         // Persist the RoomReservationEntity
         em.persist(roomReservation);
-
         // Add to the reservation's list of room reservations
         reservation.getRoomReservations().add(roomReservation);
 
@@ -116,6 +116,36 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         em.flush();
 
         return roomReservation;
+    }
+
+    public void checkInReservation(Long reservationId) {
+        // Retrieve the reservation from the database
+        ReservationEntity reservation = findReservationById(reservationId);
+
+        if (reservation == null) {
+            System.out.println("Reservation with ID " + reservationId + " does not exist.");
+            return;
+        }
+
+        // Iterate through each RoomReservationEntity associated with this reservation
+        for (RoomReservationEntity roomReservation : reservation.getRoomReservations()) {
+            RoomEntity room = roomReservation.getReservedRoom();
+
+            // Set the room's status to OCCUPIED
+            room.setStatus(RoomStatus.OCCUPIED);
+
+            // Merge the room to ensure the status is updated in the database
+            em.merge(room);
+        }
+
+        // Set the reservation's status to CHECKED_IN
+        reservation.setReservationStatus(ReservationStatus.CHECKED_IN);
+
+        // Merge the reservation to persist the updated status
+        em.merge(reservation);
+        em.flush();
+
+        System.out.println("Reservation with ID " + reservationId + " has been checked in, and all associated rooms have been marked as OCCUPIED.");
     }
 
 }

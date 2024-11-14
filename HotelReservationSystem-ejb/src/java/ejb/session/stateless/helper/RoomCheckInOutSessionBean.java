@@ -26,12 +26,29 @@ public class RoomCheckInOutSessionBean implements RoomCheckInOutSessionBeanRemot
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
+    /*
     public List<ReservationEntity> findReservedReservationsByEmail(String email) {
         Query query = em.createQuery(
                 "SELECT r FROM ReservationEntity r "
                 + "JOIN r.visitor v "
                 + "WHERE v.email = :email "
-                + "AND r.status = :status", ReservationEntity.class);
+                + "AND r.reservationStatus = :status", ReservationEntity.class);
+
+        query.setParameter("email", email);
+        query.setParameter("status", ReservationStatus.RESERVED);
+        
+        return query.getResultList();
+    }
+     */
+    public List<ReservationEntity> findReservedReservationsByEmail(String email) {
+        Query query = em.createQuery(
+                "SELECT r FROM ReservationEntity r "
+                + "JOIN FETCH r.roomReservations rr "
+                + // This eagerly loads roomReservations
+                "JOIN FETCH rr.reservedRoom "
+                + // This eagerly loads reservedRoom within roomReservations
+                "JOIN r.visitor v "
+                + "WHERE v.email = :email AND r.reservationStatus = :status", ReservationEntity.class);
 
         query.setParameter("email", email);
         query.setParameter("status", ReservationStatus.RESERVED);
@@ -88,20 +105,20 @@ public class RoomCheckInOutSessionBean implements RoomCheckInOutSessionBeanRemot
         System.out.println("Room reservation updated. Replacement room " + replacementRoom.getRoomNumber()
                 + " has been assigned to reservation ID: " + roomReservation.getReservation().getReservationId());
     }
-    
+
     public List<ReservationEntity> findReservationsByEmailAndStatus(String email, ReservationStatus status) {
         Query query = em.createQuery(
                 "SELECT r FROM ReservationEntity r "
                 + "JOIN r.visitor v "
                 + "WHERE v.email = :email "
                 + "AND r.status = :status", ReservationEntity.class);
-        
+
         query.setParameter("email", email);
         query.setParameter("status", status);
 
         return query.getResultList();
     }
-    
+
     public void checkOutRoomReservation(RoomReservationEntity roomReservation) {
         if (!roomReservation.getIsAssigned()) {
             throw new IllegalArgumentException("Room reservation is not assigned and cannot be checked out.");
@@ -117,7 +134,7 @@ public class RoomCheckInOutSessionBean implements RoomCheckInOutSessionBeanRemot
             ReservationEntity reservation = roomReservation.getReservation();
             boolean allRoomsCheckedOut = reservation.getRoomReservations().stream()
                     .allMatch(rr -> rr.getReservedRoom().getStatus() == RoomStatus.AVAILABLE);
-            
+
             if (allRoomsCheckedOut) {
                 reservation.setReservationStatus(ReservationStatus.CHECKED_OUT);
                 em.merge(reservation);

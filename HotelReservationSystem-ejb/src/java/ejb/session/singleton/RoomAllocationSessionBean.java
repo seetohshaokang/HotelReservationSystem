@@ -94,6 +94,7 @@ public class RoomAllocationSessionBean {
 
                 // Mark room as occupied
                 room.setStatus(RoomStatus.OCCUPIED);
+                
             }
             System.out.println("Rooms allocated for reservation with ID: " + reservation.getReservationId());
         } else {
