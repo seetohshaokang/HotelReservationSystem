@@ -324,7 +324,7 @@ public class MainApp {
         System.out.println("Check-in Date: " + reservation.getCheckInDate());
         System.out.println("Check-out Date: " + reservation.getCheckOutDate());
         System.out.println("Total Amount: $" + reservation.getTotalAmount());
-        System.out.println("Status: " + reservation.getStatus());
+        System.out.println("Status: " + reservation.getReservationStatus());
     }
     }
 

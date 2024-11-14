@@ -319,7 +319,7 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
     
     public void updateReservationToCheckedIn(ReservationEntity reservation) {
         ReservationStatus newStatus = ReservationStatus.CHECKED_IN;
-        reservation.setStatus(newStatus);
+        reservation.setReservationStatus(newStatus);
         em.merge(reservation);
         em.flush();
         System.out.println("Reservation ID " + reservation.getReservationId() + " status updated to " + newStatus);
@@ -327,7 +327,7 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
     
     public void updateReservationToCheckedOut(ReservationEntity reservation) {
         ReservationStatus newStatus = ReservationStatus.CHECKED_OUT;
-        reservation.setStatus(newStatus);
+        reservation.setReservationStatus(newStatus);
         em.merge(reservation);
         em.flush();
         System.out.println("Reservation ID " + reservation.getReservationId() + " status updated to " + newStatus);

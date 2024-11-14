@@ -54,8 +54,8 @@ public class RoomCheckInOutSessionBean implements RoomCheckInOutSessionBeanRemot
 
             // Update the status of the parent reservation to CHECKED_IN if not already done
             ReservationEntity reservation = roomReservation.getReservation();
-            if (reservation.getStatus() == ReservationStatus.RESERVED) {
-                reservation.setStatus(ReservationStatus.CHECKED_IN);
+            if (reservation.getReservationStatus() == ReservationStatus.RESERVED) {
+                reservation.setReservationStatus(ReservationStatus.CHECKED_IN);
                 em.merge(reservation); // Persist reservation status change
             }
 
@@ -119,7 +119,7 @@ public class RoomCheckInOutSessionBean implements RoomCheckInOutSessionBeanRemot
                     .allMatch(rr -> rr.getReservedRoom().getStatus() == RoomStatus.AVAILABLE);
             
             if (allRoomsCheckedOut) {
-                reservation.setStatus(ReservationStatus.CHECKED_OUT);
+                reservation.setReservationStatus(ReservationStatus.CHECKED_OUT);
                 em.merge(reservation);
             }
 

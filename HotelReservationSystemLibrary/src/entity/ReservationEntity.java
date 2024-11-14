@@ -47,7 +47,9 @@ public class ReservationEntity implements Serializable {
     // 1...* r/s with room
     @OneToMany(mappedBy = "reservation", cascade = {}, fetch = FetchType.LAZY)
     private List<RoomReservationEntity> roomReservations;
-
+    
+    @ManyToOne
+    private RoomTypeEntity roomType;
     @Column
     private LocalDate checkInDate;
     @Column
@@ -56,37 +58,42 @@ public class ReservationEntity implements Serializable {
     private Double totalAmount;
     @Column
     private LocalDate reservationDate;
+    @Column
+    private Integer numberRooms;
 
     @Enumerated(EnumType.STRING)
-    private ReservationStatus status;
+    private ReservationStatus reservationStatus;
 
     // JPA Constructor
     public ReservationEntity() {
         this.roomReservations = new ArrayList<>();
     }
 
-    // Constructor for guests
+    // Working constructor
     public ReservationEntity(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
         this.visitor = visitor;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.totalAmount = totalAmount;
-        this.status = status;
+        this.reservationStatus = status;
         this.roomReservations = new ArrayList<>();
         this.reservationDate = LocalDate.now();
     }
 
-    // Constructor for partners
-    /*
-    public ReservationEntity(PartnerEntity partner, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, ReservationStatus status) {
-        this.partner = partner;
+    // Ideal Constructor
+    public ReservationEntity(VisitorEntity visitor, RoomTypeEntity roomType, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, Integer numberRooms) {
+        this.visitor = visitor;
+        this.roomType = roomType;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.totalAmount = totalAmount;
-        this.status = status;
+        this.numberRooms = numberRooms;
+        // Other attributes
+        this.reservationDate = LocalDate.now();
         this.roomReservations = new ArrayList<>();
+        this.reservationStatus = ReservationStatus.PENDING;
     }
-     */
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -159,12 +166,12 @@ public class ReservationEntity implements Serializable {
         this.totalAmount = totalAmount;
     }
 
-    public ReservationStatus getStatus() {
-        return status;
+    public ReservationStatus getReservationStatus() {
+        return reservationStatus;
     }
 
-    public void setStatus(ReservationStatus status) {
-        this.status = status;
+    public void setReservationStatus(ReservationStatus reservationStatus) {
+        this.reservationStatus = reservationStatus;
     }
 
     /**
@@ -202,6 +209,20 @@ public class ReservationEntity implements Serializable {
 
     public void setGuest(GuestEntity guest) {
         this.visitor = guest;
+    }
+
+    /**
+     * @return the numberRooms
+     */
+    public Integer getNumberRooms() {
+        return numberRooms;
+    }
+
+    /**
+     * @param numberRooms the numberRooms to set
+     */
+    public void setNumberRooms(Integer numberRooms) {
+        this.numberRooms = numberRooms;
     }
 
 }
