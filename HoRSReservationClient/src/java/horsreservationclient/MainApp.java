@@ -324,6 +324,7 @@ public class MainApp {
             System.out.println("\n*** Reservation Details ***");
             System.out.println("Reservation ID: " + reservation.getReservationId());
             System.out.println("Reservation Date: " + reservation.getReservationDate());
+            System.out.println("Room Type: " + reservation.getRoomType().getRoomTypeName());
             System.out.println("Check-in Date: " + reservation.getCheckInDate());
             System.out.println("Check-out Date: " + reservation.getCheckOutDate());
             System.out.println("Total Amount: $" + reservation.getTotalAmount());
@@ -336,7 +337,6 @@ public class MainApp {
             System.out.println("Please log in to view your reservations.");
             return;
         }
-
         // Retrieve all reservations for the logged-in guest
         List<ReservationEntity> reservations = guestEntitySessionBeanRemote.retrieveAllReservations(loggedInGuest);
 
