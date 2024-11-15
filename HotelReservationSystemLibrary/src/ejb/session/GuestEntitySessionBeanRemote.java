@@ -20,14 +20,15 @@ import util.exception.VisitorFoundException;
 @Remote
 public interface GuestEntitySessionBeanRemote {
 
-    public Long createNewGuest(String name, String email, String password)throws InvalidInputException;
-    
-    public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException;
+    public Long createNewGuest(String name, String email, String password) throws InvalidInputException, VisitorFoundException;
 
-public GuestEntity retrieveGuestByEmail(String email) throws GuestNotFoundException, VisitorFoundException;    
+    public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException, VisitorFoundException;
+
+    public GuestEntity retrieveGuestByEmail(String email) throws GuestNotFoundException, VisitorFoundException;
+
     // New method to retrieve reservation only if it belongs to the specified guest
     public ReservationEntity retrieveGuestReservationById(Long reservationId, Long guestId);
-    
+
     public List<ReservationEntity> retrieveAllReservations(GuestEntity guest);
 
 }

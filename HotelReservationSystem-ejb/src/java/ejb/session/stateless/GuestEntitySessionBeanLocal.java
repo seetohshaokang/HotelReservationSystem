@@ -20,10 +20,10 @@ import util.exception.VisitorFoundException;
 @Local
 public interface GuestEntitySessionBeanLocal {
     
-    public Long createNewGuest(String name, String email, String password)throws InvalidInputException;
+    public Long createNewGuest(String name, String email, String password)throws InvalidInputException, VisitorFoundException;
     
-    public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException;
-
+    public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException, VisitorFoundException;
+    
     public GuestEntity retrieveGuestByEmail(String email) throws GuestNotFoundException, VisitorFoundException;
     
     // New method to retrieve reservation only if it belongs to the specified guest

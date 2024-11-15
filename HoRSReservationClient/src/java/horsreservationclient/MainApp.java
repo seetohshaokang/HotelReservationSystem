@@ -65,13 +65,7 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    try {
-                        doLogin();
-                        System.out.println("Login Successful");
-                        menuGuest();
-                    } catch (InvalidLoginCredentialException ex) {
-                        System.out.println("Invalid Login : " + ex.getMessage() + "\n");
-                    }
+                    doLogin();
                 } else if (response == 2) {
                     registerAsGuest();
                 } else if (response == 3) {
@@ -88,7 +82,7 @@ public class MainApp {
         }
     }
 
-    private void doLogin() throws InvalidLoginCredentialException {
+    private void doLogin() {
         Scanner scanner = new Scanner(System.in);
         String email;
         String password;
@@ -99,17 +93,25 @@ public class MainApp {
         System.out.print("Enter password > ");
         password = scanner.nextLine().trim();
 
-        if (email.length() > 0 && password.length() > 0) {
-            loggedInGuest = guestEntitySessionBeanRemote.guestLogin(email, password);
-        } else {
-            throw new InvalidLoginCredentialException("Missing login credential");
+        if (email.isEmpty() || password.isEmpty()) {
+            System.out.println("Login failed: Missing login credential.");
+            return; // Exit early if credentials are missing
         }
 
+        try {
+            loggedInGuest = guestEntitySessionBeanRemote.guestLogin(email, password);
+            System.out.println("Login successful! Welcome, " + loggedInGuest.getName() + "!");
+            menuGuest(); // Proceed to guest menu only on successful login
+        } catch (InvalidLoginCredentialException ex) {
+            System.out.println("Login failed: " + ex.getMessage());
+        } catch (VisitorFoundException ex) {
+            System.out.println("Login failed: " + ex.getMessage() + " Please use the appropriate visitor login.");
+        }
     }
 
     private void registerAsGuest() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("*** HORS System :: System Administrator :: Create New Guest");
+        System.out.println("*** HORS System :: System Administrator :: Create New Guest ***");
         System.out.print("Enter Guest Name: ");
         String name = scanner.nextLine().trim();
 
@@ -123,7 +125,9 @@ public class MainApp {
             Long guestId = guestEntitySessionBeanRemote.createNewGuest(name, email, password);
             System.out.printf("Guest with name %s and email %s has been successfully registered.%n", name, email);
         } catch (InvalidInputException ex) {
-            System.out.println("Invalid Input: " + ex.getMessage());
+            System.out.println("Registration failed: Invalid input - " + ex.getMessage());
+        } catch (VisitorFoundException ex) {
+            System.out.println("Registration failed: " + ex.getMessage() + " The email is already associated with a visitor.");
         }
     }
 

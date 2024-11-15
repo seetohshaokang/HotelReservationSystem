@@ -31,7 +31,7 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
     @PersistenceContext(unitName = "HotelReservationSystem-ejbPU")
     private EntityManager em;
 
-    public Long createNewGuest(String name, String email, String password) throws InvalidInputException {
+    public Long createNewGuest(String name, String email, String password) throws InvalidInputException, VisitorFoundException {
         // Validate name: non-empty, only letters and spaces, reasonable length
         if (name == null || name.trim().isEmpty()) {
             throw new InvalidInputException("Name cannot be empty!");
@@ -46,24 +46,29 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
             throw new InvalidInputException("Email cannot be empty!");
         } else {
             String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-            Pattern pattern = Pattern.compile(emailRegex);
-            if (!pattern.matcher(email).matches()) {
+            if (!email.matches(emailRegex)) {
                 throw new InvalidInputException("Invalid email format.");
             }
         }
 
-        // Validate password: non-empty, minimum length, and complexity (e.g., at least one letter and one number)
+        // Validate password: non-empty
         if (password == null || password.trim().isEmpty()) {
             throw new InvalidInputException("Password cannot be empty.");
         }
-        // Check if guest already exist
-        GuestEntity newGuest;
+
+        // Check if guest or visitor already exists with the provided email
         try {
-            retrieveGuestByEmail(email);
+            retrieveGuestByEmail(email);  // Checks if a guest with the email exists
             throw new InvalidInputException("A guest with this email already exists.");
         } catch (GuestNotFoundException ex) {
-            // Create and persist the new guest entity
-            newGuest = new GuestEntity(name, email, password);
+            // No guest found, proceed to check if a visitor exists
+            VisitorEntity existingVisitor = retrieveVisitorByEmail(email);
+            if (existingVisitor != null) {
+                throw new VisitorFoundException("A visitor with this email already exists.");
+            }
+
+            // No visitor found, proceed with creating the new guest
+            GuestEntity newGuest = new GuestEntity(name, email, password);
             em.persist(newGuest);
             em.flush();
             return newGuest.getGuestId();
@@ -71,7 +76,7 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
     }
 
     @Override
-    public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException {
+    public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException, VisitorFoundException {
         // Input validation for email and password
         if (email == null || email.trim().isEmpty()) {
             throw new InvalidLoginCredentialException("Email cannot be empty.");
@@ -87,9 +92,14 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
             throw new InvalidLoginCredentialException("Password cannot be empty.");
         }
 
+        // First, check if the email belongs to a visitor
+        VisitorEntity existingVisitor = retrieveVisitorByEmail(email);
+        if (existingVisitor != null) {
+            throw new VisitorFoundException("A visitor with this email already exists. Please log in as a visitor.");
+        }
+
         try {
             GuestEntity guestEntity = retrieveGuestByEmail(email);
-
             // Password verification
             if (guestEntity.getPassword().equals(password)) {
                 return guestEntity;
@@ -138,11 +148,21 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
 
     // New method to retrieve reservation only if it belongs to the specified guest
     public ReservationEntity retrieveGuestReservationById(Long reservationId, Long guestId) {
-        ReservationEntity reservation = em.find(ReservationEntity.class,
-                reservationId);
+        ReservationEntity reservation = em.find(ReservationEntity.class, reservationId);
         if (reservation != null && reservation.getGuest() != null && reservation.getGuest().getGuestId().equals(guestId)) {
             return reservation; // Return reservation if it belongs to the guest
         }
         return null; // Return null if reservation not found or doesn't belong to guest
+    }
+
+    // Modified method to retrieve a non-guest visitor by email
+    private VisitorEntity retrieveVisitorByEmail(String email) {
+        try {
+            return em.createQuery("SELECT v FROM VisitorEntity v WHERE v.email = :email AND TYPE(v) <> GuestEntity", VisitorEntity.class)
+                    .setParameter("email", email)
+                    .getSingleResult();
+        } catch (NoResultException ex) {
+            return null; // Return null if no non-guest visitor is found
+        }
     }
 }
