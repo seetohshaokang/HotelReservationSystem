@@ -13,6 +13,7 @@ import entity.VisitorEntity;
 import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.VisitorNotFoundException;
 
 /**
  *
@@ -33,5 +34,6 @@ public interface ReservationEntitySessionBeanLocal {
     
     public List<ReservationEntity> getAllReservations();
     public RoomReservationEntity addRoomReservationToReservation(RoomEntity room, ReservationEntity reservation);
-   
+
+    public VisitorEntity getVisitorByEmail(String email) throws VisitorNotFoundException;
 }

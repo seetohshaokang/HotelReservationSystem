@@ -4,30 +4,27 @@
  */
 package horsmanagementclient;
 
-import ejb.session.RoomEntitySessionBeanRemote;
 import ejb.session.stateless.helper.RoomReservationSessionBeanRemote;
 import entity.EmployeeEntity;
 import entity.RoomEntity;
 import dataaccessobject.AvailableRoomsPerRoomType;
 import dataaccessobject.RoomsPerRoomType;
-import ejb.session.stateless.helper.ExceptionReportSessionBeanRemote;
+import ejb.session.ReservationEntitySessionBeanRemote;
 import ejb.session.stateless.helper.RoomCheckInOutSessionBeanRemote;
 import entity.ReservationEntity;
 import entity.RoomReservationEntity;
-import entity.RoomTypeEntity;
 import entity.VisitorEntity;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import util.enumeration.EmployeeRole;
 import util.enumeration.ReservationStatus;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
 import util.exception.InvalidAccessRightException;
+import util.exception.VisitorNotFoundException;
 
 /**
  *
@@ -38,6 +35,7 @@ public class GuestRelationOfficerModule {
     // Insert relevant sessionbeans;
     private RoomReservationSessionBeanRemote roomReservationSessionBeanRemote;
     private RoomCheckInOutSessionBeanRemote roomCheckInOutSessionBean;
+    private ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote;
 
     // State for employee
     private EmployeeEntity currentEmployee;
@@ -45,10 +43,11 @@ public class GuestRelationOfficerModule {
     public GuestRelationOfficerModule() {
     }
 
-    public GuestRelationOfficerModule(RoomReservationSessionBeanRemote roomReservationSessionBeanRemote, RoomCheckInOutSessionBeanRemote roomCheckInOutSessionBean, EmployeeEntity currentEmployee) {
+    public GuestRelationOfficerModule(RoomReservationSessionBeanRemote roomReservationSessionBeanRemote, RoomCheckInOutSessionBeanRemote roomCheckInOutSessionBean, EmployeeEntity currentEmployee, ReservationEntitySessionBeanRemote reservationEntitySessionBeanRemote) {
         this.roomReservationSessionBeanRemote = roomReservationSessionBeanRemote;
         this.roomCheckInOutSessionBean = roomCheckInOutSessionBean;
         this.currentEmployee = currentEmployee;
+        this.reservationEntitySessionBeanRemote = reservationEntitySessionBeanRemote;
     }
 
     // Insert constructor with appropriate sessionbean
@@ -152,8 +151,12 @@ public class GuestRelationOfficerModule {
         System.out.print("Enter Visitor Email: ");
         String visitorEmail = scanner.nextLine().trim();
 
-        // Create a new VisitorEntity for the walk-in visitor
-        VisitorEntity visitor = new VisitorEntity(visitorName, visitorEmail);
+        VisitorEntity visitor = null;
+        try {
+            visitor = reservationEntitySessionBeanRemote.getVisitorByEmail(visitorEmail);
+        } catch (VisitorNotFoundException ex) {
+            visitor = new VisitorEntity(visitorName, visitorEmail); // Create a new VisitorEntity for the walk-in visitor if its not an existing visitor already
+        }
 
         // Prompt for check-in and check-out dates
         LocalDate checkInDate = null;
@@ -172,7 +175,7 @@ public class GuestRelationOfficerModule {
             String checkOutInput = scanner.nextLine();
             try {
                 checkOutDate = LocalDate.parse(checkOutInput, formatter);
-                if (checkOutDate.isBefore(checkInDate)) {
+                if (checkOutDate.isBefore(checkInDate) || checkOutDate.equals(checkInDate)) {
                     System.out.println("Check-out date must be after check-in date. Please enter again.");
                     checkOutDate = null;
                 }
