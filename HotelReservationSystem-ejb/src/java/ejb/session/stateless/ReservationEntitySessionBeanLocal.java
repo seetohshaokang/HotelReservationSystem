@@ -13,6 +13,7 @@ import entity.VisitorEntity;
 import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -22,16 +23,19 @@ import javax.ejb.Local;
 public interface ReservationEntitySessionBeanLocal {
 
     public Long createReservationForGuest(Long guestId, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, RoomTypeEntity roomType, Integer numberRooms);
-    
+
     public ReservationEntity findReservationById(Long reservationId);
-    
+
     public Long createReservationForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, RoomTypeEntity roomType, Integer numberRooms);
-    
+
     public void confirmReservation(ReservationEntity reservation);
-    
+
     public List<ReservationEntity> findReservationsByCheckInDate(LocalDate checkInDate);
-    
+
     public List<ReservationEntity> getAllReservations();
+
     public RoomReservationEntity addRoomReservationToReservation(RoomEntity room, ReservationEntity reservation);
-   
+
+    public boolean hasRoomAllocations(Long reservationId) throws ReservationNotFoundException;
+
 }

@@ -20,6 +20,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.ReservationStatus;
 import util.enumeration.RoomStatus;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -146,6 +147,17 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
         em.flush();
 
         System.out.println("Reservation with ID " + reservationId + " has been checked in, and all associated rooms have been marked as OCCUPIED.");
+    }
+
+    @Override
+    public boolean hasRoomAllocations(Long reservationId) throws ReservationNotFoundException {
+        ReservationEntity reservation = em.find(ReservationEntity.class, reservationId);
+
+        if (reservation == null) {
+            throw new ReservationNotFoundException("Reservation ID " + reservationId + " does not exist.");
+        }
+
+        return !reservation.getRoomReservations().isEmpty();
     }
 
 }

@@ -27,6 +27,7 @@ import javax.ejb.Timer;
 import util.enumeration.ReservationStatus;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -77,45 +78,62 @@ public class RoomAllocationSessionBean {
 
     // Can be used to immediately process reservation for same day check in
     public void processReservation(ReservationEntity reservation) {
+        try {
+            // Step 1: Check if the reservation already has room allocations
+            if (reservationEntitySessionBean.hasRoomAllocations(reservation.getReservationId())) {
+                System.out.println("Reservation with ID: " + reservation.getReservationId() + " already has room allocations.");
+                return; // Exit the method to avoid duplicate allocations
+            }
+        } catch (ReservationNotFoundException e) {
+            System.out.println("Reservation not found: " + e.getMessage());
+            return; // Exit early since the reservation does not exist
+        }
+
         RoomTypeName roomTypeName = reservation.getRoomType().getRoomTypeName();
         int numberOfRoomsNeeded = reservation.getNumberRooms();
         LocalDate checkInDate = reservation.getCheckInDate();
         LocalDate checkOutDate = reservation.getCheckOutDate();
 
-        // Retrieve available rooms for the specified room type
+        // Step 2: Retrieve available rooms for the specified room type
         List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(roomTypeName);
 
         if (availableRooms.size() >= numberOfRoomsNeeded) {
+            // Allocate rooms of the requested type
             for (int i = 0; i < numberOfRoomsNeeded; i++) {
                 RoomEntity room = availableRooms.get(i);
 
-                // Use the new method to add room reservations
+                // Add room reservations
                 reservationEntitySessionBean.addRoomReservationToReservation(room, reservation);
             }
             System.out.println("Rooms allocated for reservation with ID: " + reservation.getReservationId());
         } else {
-            // Handle upgrading to the next higher room type, similar to the original implementation
+            // Step 3: Handle upgrading to the next higher room type
             RoomTypeName nextHigherRoomType = reservation.getRoomType().getNextHigherRoomTypeName();
             if (nextHigherRoomType != null) {
                 List<RoomEntity> higherAvailableRooms = roomEntitySessionBean.retrieveAvailableRooms(nextHigherRoomType);
 
                 if (higherAvailableRooms.size() >= numberOfRoomsNeeded) {
+                    // Allocate upgraded rooms
                     for (int i = 0; i < numberOfRoomsNeeded; i++) {
                         RoomEntity upgradedRoom = higherAvailableRooms.get(i);
 
-                        // Use the new method to add upgraded room reservations
+                        // Add upgraded room reservations
                         reservationEntitySessionBean.addRoomReservationToReservation(upgradedRoom, reservation);
 
+                        // Update room status to occupied
                         upgradedRoom.setStatus(RoomStatus.OCCUPIED);
                     }
-                    exceptionReportSessionBean.createTypeOneException(availableRooms.get(0), higherAvailableRooms.get(0));
+                    // Create an exception report for the upgrade
+                    exceptionReportSessionBean.createTypeOneException(availableRooms.isEmpty() ? null : availableRooms.get(0), higherAvailableRooms.get(0));
                     System.out.println("Upgraded rooms allocated for reservation with ID: " + reservation.getReservationId());
                 } else {
-                    exceptionReportSessionBean.createTypeTwoException(availableRooms.get(0));
+                    // Step 4: Handle cases where no rooms are available for the next higher type
+                    exceptionReportSessionBean.createTypeTwoException(availableRooms.isEmpty() ? null : availableRooms.get(0));
                     System.out.println("No available rooms found for the requested type or next higher type.");
                 }
             } else {
-                exceptionReportSessionBean.createTypeTwoException(availableRooms.get(0));
+                // Step 5: Handle cases where no higher room type exists
+                exceptionReportSessionBean.createTypeTwoException(availableRooms.isEmpty() ? null : availableRooms.get(0));
                 System.out.println("No higher room type available for reservation.");
             }
         }

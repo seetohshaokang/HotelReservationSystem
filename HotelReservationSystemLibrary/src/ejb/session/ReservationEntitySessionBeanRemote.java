@@ -13,6 +13,7 @@ import entity.VisitorEntity;
 import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Remote;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -32,7 +33,9 @@ public interface ReservationEntitySessionBeanRemote {
     public List<ReservationEntity> findReservationsByCheckInDate(LocalDate checkInDate);
 
     public List<ReservationEntity> getAllReservations();
-    
+
     public RoomReservationEntity addRoomReservationToReservation(RoomEntity room, ReservationEntity reservation);
+
+    public boolean hasRoomAllocations(Long reservationId) throws ReservationNotFoundException;
 
 }
