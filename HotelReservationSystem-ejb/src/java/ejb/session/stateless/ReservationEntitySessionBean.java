@@ -16,11 +16,15 @@ import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.ReservationStatus;
 import util.enumeration.RoomStatus;
 import util.exception.ReservationNotFoundException;
+import util.exception.VisitorNotFoundException;
+
 
 /**
  *
@@ -59,6 +63,18 @@ public class ReservationEntitySessionBean implements ReservationEntitySessionBea
     public ReservationEntity findReservationById(Long reservationId) {
         ReservationEntity reservation = em.find(ReservationEntity.class, reservationId);
         return reservation;
+    }
+    
+    @Override
+    public VisitorEntity getVisitorByEmail(String email) throws VisitorNotFoundException{
+        Query query = em.createQuery("SELECT v FROM VisitorEntity v WHERE v.email = :email", VisitorEntity.class);
+        query.setParameter("email", email);
+
+        try {
+            return (VisitorEntity) query.getSingleResult();
+        } catch (NoResultException | NonUniqueResultException ex) {
+            throw new VisitorNotFoundException("Visitor with email: " + email + " does not exist");
+        }
     }
 
     public Long createReservationForVisitor(VisitorEntity visitor, LocalDate checkInDate, LocalDate checkOutDate, Double totalAmount, RoomTypeEntity roomType, Integer numberRooms) {

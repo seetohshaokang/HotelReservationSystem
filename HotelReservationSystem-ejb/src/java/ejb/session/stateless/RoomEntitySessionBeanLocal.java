@@ -25,8 +25,6 @@ import util.exception.RoomTypeNotFoundException;
 @Local
 public interface RoomEntitySessionBeanLocal {
 
-    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException;
-
     public RoomEntity searchRoomByRoomNumber(String roomNumber) throws NoExistingRoomException;
 
     public RoomEntity updateRoom(Long roomId, Long roomTypeId, String newRoomNumber, RoomStatus newStatus) throws RoomNotFoundException, RoomTypeNotFoundException;
@@ -43,4 +41,6 @@ public interface RoomEntitySessionBeanLocal {
     public List<ReservationEntity> retrieveOverlappingReservations(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName);
     
     public List<RoomEntity> retrieveAvailableRooms(RoomTypeName roomTypeName);
+
+    public RoomEntity createNewRoom(Long roomtypeid, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException;
 }

@@ -5,7 +5,6 @@
 package ejb.session.singleton;
 
 import ejb.session.stateless.EmployeeEntitySessionBeanLocal;
-import ejb.session.stateless.GuestEntitySessionBeanLocal;
 import ejb.session.stateless.ReservationEntitySessionBeanLocal;
 import ejb.session.stateless.RoomEntitySessionBeanLocal;
 import ejb.session.stateless.RoomRateEntitySessionBeanLocal;
@@ -20,16 +19,15 @@ import javax.persistence.PersistenceContext;
 import util.enumeration.EmployeeRole;
 import ejb.session.stateless.RoomReservationEntitySessionBeanLocal;
 import ejb.session.stateless.RoomTypeEntitySessionBeanLocal;
-import entity.ReservationEntity;
 import entity.RoomTypeEntity;
 import entity.VisitorEntity;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import util.enumeration.RateType;
 import util.enumeration.RoomStatus;
 import util.enumeration.RoomTypeName;
 import util.exception.DisabledException;
+import util.exception.EmployeeExistException;
 import util.exception.ExistingRoomException;
 import util.exception.RoomTypeNotFoundException;
 
@@ -85,10 +83,14 @@ public class DataInitialisationBean {
     }
 
     private void initialiseEmployeeData() {
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("sysadmin", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("opmanager", "password", EmployeeRole.OPERATION_MANAGER));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("salesmanager", "password", EmployeeRole.SALES_MANAGER));
-        employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("guestrelo", "password", EmployeeRole.GUEST_RELATION_OFFICER));
+        try {
+            employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("sysadmin", "password", EmployeeRole.SYSTEM_ADMINISTRATOR));
+            employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("opmanager", "password", EmployeeRole.OPERATION_MANAGER));
+            employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("salesmanager", "password", EmployeeRole.SALES_MANAGER));
+            employeeEntitySessionBeanLocal.createNewEmployee(new EmployeeEntity("guestrelo", "password", EmployeeRole.GUEST_RELATION_OFFICER));
+        } catch (EmployeeExistException ex) {
+            
+        }
 
     }
 
@@ -268,154 +270,178 @@ public class DataInitialisationBean {
 
         //Deluxe Room, 0101, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.DELUXE, 01, 01, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.DELUXE);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 01, 01, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Deluxe Room, 0201, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.DELUXE, 02, 01, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.DELUXE);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 02, 01, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Deluxe Room, 0301, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.DELUXE, 03, 01, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.DELUXE);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 03, 01, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Deluxe Room, 0401, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.DELUXE, 04, 01, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.DELUXE);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 04, 01, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Deluxe Room, 0501, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.DELUXE, 05, 01, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.DELUXE);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 05, 01, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Premier Room, 0102, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.PREMIER, 01, 02, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.PREMIER);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 01, 02, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Premier Room, 0202, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.PREMIER, 02, 02, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.PREMIER);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 02, 02, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Premier Room, 0302, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.PREMIER, 03, 02, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.PREMIER);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 03, 02, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Premier Room, 0402, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.PREMIER, 04, 02, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.PREMIER);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 04, 02, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Premier Room, 0502, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.PREMIER, 05, 02, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.PREMIER);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 05, 02, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Family Room, 0103, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.FAMILY, 01, 03, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.FAMILY);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 01, 03, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Family Room, 0203, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.FAMILY, 02, 03, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.FAMILY);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 02, 03, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Family Room, 0303, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.FAMILY, 03, 03, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.FAMILY);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 03, 03, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Family Room, 0403, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.FAMILY, 04, 03, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.FAMILY);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 04, 03, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Family Room, 0503, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.FAMILY, 05, 03, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.FAMILY);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 05, 03, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Junior Suite, 0104, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.JUNIOR, 01, 04, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.JUNIOR);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 01, 04, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Junior Suite, 0204, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.JUNIOR, 02, 04, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.JUNIOR);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 02, 04, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Junior Suite, 0304, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.JUNIOR, 03, 04, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.JUNIOR);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 03, 04, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Junior Suite, 0404, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.JUNIOR, 04, 04, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.JUNIOR);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 04, 04, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Junior Suite, 0504, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.JUNIOR, 05, 04, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.JUNIOR);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 05, 04, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Grand Suite, 0105, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.GRAND, 01, 05, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.GRAND);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 01, 05, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Grand Suite, 0205, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.GRAND, 02, 05, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.GRAND);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 02, 05, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Grand Suite, 0305, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.GRAND, 03, 05, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.GRAND);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 03, 05, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Grand Suite, 0405, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.GRAND, 04, 05, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.GRAND);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 04, 05, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
         //Grand Suite, 0505, Available
         try {
-            roomEntitySessionBeanLocal.createNewRoom(RoomTypeName.GRAND, 05, 05, RoomStatus.AVAILABLE);
+            RoomTypeEntity roomtype = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.GRAND);
+            roomEntitySessionBeanLocal.createNewRoom(roomtype.getRoomTypeId(), 05, 05, RoomStatus.AVAILABLE);
         } catch (ExistingRoomException | RoomTypeNotFoundException | DisabledException ex) {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
     }
-
 }

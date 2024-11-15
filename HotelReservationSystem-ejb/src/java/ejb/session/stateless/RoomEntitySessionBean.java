@@ -40,7 +40,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
 
     // Might need to include validation checks to see if room already exists
     @Override
-    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException {
+    public RoomEntity createNewRoom(Long roomtypeid, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException {
         try {
 
             // There is existing room
@@ -53,7 +53,7 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         } catch (NoExistingRoomException ex) {
             // No existing room
             // Find roomType
-            RoomTypeEntity rt = roomTypeEntitySessionBean.getRoomTypeByName(rtName);
+            RoomTypeEntity rt = roomTypeEntitySessionBean.getRoomTypeById(roomtypeid);
 
             // Check if room type is disabled
             if (rt.getIsDisabled() == true) {

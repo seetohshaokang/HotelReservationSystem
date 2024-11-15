@@ -4,6 +4,7 @@
  */
 package ejb.session;
 
+import entity.ReservationEntity;
 import entity.RoomEntity;
 import entity.RoomTypeEntity;
 import java.time.LocalDate;
@@ -24,12 +25,11 @@ import util.exception.RoomTypeNotFoundException;
 @Remote
 public interface RoomEntitySessionBeanRemote {
 
-    public RoomEntity createNewRoom(RoomTypeName rtName, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException;
-
-    public RoomEntity searchRoomByRoomNumber(String roomNumber) throws NoExistingRoomException;
+ public RoomEntity searchRoomByRoomNumber(String roomNumber) throws NoExistingRoomException;
 
     public RoomEntity updateRoom(Long roomId, Long roomTypeId, String newRoomNumber, RoomStatus newStatus) throws RoomNotFoundException, RoomTypeNotFoundException;
 
+    // Insert delete room here
     public List<RoomEntity> viewAllRooms();
 
     public boolean isRoomInUse(Long roomId) throws RoomNotFoundException;
@@ -37,5 +37,11 @@ public interface RoomEntitySessionBeanRemote {
     public void disableRoom(Long roomId) throws RoomNotFoundException;
 
     public void deleteRoom(Long roomId) throws RoomNotFoundException;
+    
+    public List<ReservationEntity> retrieveOverlappingReservations(LocalDate checkInDate, LocalDate checkOutDate, RoomTypeName roomTypeName);
+    
+    public List<RoomEntity> retrieveAvailableRooms(RoomTypeName roomTypeName);
+
+    public RoomEntity createNewRoom(Long roomtypeid, Integer floor, Integer sequence, RoomStatus roomStatus) throws RoomTypeNotFoundException, ExistingRoomException, DisabledException;
 
 }

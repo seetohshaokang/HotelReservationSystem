@@ -96,9 +96,14 @@ public class SalesManagerModule {
         System.out.println("*** HORS System :: Sales Manager :: Create New Room Rate ***\n");
         System.out.println("-------------------------------------------------------------------");
         // Input name
-        System.out.print("Enter name > ");
-        String name = scanner.nextLine();
-
+        String name = "";
+        while (name.trim().isEmpty()) {
+            System.out.print("Enter name > ");
+            name = scanner.nextLine().trim();
+            if (name.isEmpty()) {
+                System.out.println("Name cannot be empty. Please enter a valid name.");
+            }
+        }
         // Input Room Type
         viewAllRoomTypes();
         Integer roomTypeId = null;
@@ -316,7 +321,7 @@ public class SalesManagerModule {
                     end
             );
         } catch (RoomTypeNotFoundException | RoomRateNotFoundException ex) {
-            System.out.println("Invalid creation of new room rate: " + ex.getMessage());
+            System.out.println("Invalid update of room rate: " + ex.getMessage());
         }
     }
 

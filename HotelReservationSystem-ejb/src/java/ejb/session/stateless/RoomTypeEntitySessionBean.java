@@ -45,6 +45,16 @@ public class RoomTypeEntitySessionBean implements RoomTypeEntitySessionBeanRemot
             throw new RoomTypeNotFoundException("Room Type: " + name.toString() + " does not exist");
         }
     }
+    
+    @Override
+    public RoomTypeEntity getRoomTypeById(Long id) throws RoomTypeNotFoundException {
+        try {
+            RoomTypeEntity rt = em.find(RoomTypeEntity.class, id);
+            return rt;
+        } catch (Exception ex) {
+            throw new RoomTypeNotFoundException("Room Type with id: " + id + " does not exist");
+        }
+    }
 
     public RoomTypeEntity updateRoomType(Long roomTypeId, String newDescription, Double newSize, String newBed, Integer newCapacity, List<String> newAmenities,
             RoomTypeName newNextHigherRoomTypeName) 

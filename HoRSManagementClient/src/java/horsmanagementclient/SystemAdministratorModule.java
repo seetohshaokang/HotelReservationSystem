@@ -12,7 +12,9 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeRole;
+import util.exception.EmployeeExistException;
 import util.exception.InvalidAccessRightException;
+import util.exception.PartnerExistException;
 
 /**
  *
@@ -115,20 +117,25 @@ public class SystemAdministratorModule {
         // newEmployee.setUsername(scanner.nextLine().trim());
         // System.out.print("Enter password > ");
         // newEmployee.setPassword(scanner.nextLine().trim());
+        try {
         Long newEmployeeId = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
         System.out.println("New employee created successfully!: " + newEmployee.getUsername().toString() + "\n");
+        } catch (EmployeeExistException e) {
+            System.out.println("Error creating employee: " + e.getMessage());
+        }
     }
 
     private void doViewAllEmployees() {
 
         Scanner scanner = new Scanner(System.in);
         System.out.println("*** HORS System :: System Administrator :: View All Employees");
+        System.out.println("--------------------------------------------------------------");
         List<EmployeeEntity> employeeEntities = employeeEntitySessionBeanRemote.retrieveAllEmployees();
 
-        System.out.printf("%10s%30s\n", "Username", "Role");
+        System.out.printf("%-20s || %-30s\n", "Username", "Role");
 
         for (EmployeeEntity employeeEntity : employeeEntities) {
-            System.out.printf("%10s%30s\n", employeeEntity.getUsername(), employeeEntity.getRole().toString());
+            System.out.printf("%-20s || %-30s\n", employeeEntity.getUsername(), employeeEntity.getRole().toString());
         }
 
         System.out.print("Press any key to continue...> ");
@@ -148,9 +155,11 @@ public class SystemAdministratorModule {
         System.out.print("Enter password > ");
         newPartner.setPassword(scanner.nextLine().trim());
 
-        Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
+        try { Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
         System.out.println("New partner created successfully!: " + newPartner.getUsername().toString() + "\n");
-
+        } catch (PartnerExistException ex) {
+            System.out.println("Error creating partner: " + ex.getMessage());
+        }
         System.out.print("Press any key to continue...> ");
         scanner.nextLine();
     }
@@ -162,9 +171,9 @@ public class SystemAdministratorModule {
         List<PartnerEntity> partnerEntities = partnerEntitySessionBeanRemote.viewAllPartners();
 
         if (!partnerEntities.isEmpty()) {
-            System.out.printf("%10s\n", "Username");
+            System.out.printf("%-10s\n", "Username");
             for (PartnerEntity partnerEntity : partnerEntities) {
-                System.out.printf("%10s\n", partnerEntity.getUsername());
+                System.out.printf("%-10s\n", partnerEntity.getUsername());
             }
         } else {
             System.out.println("No partners created yet.");

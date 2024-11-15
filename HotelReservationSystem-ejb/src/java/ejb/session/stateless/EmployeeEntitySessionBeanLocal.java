@@ -19,7 +19,7 @@ import util.exception.InvalidLoginCredentialException;
 public interface EmployeeEntitySessionBeanLocal {
     
     // Use case: System Administrator :: create new employee
-    public Long createNewEmployee(EmployeeEntity newEmployee);
+    public Long createNewEmployee(EmployeeEntity newEmployee) throws EmployeeExistException;
     
     // Use case: System Administrator :: retrieve all employees
     public List<EmployeeEntity> retrieveAllEmployees();
