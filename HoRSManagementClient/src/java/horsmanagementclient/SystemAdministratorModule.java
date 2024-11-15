@@ -162,39 +162,62 @@ public class SystemAdministratorModule {
 
     private void doCreateNewPartner() {
 
-        Scanner scanner = new Scanner(System.in);
-        PartnerEntity newPartner = new PartnerEntity();
+    Scanner scanner = new Scanner(System.in);
+    PartnerEntity newPartner = new PartnerEntity();
 
-        System.out.println("*** HORS System :: System Administrator :: Create New Partner ***");
+    System.out.println("*** HORS System :: System Administrator :: Create New Partner ***");
 
+    // Validate username input
+    while (true) {
         System.out.print("Enter username > ");
-        newPartner.setUsername(scanner.nextLine().trim());
-
-        System.out.print("Enter password > ");
-        newPartner.setPassword(scanner.nextLine().trim());
-
-        boolean validRole = false;
-        while (!validRole) {
-            try {
-                System.out.print("Enter role (EMPLOYEE or RESERVATION_MANAGER) > ");
-                String roleInput = scanner.nextLine().trim().toUpperCase();
-                newPartner.setRole(PartnerRole.valueOf(roleInput));
-                validRole = true; // Exit the loop if the role is valid
-            } catch (IllegalArgumentException ex) {
-                System.out.println("Invalid role entered. Please enter either 'EMPLOYEE' or 'RESERVATION_MANAGER'.");
-            }
+        String username = scanner.nextLine().trim();
+        if (!username.isEmpty()) {
+            newPartner.setUsername(username);
+            break;
+        } else {
+            System.out.println("Username cannot be empty. Please try again.");
         }
-
-        try {
-            Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
-            System.out.println("New partner created successfully!: " + newPartner.getUsername() + "\n");
-        } catch (PartnerExistException ex) {
-            System.out.println("Error creating partner: " + ex.getMessage());
-        }
-
-        System.out.print("Press any key to continue...> ");
-        scanner.nextLine();
     }
+
+    // Validate password input
+    while (true) {
+        System.out.print("Enter password > ");
+        String password = scanner.nextLine().trim();
+        if (!password.isEmpty()) {
+            newPartner.setPassword(password);
+            break;
+        } else {
+            System.out.println("Password cannot be empty. Please try again.");
+        }
+    }
+
+    // Validate role input
+    while (true) {
+        try {
+            System.out.print("Enter role (EMPLOYEE or RESERVATION_MANAGER) > ");
+            String roleInput = scanner.nextLine().trim().toUpperCase();
+            if (!roleInput.isEmpty()) {
+                newPartner.setRole(PartnerRole.valueOf(roleInput));
+                break; // Exit the loop if the role is valid
+            } else {
+                System.out.println("Role cannot be empty. Please enter a valid role.");
+            }
+        } catch (IllegalArgumentException ex) {
+            System.out.println("Invalid role entered. Please enter either 'EMPLOYEE' or 'RESERVATION_MANAGER'.");
+        }
+    }
+
+    // Create new partner and handle exceptions
+    try {
+        Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
+        System.out.println("New partner created successfully!: " + newPartner.getUsername() + "\n");
+    } catch (PartnerExistException ex) {
+        System.out.println("Error creating partner: " + ex.getMessage());
+    }
+
+    System.out.print("Press any key to continue...> ");
+    scanner.nextLine();
+}
 
     private void doViewAllPartners() {
 
