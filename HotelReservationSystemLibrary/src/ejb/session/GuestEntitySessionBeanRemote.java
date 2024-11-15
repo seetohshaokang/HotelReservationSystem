@@ -11,6 +11,7 @@ import javax.ejb.Remote;
 import util.exception.GuestNotFoundException;
 import util.exception.InvalidInputException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.VisitorFoundException;
 
 /**
  *
@@ -23,8 +24,7 @@ public interface GuestEntitySessionBeanRemote {
     
     public GuestEntity guestLogin(String email, String password) throws InvalidLoginCredentialException;
 
-    public GuestEntity retrieveGuestByEmail(String email) throws GuestNotFoundException;
-    
+public GuestEntity retrieveGuestByEmail(String email) throws GuestNotFoundException, VisitorFoundException;    
     // New method to retrieve reservation only if it belongs to the specified guest
     public ReservationEntity retrieveGuestReservationById(Long reservationId, Long guestId);
     

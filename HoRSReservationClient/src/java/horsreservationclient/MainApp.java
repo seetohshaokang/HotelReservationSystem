@@ -22,6 +22,7 @@ import java.util.Scanner;
 import util.enumeration.RoomTypeName;
 import util.exception.InvalidInputException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.VisitorFoundException;
 
 /**
  *
@@ -117,9 +118,10 @@ public class MainApp {
 
         System.out.print("Enter Guest Password: ");
         String password = scanner.nextLine().trim();
+
         try {
             Long guestId = guestEntitySessionBeanRemote.createNewGuest(name, email, password);
-            System.out.printf("Guest with name %s email %s has been successfully registed.%n", name, email);
+            System.out.printf("Guest with name %s and email %s has been successfully registered.%n", name, email);
         } catch (InvalidInputException ex) {
             System.out.println("Invalid Input: " + ex.getMessage());
         }
@@ -298,7 +300,6 @@ public class MainApp {
         }
     }
      */
-
     private void viewMyReservationDetails() {
         if (loggedInGuest == null) {
             System.out.println("Please log in to view your reservation details.");
