@@ -67,13 +67,15 @@ public class GuestRelationOfficerModule {
             System.out.println("2: Walk-in Reserve Room");
             System.out.println("3: Check-in Guest");
             System.out.println("4: Check-out Guest");
+            System.out.println("5: Manual Room Allocation");
             System.out.println("---------------------------");
-            System.out.println("5: Back\n");
+            System.out.println("6: Back\n");
             response = 0;
 
             while (response < 1 || response > 5) {
                 System.out.print("> ");
                 response = scanner.nextInt();
+                scanner.nextLine();
                 if (response == 1) {
                     walkInSearchRoom();
                 } else if (response == 2) {
@@ -83,17 +85,19 @@ public class GuestRelationOfficerModule {
                 } else if (response == 4) {
                     checkOutReservation();
                 } else if (response == 5) {
+                    manualAllocation();
+                } else if (response == 6) {
                     break;
                 } else {
                     System.out.println("Invalid option, please try again!\n");
                 }
             }
-            if (response == 5) {
+            if (response == 6) {
                 break;
             }
         }
     }
-
+    
     private void walkInSearchRoom() {
         Scanner scanner = new Scanner(System.in);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -231,19 +235,16 @@ public class GuestRelationOfficerModule {
 
     private void checkInReservation() {
         Scanner scanner = new Scanner(System.in);
-
         // Prompt for visitor/guest email
         System.out.print("Enter Visitor/Guest Email: ");
         String email = scanner.nextLine().trim();
         try {
             // Retrieve reserved reservations by email
             List<ReservationEntity> reservedReservations = roomCheckInOutSessionBean.findReservedReservationsByEmail(email);
-
             if (reservedReservations.isEmpty()) {
                 System.out.println("No reserved reservations found for email: " + email);
                 return;
             }
-
             System.out.println("\nReserved Reservations for Email: " + email);
             for (ReservationEntity reservation : reservedReservations) {
                 System.out.println("Reservation ID: " + reservation.getReservationId()
@@ -259,12 +260,10 @@ public class GuestRelationOfficerModule {
                     .filter(res -> res.getReservationId().equals(reservationId))
                     .findFirst()
                     .orElse(null);
-
             if (reservationToCheckIn == null) {
                 System.out.println("Invalid Reservation ID. Please ensure the reservation ID is correct.");
                 return;
             }
-
             // Process each room reservation associated with this reservation
             for (RoomReservationEntity roomReservation : reservationToCheckIn.getRoomReservations()) {
                 RoomEntity reservedRoom = roomReservation.getReservedRoom();
@@ -378,5 +377,30 @@ public class GuestRelationOfficerModule {
         } catch (Exception ex) {
             System.out.println("An error occurred while checking out the reservation: " + ex.getMessage());
         }
+    }
+
+    private void manualAllocation() {
+        // Scanner to accept user input for the date
+        Scanner scanner = new Scanner(System.in);
+        try {
+            // Prompt the user for the date
+            System.out.print("Enter the date for manual room allocation (YYYY-MM-DD):");
+            String dateInput = scanner.nextLine();
+
+            // Parse the user input into a LocalDate object
+            LocalDate allocationDate = LocalDate.parse(dateInput);
+
+            // Call the allocateRoomsForSpecificDay method
+            roomReservationSessionBeanRemote.allocateRoomsForSpecificDay(allocationDate);
+
+            // Confirm the operation
+            System.out.println("Manual room allocation for " + allocationDate + " has been completed.");
+        } catch (DateTimeParseException e) {
+            // Handle invalid date input
+            System.out.println("Invalid date format. Please enter the date in YYYY-MM-DD format.");
+        } catch (Exception e) {
+            // Handle any other exceptions
+            System.out.println("An error occurred during manual allocation: " + e.getMessage());
+        } 
     }
 }
