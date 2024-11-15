@@ -80,15 +80,6 @@ public class DataInitialisationBean {
         if (roomEntitySessionBeanLocal.viewAllRooms().isEmpty()) {
             initialiseRoomData();
         }
-
-        /*List<VisitorEntity> visitors = em.createQuery("SELECT v FROM VisitorEntity v").getResultList();
-        if (visitors.isEmpty()) {
-            initialiseVisitors();
-        }
-        if (reservationEntitySessionBean.getAllReservations().isEmpty()) {
-            initialiseReservations();
-
-        }*/
     }
 
     private void initialiseEmployeeData() {
@@ -454,6 +445,7 @@ public class DataInitialisationBean {
         }
     }
 
+<<<<<<< HEAD
     /*private void initialiseVisitors() {
         VisitorEntity visitor1 = new VisitorEntity("Alice Tan", "alice@example.com");
 
@@ -481,4 +473,6 @@ public class DataInitialisationBean {
 
         System.out.println("Sample reservation initialized with visitor and room type.");
     }*/
+=======
+>>>>>>> sk-refactor
 }

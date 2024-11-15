@@ -128,8 +128,11 @@ public class GuestEntitySessionBean implements GuestEntitySessionBeanRemote, Gue
     @Override
     public List<ReservationEntity> retrieveAllReservations(GuestEntity guest) {
         Long guestId = guest.getGuestId();
-        GuestEntity retrievedGuest = em.find(GuestEntity.class,
-                guestId);
+
+        GuestEntity retrievedGuest = em.find(GuestEntity.class, guestId);
+
+        // Initialize the reservations list to avoid LazyInitializationException
+        retrievedGuest.getReservations().size();
         return retrievedGuest.getReservations();
     }
 

@@ -91,10 +91,6 @@ public class RoomAllocationSessionBean {
 
                 // Use the new method to add room reservations
                 reservationEntitySessionBean.addRoomReservationToReservation(room, reservation);
-
-                // Mark room as occupied
-                room.setStatus(RoomStatus.OCCUPIED);
-                
             }
             System.out.println("Rooms allocated for reservation with ID: " + reservation.getReservationId());
         } else {

@@ -81,7 +81,7 @@ public class GuestRelationOfficerModule {
                 } else if (response == 3) {
                     checkInReservation();
                 } else if (response == 4) {
-                    // checkOutReservation();
+                    checkOutReservation();
                 } else if (response == 5) {
                     break;
                 } else {
@@ -235,7 +235,6 @@ public class GuestRelationOfficerModule {
         // Prompt for visitor/guest email
         System.out.print("Enter Visitor/Guest Email: ");
         String email = scanner.nextLine().trim();
-
         try {
             // Retrieve reserved reservations by email
             List<ReservationEntity> reservedReservations = roomCheckInOutSessionBean.findReservedReservationsByEmail(email);
@@ -251,7 +250,6 @@ public class GuestRelationOfficerModule {
                         + " | Check-In Date: " + reservation.getCheckInDate()
                         + " | Check-Out Date: " + reservation.getCheckOutDate());
             }
-
             System.out.print("\nEnter Reservation ID to check-in: ");
             Long reservationId = scanner.nextLong();
             scanner.nextLine(); // Consume newline
@@ -296,14 +294,13 @@ public class GuestRelationOfficerModule {
 
             // Update reservation status to CHECKED_IN after all room reservations are processed
             roomReservationSessionBeanRemote.updateReservationToCheckedIn(reservationToCheckIn);
-
             System.out.println("Reservation ID " + reservationId + " has been checked in successfully.");
 
         } catch (Exception ex) {
             System.out.println("An error occurred while checking in the reservation: " + ex.getMessage());
         }
     }
-    /*
+
     private void checkOutReservation() {
         Scanner scanner = new Scanner(System.in);
 
@@ -344,6 +341,9 @@ public class GuestRelationOfficerModule {
                 return;
             }
 
+            // Flag to track successful check-out of all rooms
+            boolean allRoomsCheckedOut = true;
+
             // Process each room reservation within the selected reservation
             for (RoomReservationEntity roomReservation : reservationToCheckOut.getRoomReservations()) {
                 RoomEntity reservedRoom = roomReservation.getReservedRoom();
@@ -354,21 +354,29 @@ public class GuestRelationOfficerModule {
                         // Call the session bean to perform checkout for this room reservation
                         roomCheckInOutSessionBean.checkOutRoomReservation(roomReservation);
                         System.out.println("Room " + reservedRoom.getRoomNumber() + " checked-out successfully.");
+                    } else {
+                        // If the room is not occupied, log a message and mark the reservation as incomplete
+                        System.out.println("Room " + reservedRoom.getRoomNumber()
+                                + " is not occupied and cannot be checked out. Manual intervention may be required.");
+                        allRoomsCheckedOut = false;
                     }
+
                 } catch (Exception ex) {
                     System.out.println("Error checking out room " + reservedRoom.getRoomNumber() + ": " + ex.getMessage());
+                    allRoomsCheckedOut = false; // Mark as not fully checked out
                 }
             }
 
-            // Update the reservation status to CHECKED_OUT using session bean method
-            roomReservationSessionBeanRemote.updateReservationToCheckedOut(reservationToCheckOut);
-
-            System.out.println("Reservation ID " + reservationId + " has been checked out successfully.");
+            // Update the reservation status to CHECKED_OUT only if all rooms were checked out successfully
+            if (allRoomsCheckedOut) {
+                roomReservationSessionBeanRemote.updateReservationToCheckedOut(reservationToCheckOut);
+                System.out.println("Reservation ID " + reservationId + " has been checked out successfully.");
+            } else {
+                System.out.println("Reservation ID " + reservationId + " could not be fully checked out. Manual intervention is required.");
+            }
 
         } catch (Exception ex) {
             System.out.println("An error occurred while checking out the reservation: " + ex.getMessage());
         }
     }
-
-     */
 }
