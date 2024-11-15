@@ -21,12 +21,13 @@ public class ExceptionReportEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long exceptionReportId;
     
     @Column(nullable = false)
     private String exceptionMessage;
     
+    @Column(nullable = false)
     private LocalDate dateCreated;
 
     public ExceptionReportEntity() {

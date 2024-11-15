@@ -27,7 +27,7 @@ public class ExceptionReportSessionBean implements ExceptionReportSessionBeanRem
     public Long createTypeOneException(RoomEntity oldRoom, RoomEntity upgradedRoom) {
         // Find not needed as within same PC
         ExceptionReportEntity newReport = new ExceptionReportEntity("Room number: " + oldRoom.getRoomNumber() + " with room type "
-                + oldRoom.getRoomType().getRoomTypeName() + "cannot be allocated "
+                + oldRoom.getRoomType().getRoomTypeName() + " cannot be allocated "
                 + "New room number: " + upgradedRoom.getRoomNumber() + " of the next highest room type "
                 + oldRoom.getRoomType().getNextHigherRoomTypeName() + " is automatically allocated");
         em.persist(newReport);

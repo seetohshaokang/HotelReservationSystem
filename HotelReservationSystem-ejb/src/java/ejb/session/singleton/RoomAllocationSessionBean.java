@@ -97,45 +97,53 @@ public class RoomAllocationSessionBean {
         // Step 2: Retrieve available rooms for the specified room type
         List<RoomEntity> availableRooms = roomEntitySessionBean.retrieveAvailableRooms(roomTypeName);
 
-        if (availableRooms.size() >= numberOfRoomsNeeded) {
-            // Allocate rooms of the requested type
-            for (int i = 0; i < numberOfRoomsNeeded; i++) {
-                RoomEntity room = availableRooms.get(i);
+        int roomsAllocated = 0;
 
-                // Add room reservations
+        // Allocate rooms of the requested type first
+        for (RoomEntity room : availableRooms) {
+            if (roomsAllocated < numberOfRoomsNeeded) {
                 reservationEntitySessionBean.addRoomReservationToReservation(room, reservation);
+                roomsAllocated++;
             }
-            System.out.println("Rooms allocated for reservation with ID: " + reservation.getReservationId());
-        } else {
-            // Step 3: Handle upgrading to the next higher room type
+        }
+
+        // Step 3: Check if more rooms are needed
+        int remainingRooms = numberOfRoomsNeeded - roomsAllocated;
+
+        if (remainingRooms > 0) {
+            // Retrieve rooms from the next higher room type
             RoomTypeName nextHigherRoomType = reservation.getRoomType().getNextHigherRoomTypeName();
             if (nextHigherRoomType != null) {
                 List<RoomEntity> higherAvailableRooms = roomEntitySessionBean.retrieveAvailableRooms(nextHigherRoomType);
 
-                if (higherAvailableRooms.size() >= numberOfRoomsNeeded) {
-                    // Allocate upgraded rooms
-                    for (int i = 0; i < numberOfRoomsNeeded; i++) {
+                if (higherAvailableRooms.size() >= remainingRooms) {
+                    // Allocate remaining rooms from the next higher room type
+                    for (int i = 0; i < remainingRooms; i++) {
                         RoomEntity upgradedRoom = higherAvailableRooms.get(i);
-
-                        // Add upgraded room reservations
                         reservationEntitySessionBean.addRoomReservationToReservation(upgradedRoom, reservation);
 
                         // Update room status to occupied
                         upgradedRoom.setStatus(RoomStatus.OCCUPIED);
                     }
+
                     // Create an exception report for the upgrade
-                    exceptionReportSessionBean.createTypeOneException(availableRooms.isEmpty() ? null : availableRooms.get(0), higherAvailableRooms.get(0));
+                    exceptionReportSessionBean.createTypeOneException(
+                            availableRooms.isEmpty() ? null : availableRooms.get(0),
+                            higherAvailableRooms.get(0)
+                    );
                     System.out.println("Upgraded rooms allocated for reservation with ID: " + reservation.getReservationId());
                 } else {
-                    // Step 4: Handle cases where no rooms are available for the next higher type
+                    // Step 4: Handle cases where not enough rooms are available in the next higher type
                     exceptionReportSessionBean.createTypeTwoException(availableRooms.isEmpty() ? null : availableRooms.get(0));
-                    System.out.println("No available rooms found for the requested type or next higher type.");
+                    System.out.println("Not enough rooms available for the requested type or next higher type.");
                 }
             } else {
                 // Step 5: Handle cases where no higher room type exists
                 exceptionReportSessionBean.createTypeTwoException(availableRooms.isEmpty() ? null : availableRooms.get(0));
                 System.out.println("No higher room type available for reservation.");
             }
+        } else {
+            System.out.println("All rooms allocated for reservation with ID: " + reservation.getReservationId());
         }
     }
 }
