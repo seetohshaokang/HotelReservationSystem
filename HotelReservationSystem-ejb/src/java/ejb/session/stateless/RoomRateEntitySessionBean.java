@@ -140,23 +140,34 @@ public class RoomRateEntitySessionBean implements RoomRateEntitySessionBeanRemot
     }
 
     // Checks if a room rate is associated with any active reservations
+    @Override
     public boolean isRoomRateInUse(Long roomRateId) {
-        Query query = em.createQuery("SELECT COUNT(r) FROM ReservationEntity r WHERE r.roomRate.roomRateId = :roomRateId");
+        // Check if any reservations exist for the RoomType associated with the RoomRate
+        Query query = em.createQuery(
+                "SELECT COUNT(r) FROM ReservationEntity r "
+                + "JOIN r.roomType rt "
+                + "JOIN RoomRateEntity rr ON rr.roomType = rt "
+                + "WHERE rr.roomRateId = :roomRateId"
+        );
         query.setParameter("roomRateId", roomRateId);
-        Long count = (Long) query.getSingleResult();
-        return count > 0;
+
+        Long reservationCount = (Long) query.getSingleResult();
+        return reservationCount > 0; // Room rate is in use if there are associated reservations
+
     }
 
     // Marks the room rate as disabled if it is in use
+    @Override
     public void disableRoomRate(Long roomRateId) throws RoomRateNotFoundException {
         RoomRateEntity roomRate = em.find(RoomRateEntity.class, roomRateId);
         if (roomRate == null) {
             throw new RoomRateNotFoundException("Room rate ID " + roomRateId + " does not exist!");
         }
-        roomRate.setIsDisabled(true); 
+        roomRate.setIsDisabled(true);
     }
 
     // Deletes the room rate if it is not in use
+    @Override
     public void deleteRoomRate(Long roomRateId) throws RoomRateNotFoundException {
         RoomRateEntity roomRate = em.find(RoomRateEntity.class, roomRateId);
         if (roomRate == null) {

@@ -22,6 +22,7 @@ import java.util.Scanner;
 import util.enumeration.RoomTypeName;
 import util.exception.InvalidInputException;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.VisitorFoundException;
 
 /**
  *
@@ -64,17 +65,11 @@ public class MainApp {
                 response = scanner.nextInt();
 
                 if (response == 1) {
-                    try {
-                        doLogin();
-                        System.out.println("Login Successful");
-                        menuGuest();
-                    } catch (InvalidLoginCredentialException ex) {
-                        System.out.println("Invalid Login : " + ex.getMessage() + "\n");
-                    }
+                    doLogin();
                 } else if (response == 2) {
                     registerAsGuest();
                 } else if (response == 3) {
-                    // searchHotelRoom();
+                    searchHotelRoom();
                 } else if (response == 4) {
                     break;
                 } else {
@@ -87,7 +82,7 @@ public class MainApp {
         }
     }
 
-    private void doLogin() throws InvalidLoginCredentialException {
+    private void doLogin() {
         Scanner scanner = new Scanner(System.in);
         String email;
         String password;
@@ -98,17 +93,25 @@ public class MainApp {
         System.out.print("Enter password > ");
         password = scanner.nextLine().trim();
 
-        if (email.length() > 0 && password.length() > 0) {
-            loggedInGuest = guestEntitySessionBeanRemote.guestLogin(email, password);
-        } else {
-            throw new InvalidLoginCredentialException("Missing login credential");
+        if (email.isEmpty() || password.isEmpty()) {
+            System.out.println("Login failed: Missing login credential.");
+            return; // Exit early if credentials are missing
         }
 
+        try {
+            loggedInGuest = guestEntitySessionBeanRemote.guestLogin(email, password);
+            System.out.println("Login successful! Welcome, " + loggedInGuest.getName() + "!");
+            menuGuest(); // Proceed to guest menu only on successful login
+        } catch (InvalidLoginCredentialException ex) {
+            System.out.println("Login failed: " + ex.getMessage());
+        } catch (VisitorFoundException ex) {
+            System.out.println("Login failed: " + ex.getMessage() + " Please use the appropriate visitor login.");
+        }
     }
 
     private void registerAsGuest() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("*** HORS System :: System Administrator :: Create New Guest");
+        System.out.println("*** HORS System :: System Administrator :: Create New Guest ***");
         System.out.print("Enter Guest Name: ");
         String name = scanner.nextLine().trim();
 
@@ -117,16 +120,57 @@ public class MainApp {
 
         System.out.print("Enter Guest Password: ");
         String password = scanner.nextLine().trim();
+
         try {
             Long guestId = guestEntitySessionBeanRemote.createNewGuest(name, email, password);
-            System.out.printf("Guest with name %s email %s has been successfully registed.%n", name, email);
+            System.out.printf("Guest with name %s and email %s has been successfully registered.%n", name, email);
         } catch (InvalidInputException ex) {
-            System.out.println("Invalid Input: " + ex.getMessage());
+            System.out.println("Registration failed: Invalid input - " + ex.getMessage());
+        } catch (VisitorFoundException ex) {
+            System.out.println("Registration failed: " + ex.getMessage() + " The email is already associated with a visitor.");
+        }
+    }
+
+    private void menuGuest() {
+        Scanner scanner = new Scanner(System.in);
+        Integer response = 0;
+
+        while (true) {
+            System.out.println("*** HORS - Reservation System ***\n");
+            System.out.println("You are logged in as " + loggedInGuest.getName() + "\n");
+
+            System.out.println("1. Reserve a Room");
+            System.out.println("2. View My Reservation Details");
+            System.out.println("3. View All My Reservations");
+            System.out.println("4. Logout\n");
+
+            response = 0;
+
+            while (response < 1 || response > 4) {
+                System.out.print("> ");
+                response = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+
+                if (response == 1) {
+                    reserveHotelRoom();
+                } else if (response == 2) {
+                    viewMyReservationDetails();
+                } else if (response == 3) {
+                    viewAllMyReservations();
+                } else if (response == 4) {
+                    break; // Exit the loop and log out
+                } else {
+                    System.out.println("Invalid option, please try again!\n");
+                }
+            }
+            if (response == 4) {
+                System.out.println("Logging out...");
+                break; // Break out of the menu loop to return to the main menu
+            }
         }
     }
 
     // Same as Guest Relo Officer search hotel case, with reservationrate instead of walkinrate
-    /*
     private void searchHotelRoom() {
         Scanner scanner = new Scanner(System.in);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -167,53 +211,13 @@ public class MainApp {
         // Print each AvailableRoomsPerRoomType object with details
         for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
             RoomTypeName roomTypeName = roomTypeAvailability.getRoomTypeName();
-            List<RoomEntity> availableRooms = roomTypeAvailability.getAvailableRooms();
+            int availableRoomsCount = roomTypeAvailability.getAvailableRoomsCount();
             Double totalRate = roomReservationSessionBeanRemote.getReservationRate(checkInDate, checkOutDate, roomTypeName);
 
-            System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRooms.size(), (totalRate != null ? totalRate : 0.0));
-        }
-    }
-     */
-    private void menuGuest() {
-        Scanner scanner = new Scanner(System.in);
-        Integer response = 0;
-
-        while (true) {
-            System.out.println("*** HORS - Reservation System ***\n");
-            System.out.println("You are logged in as " + loggedInGuest.getName() + "\n");
-
-            System.out.println("1. Reserve a Room");
-            System.out.println("2. View My Reservation Details");
-            System.out.println("3. View All My Reservations");
-            System.out.println("4. Logout\n");
-
-            response = 0;
-
-            while (response < 1 || response > 4) {
-                System.out.print("> ");
-                response = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
-
-                if (response == 1) {
-                    // reserveHotelRoom();
-                } else if (response == 2) {
-                    viewMyReservationDetails();
-                } else if (response == 3) {
-                    viewAllMyReservations();
-                } else if (response == 4) {
-                    break; // Exit the loop and log out
-                } else {
-                    System.out.println("Invalid option, please try again!\n");
-                }
-            }
-            if (response == 4) {
-                System.out.println("Logging out...");
-                break; // Break out of the menu loop to return to the main menu
-            }
+            System.out.printf("%-20s || %-20d || %-20.2f%n", roomTypeName, availableRoomsCount, (totalRate != null ? totalRate : 0.0));
         }
     }
 
-    /*
     private void reserveHotelRoom() {
         if (loggedInGuest == null) {
             System.out.println("Please login before making a reservation.");
@@ -254,40 +258,43 @@ public class MainApp {
         System.out.println("\nAvailable Room Types:");
         System.out.printf("%-20s || %-20s%n", "Room Type", "Available Rooms");
         for (AvailableRoomsPerRoomType roomTypeAvailability : roomTypeAvailabilityList) {
-            System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRooms().size());
+            System.out.printf("%-20s || %-20d%n", roomTypeAvailability.getRoomTypeName(), roomTypeAvailability.getAvailableRoomsCount());
         }
 
-        // Gather room reservation details from the user
-        List<RoomsPerRoomType> roomsToReserve = new ArrayList<>();
+        // Prompt for a single room type and quantity
+        System.out.print("Enter the room type name to reserve: ");
+        RoomTypeName roomTypeName;
         while (true) {
-            System.out.print("Enter room type name to reserve (or type 'done' to finish): ");
             String roomTypeNameInput = scanner.nextLine().trim();
-            if (roomTypeNameInput.equalsIgnoreCase("done")) {
-                break;
-            }
-
-            RoomTypeName roomTypeName;
             try {
                 roomTypeName = RoomTypeName.valueOf(roomTypeNameInput.toUpperCase());
+                break;
             } catch (IllegalArgumentException e) {
                 System.out.println("Invalid room type. Please try again.");
-                continue;
+                System.out.print("Enter the room type name to reserve: ");
             }
+        }
 
-            System.out.print("Enter the number of rooms to reserve for " + roomTypeName + ": ");
-            int numberOfRooms;
+        System.out.print("Enter the number of rooms to reserve for " + roomTypeName + ": ");
+        int numberOfRooms;
+        while (true) {
             try {
                 numberOfRooms = Integer.parseInt(scanner.nextLine().trim());
+                if (numberOfRooms <= 0) {
+                    System.out.println("Number of rooms must be a positive integer. Please try again.");
+                    continue;
+                }
+                break;
             } catch (NumberFormatException e) {
                 System.out.println("Invalid number of rooms. Please enter a valid integer.");
-                continue;
+                System.out.print("Enter the number of rooms to reserve for " + roomTypeName + ": ");
             }
-
-            RoomsPerRoomType rooms = new RoomsPerRoomType();
-            rooms.setRoomTypeName(roomTypeName);
-            rooms.setNumRooms(numberOfRooms);
-            roomsToReserve.add(rooms);
         }
+
+        // Prepare the RoomsPerRoomType object
+        RoomsPerRoomType roomsToReserve = new RoomsPerRoomType();
+        roomsToReserve.setRoomTypeName(roomTypeName);
+        roomsToReserve.setNumRooms(numberOfRooms);
 
         // Make the reservation
         Long reservationId = roomReservationSessionBeanRemote.reserveRoomForGuest(loggedInGuest.getGuestId(), checkInDate, checkOutDate, roomsToReserve);
@@ -297,7 +304,6 @@ public class MainApp {
             System.out.println("Reservation failed. Please ensure your requested rooms are available.");
         }
     }
-     */
 
     private void viewMyReservationDetails() {
         if (loggedInGuest == null) {
@@ -324,6 +330,7 @@ public class MainApp {
             System.out.println("\n*** Reservation Details ***");
             System.out.println("Reservation ID: " + reservation.getReservationId());
             System.out.println("Reservation Date: " + reservation.getReservationDate());
+            System.out.println("Room Type: " + reservation.getRoomType().getRoomTypeName());
             System.out.println("Check-in Date: " + reservation.getCheckInDate());
             System.out.println("Check-out Date: " + reservation.getCheckOutDate());
             System.out.println("Total Amount: $" + reservation.getTotalAmount());
@@ -336,7 +343,6 @@ public class MainApp {
             System.out.println("Please log in to view your reservations.");
             return;
         }
-
         // Retrieve all reservations for the logged-in guest
         List<ReservationEntity> reservations = guestEntitySessionBeanRemote.retrieveAllReservations(loggedInGuest);
 

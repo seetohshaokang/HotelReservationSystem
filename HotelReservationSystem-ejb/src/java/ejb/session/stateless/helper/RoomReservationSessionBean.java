@@ -359,4 +359,12 @@ public class RoomReservationSessionBean implements RoomReservationSessionBeanRem
         System.out.println("Reservation ID " + reservation.getReservationId() + " status updated to " + newStatus);
     }
 
+    public void allocateRoomsForSpecificDay(LocalDate date) {
+        // Log the operation for clarity
+        System.out.println("Allocating rooms for date: " + date);
+        // Call the allocateRoomsForThatDay method from the RoomAllocationSessionBean
+        roomAllocationSessionBean.allocateRoomsForThatDay(date);
+        System.out.println("Room allocation for date " + date + " completed.");
+    }
+
 }

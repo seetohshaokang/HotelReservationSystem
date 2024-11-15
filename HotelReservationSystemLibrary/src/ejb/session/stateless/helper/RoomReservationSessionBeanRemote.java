@@ -40,4 +40,6 @@ public interface RoomReservationSessionBeanRemote {
 
     public void updateReservationToCheckedOut(ReservationEntity reservation);
 
+    public void allocateRoomsForSpecificDay(LocalDate date);
+
 }

@@ -39,5 +39,6 @@ public interface RoomReservationSessionBeanLocal {
     public void updateReservationToCheckedIn(ReservationEntity reservation);
 
     public void updateReservationToCheckedOut(ReservationEntity reservation);
-
+    
+    public void allocateRoomsForSpecificDay(LocalDate date);
 }

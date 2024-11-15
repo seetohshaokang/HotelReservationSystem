@@ -117,7 +117,6 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         return query.getResultList();
     }
 
-
     public boolean isRoomInUse(Long roomId) throws RoomNotFoundException {
         RoomEntity room = em.find(RoomEntity.class, roomId);
         if (room == null) {
@@ -140,6 +139,11 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         }
 
         room.setStatus(RoomStatus.DISABLED); // Assuming DISABLED status exists in RoomStatus enum
+        // Fetch the roomtype
+        RoomTypeEntity roomType = room.getRoomType();
+        // Remove room from room types
+        roomType.getRooms().remove(room);
+        em.merge(roomType);
         em.merge(room);
         em.flush();
     }
@@ -150,12 +154,16 @@ public class RoomEntitySessionBean implements RoomEntitySessionBeanRemote, RoomE
         if (room == null) {
             throw new RoomNotFoundException("Room ID " + roomId + " does not exist!");
         }
-
         // Check if room is not in use before deleting
         if (isRoomInUse(roomId)) {
             throw new IllegalStateException("Room is currently in use and cannot be deleted.");
         }
-
+        // Retrieve room type and remove room from room type
+        RoomTypeEntity roomType = room.getRoomType();
+        roomType.getRooms().remove(room);
+        // Update roomtype
+        em.merge(roomType);
+        // Remove room
         em.remove(room);
         em.flush();
     }

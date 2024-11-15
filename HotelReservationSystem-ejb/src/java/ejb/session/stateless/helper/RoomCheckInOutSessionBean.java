@@ -109,9 +109,11 @@ public class RoomCheckInOutSessionBean implements RoomCheckInOutSessionBeanRemot
     public List<ReservationEntity> findReservationsByEmailAndStatus(String email, ReservationStatus status) {
         Query query = em.createQuery(
                 "SELECT r FROM ReservationEntity r "
+                + "JOIN FETCH r.roomReservations rr "
+                + "JOIN FETCH rr.reservedRoom "
                 + "JOIN r.visitor v "
                 + "WHERE v.email = :email "
-                + "AND r.status = :status", ReservationEntity.class);
+                + "AND r.reservationStatus = :status", ReservationEntity.class);
 
         query.setParameter("email", email);
         query.setParameter("status", status);
