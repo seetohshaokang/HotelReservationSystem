@@ -12,6 +12,7 @@ import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import util.enumeration.EmployeeRole;
+import util.enumeration.PartnerRole;
 import util.exception.EmployeeExistException;
 import util.exception.InvalidAccessRightException;
 import util.exception.PartnerExistException;
@@ -118,8 +119,8 @@ public class SystemAdministratorModule {
         // System.out.print("Enter password > ");
         // newEmployee.setPassword(scanner.nextLine().trim());
         try {
-        Long newEmployeeId = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
-        System.out.println("New employee created successfully!: " + newEmployee.getUsername().toString() + "\n");
+            Long newEmployeeId = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
+            System.out.println("New employee created successfully!: " + newEmployee.getUsername().toString() + "\n");
         } catch (EmployeeExistException e) {
             System.out.println("Error creating employee: " + e.getMessage());
         }
@@ -147,7 +148,7 @@ public class SystemAdministratorModule {
         Scanner scanner = new Scanner(System.in);
         PartnerEntity newPartner = new PartnerEntity();
 
-        System.out.println("*** HORS System :: System Administrator :: Create new partner");
+        System.out.println("*** HORS System :: System Administrator :: Create New Partner ***");
 
         System.out.print("Enter username > ");
         newPartner.setUsername(scanner.nextLine().trim());
@@ -155,11 +156,25 @@ public class SystemAdministratorModule {
         System.out.print("Enter password > ");
         newPartner.setPassword(scanner.nextLine().trim());
 
-        try { Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
-        System.out.println("New partner created successfully!: " + newPartner.getUsername().toString() + "\n");
+        boolean validRole = false;
+        while (!validRole) {
+            try {
+                System.out.print("Enter role (EMPLOYEE or RESERVATION_MANAGER) > ");
+                String roleInput = scanner.nextLine().trim().toUpperCase();
+                newPartner.setRole(PartnerRole.valueOf(roleInput));
+                validRole = true; // Exit the loop if the role is valid
+            } catch (IllegalArgumentException ex) {
+                System.out.println("Invalid role entered. Please enter either 'EMPLOYEE' or 'RESERVATION_MANAGER'.");
+            }
+        }
+
+        try {
+            Long newPartnerId = partnerEntitySessionBeanRemote.createNewPartner(newPartner);
+            System.out.println("New partner created successfully!: " + newPartner.getUsername() + "\n");
         } catch (PartnerExistException ex) {
             System.out.println("Error creating partner: " + ex.getMessage());
         }
+
         System.out.print("Press any key to continue...> ");
         scanner.nextLine();
     }
