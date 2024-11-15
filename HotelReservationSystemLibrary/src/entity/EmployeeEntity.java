@@ -28,7 +28,8 @@ public class EmployeeEntity implements Serializable {
     
     @Column(unique = true)
     private String username;
-    @Column
+    
+    @Column(nullable = false)
     private String password;
     
     @Enumerated(EnumType.STRING)

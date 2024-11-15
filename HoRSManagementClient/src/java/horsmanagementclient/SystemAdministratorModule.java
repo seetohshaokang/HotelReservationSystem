@@ -90,37 +90,54 @@ public class SystemAdministratorModule {
         Scanner scanner = new Scanner(System.in);
         EmployeeEntity newEmployee = new EmployeeEntity();
 
-        System.out.println("*** HORS System :: System Administrator :: Create New Employee");
+        System.out.println("*** HORS System :: System Administrator :: Create New Employee ***");
 
-        System.out.print("Enter username > ");
-        newEmployee.setUsername(scanner.nextLine().trim());
-
-        System.out.print("Enter password > ");
-        newEmployee.setPassword(scanner.nextLine().trim());
-
+        // Validate username input
         while (true) {
-            System.out.println("Select Access Right (1: System Administrator, 2: Operations Manager, 3: Sales Manager, 4: Guest Relations Officer");
-            Integer accessRightInt = scanner.nextInt();
-
-            if (accessRightInt >= 1 && accessRightInt <= 4) {
-
-                newEmployee.setRole(EmployeeRole.values()[accessRightInt - 1]);
+            System.out.print("Enter username > ");
+            String username = scanner.nextLine().trim();
+            if (!username.isEmpty()) {
+                newEmployee.setUsername(username);
                 break;
             } else {
-
-                System.out.println("Invalid option, please try again!\n");
+                System.out.println("Username cannot be empty. Please try again.");
             }
         }
 
-        scanner.nextLine();
+        // Validate password input
+        while (true) {
+            System.out.print("Enter password > ");
+            String password = scanner.nextLine().trim();
+            if (!password.isEmpty()) {
+                newEmployee.setPassword(password);
+                break;
+            } else {
+                System.out.println("Password cannot be empty. Please try again.");
+            }
+        }
 
-        // System.out.print("Enter username > ");
-        // newEmployee.setUsername(scanner.nextLine().trim());
-        // System.out.print("Enter password > ");
-        // newEmployee.setPassword(scanner.nextLine().trim());
+        // Select access right with validation
+        while (true) {
+            System.out.println("Select Access Right (1: System Administrator, 2: Operations Manager, 3: Sales Manager, 4: Guest Relations Officer)");
+            if (scanner.hasNextInt()) {
+                Integer accessRightInt = scanner.nextInt();
+                if (accessRightInt >= 1 && accessRightInt <= 4) {
+                    newEmployee.setRole(EmployeeRole.values()[accessRightInt - 1]);
+                    break;
+                } else {
+                    System.out.println("Invalid option, please enter a number between 1 and 4.\n");
+                }
+            } else {
+                System.out.println("Invalid input, please enter a number between 1 and 4.\n");
+                scanner.next(); // Clear invalid input
+            }
+        }
+
+        scanner.nextLine(); // Consume newline
+
         try {
             Long newEmployeeId = employeeEntitySessionBeanRemote.createNewEmployee(newEmployee);
-            System.out.println("New employee created successfully!: " + newEmployee.getUsername().toString() + "\n");
+            System.out.println("New employee created successfully!: " + newEmployee.getUsername() + "\n");
         } catch (EmployeeExistException e) {
             System.out.println("Error creating employee: " + e.getMessage());
         }
