@@ -444,35 +444,4 @@ public class DataInitialisationBean {
             System.out.println("Failed to create new room rate: " + ex.getMessage());
         }
     }
-
-<<<<<<< HEAD
-    /*private void initialiseVisitors() {
-        VisitorEntity visitor1 = new VisitorEntity("Alice Tan", "alice@example.com");
-
-        em.persist(visitor1);
-
-        System.out.println("Sample visitor initialized.");
-    }
-
-    private void initialiseReservations() {
-        // Retrieve an existing visitor from the database
-        VisitorEntity visitor = em.createQuery("SELECT v FROM VisitorEntity v WHERE v.email = :email", VisitorEntity.class)
-                .setParameter("email", "alice@example.com").getSingleResult();
-
-        // Sample room type data (Assuming some RoomTypeEntity instances exist in the database)
-        RoomTypeEntity roomType = null;
-        try {
-            roomType = roomTypeEntitySessionBeanLocal.getRoomTypeByName(RoomTypeName.FAMILY);
-        } catch (RoomTypeNotFoundException e) {
-            System.out.println("Room Type Not Found!");
-        }
-        // Create a reservation with the specified visitor, room type, and room details
-        ReservationEntity reservation = new ReservationEntity(visitor, roomType, LocalDate.now(), LocalDate.now().plusDays(3), 450.0, 2);
-
-        em.persist(reservation);
-
-        System.out.println("Sample reservation initialized with visitor and room type.");
-    }*/
-=======
->>>>>>> sk-refactor
 }
